@@ -1,0 +1,132 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+<!--    <changeSet author="yl" id="20210428-1">-->
+<!--        <preConditions onFail="MARK_RAN">-->
+<!--            <not>-->
+<!--                <tableExists tableName="fregata_forces_model"/>-->
+<!--            </not>-->
+<!--        </preConditions>-->
+<!--        <createTable tableName="fregata_forces_model">-->
+<!--            <column name="id" type="VARCHAR(50)">-->
+<!--                <constraints nullable="false" primaryKey="true"/>-->
+<!--            </column>-->
+<!--            <column name="entity" remarks="实体ID" type="VARCHAR(50)"/>-->
+<!--            <column name="name" remarks="名称" type="VARCHAR(80)"/>-->
+<!--            <column name="type" remarks="类型" type="VARCHAR(50)"/>-->
+<!--            <column name="subType" remarks="子类型" type="VARCHAR(50)"/>-->
+<!--            <column name="model3DUrl" remarks="3D模型URL" type="VARCHAR(100)"/>-->
+<!--            <column name="model2DUrl" remarks="2D模型URL" type="VARCHAR(100)"/>-->
+<!--            <column name="scaleRatio" remarks="缩放比" type="VARCHAR(50)"/>-->
+<!--            <column name="disabled" remarks="是否废弃" type="VARCHAR(50)"/>-->
+<!--            <column name="bias" remarks="中心点偏差" type="VARCHAR(50)"/>-->
+<!--            <column name="createTime" remarks="创建时间" type="datetime"/>-->
+<!--            <column name="modifyTime" remarks="修改时间" type="datetime"/>-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
+
+<!--    <changeSet author="yl" id="20210428-2">-->
+<!--        <preConditions onFail="MARK_RAN">-->
+<!--            <not>-->
+<!--                <tableExists tableName="fregata_map_setting"/>-->
+<!--            </not>-->
+<!--        </preConditions>-->
+<!--        <createTable tableName="fregata_map_setting">-->
+<!--            <column name="id" remarks="主键" type="VARCHAR(50)">-->
+<!--                <constraints nullable="false" primaryKey="true"/>-->
+<!--            </column>-->
+<!--            <column name="simuName" remarks="模拟名称" type="VARCHAR(80)"/>-->
+<!--            <column name="pageCode" remarks="页面编码" type="VARCHAR(50)"/>-->
+<!--            <column name="nearFarScalarStr" remarks="近大远小控制参数[近点高度，模型比例，远点高度，模型比例]" type="VARCHAR(100)"/>-->
+<!--            <column name="switchHeight" remarks="模型切换高度" type="INT"/>-->
+<!--            <column name="farHeight" remarks="远景高度高度" type="INT"/>-->
+<!--            <column name="middleHeight" remarks="中景高度高度" type="INT"/>-->
+<!--            <column name="nearHeight" remarks="近景高度高度" type="INT"/>-->
+<!--            <column name="createTime" remarks="创建时间" type="datetime"/>-->
+<!--            <column name="modifyTime" remarks="修改时间" type="datetime"/>-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
+
+<!--    <changeSet author="nemo (generated)" id="1619512774557-1">-->
+<!--        <preConditions onFail="MARK_RAN">-->
+<!--            <not>-->
+<!--                <tableExists tableName="fregata_forces_init"/>-->
+<!--            </not>-->
+<!--        </preConditions>-->
+<!--        <createTable tableName="fregata_forces_init">-->
+<!--            <column name="id" type="VARCHAR(50)">-->
+<!--                <constraints nullable="false" primaryKey="true"/>-->
+<!--            </column>-->
+<!--            <column name="pageCode" remarks="编码" type="VARCHAR(50)"/>-->
+<!--            <column name="name" remarks="页面名称" type="VARCHAR(80)"/>-->
+<!--            <column name="entity" remarks="实体ID" type="VARCHAR(50)"/>-->
+<!--            <column name="lon" remarks="经度" type="DOUBLE(20, 10)"/>-->
+<!--            <column name="lat" remarks="纬度" type="DOUBLE(20, 10)"/>-->
+<!--            <column name="alt" remarks="海拔" type="DOUBLE(20, 10)"/>-->
+<!--            <column name="heading" remarks="航向角" type="DOUBLE(20, 10)"/>-->
+<!--            <column name="roll" remarks="横滚角" type="DOUBLE(20, 10)"/>-->
+<!--            <column name="pitch" remarks="俯仰角" type="DOUBLE(20, 10)"/>-->
+<!--            <column name="life" remarks="生命值" type="INT"/>-->
+<!--            <column name="speed" remarks="速度" type="FLOAT(20, 4)"/>-->
+<!--            <column name="iff" remarks="敌我属性" type="INT"/>-->
+<!--            <column name="disabled" remarks="是否废弃" type="INT"/>-->
+<!--            <column name="modifyTime" remarks="修改时间" type="datetime"/>-->
+<!--            <column name="createTime" remarks="创建时间" type="datetime"/>-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
+
+<!--    <changeSet author="yl" id="20210428-3">-->
+<!--        <preConditions onFail="MARK_RAN">-->
+<!--            <not>-->
+<!--                <tableExists tableName="fregata_map_point"/>-->
+<!--            </not>-->
+<!--        </preConditions>-->
+<!--        <createTable tableName="fregata_map_point">-->
+<!--            <column name="id" remarks="主键" type="VARCHAR(50)">-->
+<!--                <constraints nullable="false" primaryKey="true"/>-->
+<!--            </column>-->
+<!--            <column name="pageCode" remarks="页面编码" type="VARCHAR(50)"/>-->
+<!--            <column name="lon" remarks="经度" type="DOUBLE(20, 10)"/>-->
+<!--            <column name="lat" remarks="纬度" type="DOUBLE(20, 10)"/>-->
+<!--            <column name="alt" remarks="海拔" type="DOUBLE(20, 10)"/>-->
+<!--            <column name="heading" remarks="航向角" type="DOUBLE(20, 10)"/>-->
+<!--            <column name="roll" remarks="横滚角" type="DOUBLE(20, 10)"/>-->
+<!--            <column name="pitch" remarks="俯仰角" type="DOUBLE(20, 10)"/>-->
+<!--            <column name="zoom" remarks="上升角" type="DOUBLE(20, 10)"/>-->
+<!--            <column name="disabled" remarks="是否废弃" type="VARCHAR(50)"/>-->
+<!--            <column name="beDefault" remarks="默认点" type="VARCHAR(50)"/>-->
+<!--            <column name="createTime" remarks="创建时间" type="datetime"/>-->
+<!--            <column name="modifyTime" remarks="修改时间" type="datetime"/>-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
+
+<!--    <changeSet author="cww" id="20210624-2">-->
+<!--        <preConditions onFail="MARK_RAN">-->
+<!--            <columnExists tableName="fregata_map_point" columnName="beDefault"/>-->
+<!--        </preConditions>-->
+<!--        <modifyDataType tableName="fregata_map_point"-->
+<!--                        columnName="beDefault"-->
+<!--                        newDataType="INT"/>-->
+<!--    </changeSet>-->
+<!--    <changeSet author="cww" id="20210624-3">-->
+<!--        <preConditions onFail="MARK_RAN">-->
+<!--            <columnExists tableName="fregata_map_point" columnName="disabled"/>-->
+<!--        </preConditions>-->
+<!--        <modifyDataType tableName="fregata_map_point"-->
+<!--                        columnName="disabled"-->
+<!--                        newDataType="INT"/>-->
+<!--    </changeSet>-->
+<!--    <changeSet author="cww" id="20210702-1">-->
+<!--        <preConditions onFail="MARK_RAN">-->
+<!--            <not>-->
+<!--                <columnExists tableName="fregata_map_point" columnName="name"/>-->
+<!--            </not>-->
+<!--        </preConditions>-->
+<!--        <addColumn tableName="fregata_map_point">-->
+<!--            <column name="name" remarks="名称" type="VARCHAR(50)"/>-->
+<!--        </addColumn>-->
+<!--    </changeSet>-->
+
+</databaseChangeLog>
