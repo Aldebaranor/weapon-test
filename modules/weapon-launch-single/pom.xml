@@ -31,6 +31,16 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
+            <groupId>com.soul</groupId>
+            <artifactId>weapon-test-api</artifactId>
+            <version>5.0.3-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.soul</groupId>
+            <artifactId>weapon-test-rest</artifactId>
+            <version>5.0.3-SNAPSHOT</version>
+        </dependency>
+        <dependency>
             <groupId>com.egova</groupId>
             <artifactId>egova-common-liquibase</artifactId>
         </dependency>

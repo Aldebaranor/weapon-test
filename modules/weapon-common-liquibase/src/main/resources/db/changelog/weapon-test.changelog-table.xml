@@ -3,6 +3,53 @@
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
+<property name="now" value="sysdate" dbms="oracle"/>
+<property name="now" value="now()" dbms="mysql"/>
+<property name="now" value="now()" dbms="postgresql"/>
+
+<changeSet id="weapon-test task" author="xychen">
+    <preConditions onFail="MARK_RAN">
+        <not>
+            <tableExists tableName="task"/>
+        </not>
+    </preConditions>
+
+    <createTable tableName="task">
+        <column name="id" type="VARCHAR(100)">
+            <constraints nullable="false" primaryKey="true"/>
+        </column>
+        <column name="createTime" remarks="创建时间" type="datetime"/>
+        <column name="owner" remarks="创建人" type="VARCHAR(100)"/>
+        <column name="taskTitle" remarks="任务标题" type="VARCHAR(100)"/>
+        <column name="taskDescription" remarks="任务描述" type="VARCHAR(1000)"/>
+    </createTable>
+
+
+</changeSet>
+
+<changeSet id="task test" author="xychen">
+    <preConditions onFail="MARK_RAN">
+        <tableExists tableName="task"/>
+    </preConditions>
+
+    <insert tableName="task">
+        <column name="id" value="uuid1"/>
+        <column name="owner" value="lihua1"/>
+        <column name="taskTitle" value="task1"/>
+        <column name="taskDescription" value="do 1, 2, 3"/>
+<!--        we use mysql: so as below: -->
+        <column name="createTime" valueDate="now()"/>
+    </insert>
+    <insert tableName="task">
+        <column name="id" value="uuid2"/>
+        <column name="owner" value="lihua2"/>
+        <column name="taskTitle" value="task2"/>
+        <column name="taskDescription" value="do 4, 5, 6"/>
+        <!--        we use mysql: so as below: -->
+        <column name="createTime" valueDate="now()"/>
+    </insert>
+</changeSet>
+
 <!--    <changeSet author="yl" id="20210428-1">-->
 <!--        <preConditions onFail="MARK_RAN">-->
 <!--            <not>-->

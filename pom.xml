@@ -249,6 +249,8 @@
         <module>modules/weapon-common-liquibase</module>
         <module>modules/weapon-common-base</module>
         <module>modules/weapon-launch-single</module>
+        <module>modules/weapon-test-rest</module>
+        <module>modules/weapon-test-api</module>
     </modules>
 
 </project>
