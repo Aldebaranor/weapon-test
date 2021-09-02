@@ -11,6 +11,11 @@ import java.util.List;
  */
 public interface TaskService {
 
+    /**
+     * todo: using swagger to generate the interface doc
+     * @param id
+     * @return
+     */
     Task getById(String id);
 
 

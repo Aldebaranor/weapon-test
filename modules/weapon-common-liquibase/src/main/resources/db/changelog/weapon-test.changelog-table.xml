@@ -1,179 +1,164 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
-<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
-
-<property name="now" value="sysdate" dbms="oracle"/>
-<property name="now" value="now()" dbms="mysql"/>
-<property name="now" value="now()" dbms="postgresql"/>
-
-<changeSet id="weapon-test task" author="xychen">
-    <preConditions onFail="MARK_RAN">
-        <not>
-            <tableExists tableName="task"/>
-        </not>
-    </preConditions>
-
-    <createTable tableName="task">
-        <column name="id" type="VARCHAR(100)">
-            <constraints nullable="false" primaryKey="true"/>
-        </column>
-        <column name="createTime" remarks="创建时间" type="datetime"/>
-        <column name="owner" remarks="创建人" type="VARCHAR(100)"/>
-        <column name="taskTitle" remarks="任务标题" type="VARCHAR(100)"/>
-        <column name="taskDescription" remarks="任务描述" type="VARCHAR(1000)"/>
-    </createTable>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:pro="http://www.liquibase.org/xml/ns/pro" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/pro http://www.liquibase.org/xml/ns/pro/liquibase-pro-3.8.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
 
-</changeSet>
-
-<changeSet id="task test" author="xychen">
-    <preConditions onFail="MARK_RAN">
-        <tableExists tableName="task"/>
-    </preConditions>
-
-    <insert tableName="task">
-        <column name="id" value="uuid1"/>
-        <column name="owner" value="lihua1"/>
-        <column name="taskTitle" value="task1"/>
-        <column name="taskDescription" value="do 1, 2, 3"/>
-<!--        we use mysql: so as below: -->
-        <column name="createTime" valueDate="now()"/>
-    </insert>
-    <insert tableName="task">
-        <column name="id" value="uuid2"/>
-        <column name="owner" value="lihua2"/>
-        <column name="taskTitle" value="task2"/>
-        <column name="taskDescription" value="do 4, 5, 6"/>
-        <!--        we use mysql: so as below: -->
-        <column name="createTime" valueDate="now()"/>
-    </insert>
-</changeSet>
-
-<!--    <changeSet author="yl" id="20210428-1">-->
-<!--        <preConditions onFail="MARK_RAN">-->
-<!--            <not>-->
-<!--                <tableExists tableName="fregata_forces_model"/>-->
-<!--            </not>-->
-<!--        </preConditions>-->
-<!--        <createTable tableName="fregata_forces_model">-->
-<!--            <column name="id" type="VARCHAR(50)">-->
-<!--                <constraints nullable="false" primaryKey="true"/>-->
-<!--            </column>-->
-<!--            <column name="entity" remarks="实体ID" type="VARCHAR(50)"/>-->
-<!--            <column name="name" remarks="名称" type="VARCHAR(80)"/>-->
-<!--            <column name="type" remarks="类型" type="VARCHAR(50)"/>-->
-<!--            <column name="subType" remarks="子类型" type="VARCHAR(50)"/>-->
-<!--            <column name="model3DUrl" remarks="3D模型URL" type="VARCHAR(100)"/>-->
-<!--            <column name="model2DUrl" remarks="2D模型URL" type="VARCHAR(100)"/>-->
-<!--            <column name="scaleRatio" remarks="缩放比" type="VARCHAR(50)"/>-->
-<!--            <column name="disabled" remarks="是否废弃" type="VARCHAR(50)"/>-->
-<!--            <column name="bias" remarks="中心点偏差" type="VARCHAR(50)"/>-->
-<!--            <column name="createTime" remarks="创建时间" type="datetime"/>-->
-<!--            <column name="modifyTime" remarks="修改时间" type="datetime"/>-->
-<!--        </createTable>-->
-<!--    </changeSet>-->
-
-<!--    <changeSet author="yl" id="20210428-2">-->
-<!--        <preConditions onFail="MARK_RAN">-->
-<!--            <not>-->
-<!--                <tableExists tableName="fregata_map_setting"/>-->
-<!--            </not>-->
-<!--        </preConditions>-->
-<!--        <createTable tableName="fregata_map_setting">-->
-<!--            <column name="id" remarks="主键" type="VARCHAR(50)">-->
-<!--                <constraints nullable="false" primaryKey="true"/>-->
-<!--            </column>-->
-<!--            <column name="simuName" remarks="模拟名称" type="VARCHAR(80)"/>-->
-<!--            <column name="pageCode" remarks="页面编码" type="VARCHAR(50)"/>-->
-<!--            <column name="nearFarScalarStr" remarks="近大远小控制参数[近点高度，模型比例，远点高度，模型比例]" type="VARCHAR(100)"/>-->
-<!--            <column name="switchHeight" remarks="模型切换高度" type="INT"/>-->
-<!--            <column name="farHeight" remarks="远景高度高度" type="INT"/>-->
-<!--            <column name="middleHeight" remarks="中景高度高度" type="INT"/>-->
-<!--            <column name="nearHeight" remarks="近景高度高度" type="INT"/>-->
-<!--            <column name="createTime" remarks="创建时间" type="datetime"/>-->
-<!--            <column name="modifyTime" remarks="修改时间" type="datetime"/>-->
-<!--        </createTable>-->
-<!--    </changeSet>-->
-
-<!--    <changeSet author="nemo (generated)" id="1619512774557-1">-->
-<!--        <preConditions onFail="MARK_RAN">-->
-<!--            <not>-->
-<!--                <tableExists tableName="fregata_forces_init"/>-->
-<!--            </not>-->
-<!--        </preConditions>-->
-<!--        <createTable tableName="fregata_forces_init">-->
-<!--            <column name="id" type="VARCHAR(50)">-->
-<!--                <constraints nullable="false" primaryKey="true"/>-->
-<!--            </column>-->
-<!--            <column name="pageCode" remarks="编码" type="VARCHAR(50)"/>-->
-<!--            <column name="name" remarks="页面名称" type="VARCHAR(80)"/>-->
-<!--            <column name="entity" remarks="实体ID" type="VARCHAR(50)"/>-->
-<!--            <column name="lon" remarks="经度" type="DOUBLE(20, 10)"/>-->
-<!--            <column name="lat" remarks="纬度" type="DOUBLE(20, 10)"/>-->
-<!--            <column name="alt" remarks="海拔" type="DOUBLE(20, 10)"/>-->
-<!--            <column name="heading" remarks="航向角" type="DOUBLE(20, 10)"/>-->
-<!--            <column name="roll" remarks="横滚角" type="DOUBLE(20, 10)"/>-->
-<!--            <column name="pitch" remarks="俯仰角" type="DOUBLE(20, 10)"/>-->
-<!--            <column name="life" remarks="生命值" type="INT"/>-->
-<!--            <column name="speed" remarks="速度" type="FLOAT(20, 4)"/>-->
-<!--            <column name="iff" remarks="敌我属性" type="INT"/>-->
-<!--            <column name="disabled" remarks="是否废弃" type="INT"/>-->
-<!--            <column name="modifyTime" remarks="修改时间" type="datetime"/>-->
-<!--            <column name="createTime" remarks="创建时间" type="datetime"/>-->
-<!--        </createTable>-->
-<!--    </changeSet>-->
-
-<!--    <changeSet author="yl" id="20210428-3">-->
-<!--        <preConditions onFail="MARK_RAN">-->
-<!--            <not>-->
-<!--                <tableExists tableName="fregata_map_point"/>-->
-<!--            </not>-->
-<!--        </preConditions>-->
-<!--        <createTable tableName="fregata_map_point">-->
-<!--            <column name="id" remarks="主键" type="VARCHAR(50)">-->
-<!--                <constraints nullable="false" primaryKey="true"/>-->
-<!--            </column>-->
-<!--            <column name="pageCode" remarks="页面编码" type="VARCHAR(50)"/>-->
-<!--            <column name="lon" remarks="经度" type="DOUBLE(20, 10)"/>-->
-<!--            <column name="lat" remarks="纬度" type="DOUBLE(20, 10)"/>-->
-<!--            <column name="alt" remarks="海拔" type="DOUBLE(20, 10)"/>-->
-<!--            <column name="heading" remarks="航向角" type="DOUBLE(20, 10)"/>-->
-<!--            <column name="roll" remarks="横滚角" type="DOUBLE(20, 10)"/>-->
-<!--            <column name="pitch" remarks="俯仰角" type="DOUBLE(20, 10)"/>-->
-<!--            <column name="zoom" remarks="上升角" type="DOUBLE(20, 10)"/>-->
-<!--            <column name="disabled" remarks="是否废弃" type="VARCHAR(50)"/>-->
-<!--            <column name="beDefault" remarks="默认点" type="VARCHAR(50)"/>-->
-<!--            <column name="createTime" remarks="创建时间" type="datetime"/>-->
-<!--            <column name="modifyTime" remarks="修改时间" type="datetime"/>-->
-<!--        </createTable>-->
-<!--    </changeSet>-->
-
-<!--    <changeSet author="cww" id="20210624-2">-->
-<!--        <preConditions onFail="MARK_RAN">-->
-<!--            <columnExists tableName="fregata_map_point" columnName="beDefault"/>-->
-<!--        </preConditions>-->
-<!--        <modifyDataType tableName="fregata_map_point"-->
-<!--                        columnName="beDefault"-->
-<!--                        newDataType="INT"/>-->
-<!--    </changeSet>-->
-<!--    <changeSet author="cww" id="20210624-3">-->
-<!--        <preConditions onFail="MARK_RAN">-->
-<!--            <columnExists tableName="fregata_map_point" columnName="disabled"/>-->
-<!--        </preConditions>-->
-<!--        <modifyDataType tableName="fregata_map_point"-->
-<!--                        columnName="disabled"-->
-<!--                        newDataType="INT"/>-->
-<!--    </changeSet>-->
-<!--    <changeSet author="cww" id="20210702-1">-->
-<!--        <preConditions onFail="MARK_RAN">-->
-<!--            <not>-->
-<!--                <columnExists tableName="fregata_map_point" columnName="name"/>-->
-<!--            </not>-->
-<!--        </preConditions>-->
-<!--        <addColumn tableName="fregata_map_point">-->
-<!--            <column name="name" remarks="名称" type="VARCHAR(50)"/>-->
-<!--        </addColumn>-->
-<!--    </changeSet>-->
-
+    <changeSet author="nash5 (generated)" id="1630566618258-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="pipe_task"/>
+            </not>
+        </preConditions>
+        <createTable tableName="pipe_task">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" remarks="任务名称" type="VARCHAR(50)">
+                <constraints unique="true"/>
+            </column>
+            <column name="code" remarks="任务编号" type="VARCHAR(10)"/>
+            <column name="description" remarks="任务内容" type="VARCHAR(1000)"/>
+            <column name="startTime" remarks="开始时间" type="datetime"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="endTime" remarks="结束时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="disabled" remarks="废弃标志" type="TINYINT(3)"/>
+            <column name="status" remarks="运行状态, 0: 未执行, 1: 执行中, 2: 执行完" type="TINYINT(3)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="nash5 (generated)" id="1630566618258-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="pipe_test"/>
+            </not>
+        </preConditions>
+        <createTable tableName="pipe_test">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" remarks="测试名称" type="VARCHAR(50)">
+                <constraints unique="true"/>
+            </column>
+            <column name="code" remarks="测试编号" type="VARCHAR(10)"/>
+            <column name="type" remarks="测试类别(单武器通道测试, 自动防御系统测试)" type="VARCHAR(50)"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="sortKey" remarks="排序字段" type="INT"/>
+            <column name="threshold" remarks="阈值, eg: [{&quot;time&quot;: &quot;5&quot;, ...}]" type="VARCHAR(100)"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="status" remarks="运行状态, 0: 未执行, 1: 执行中, 2: 执行完" type="TINYINT(3)"/>
+            <column name="taskId" remarks="外键-任务id" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="nash5 (generated)" id="1630566618258-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="self_check"/>
+            </not>
+        </preConditions>
+        <createTable tableName="self_check">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" remarks="装备名称" type="VARCHAR(50)">
+                <constraints unique="true"/>
+            </column>
+            <column name="showName" remarks="显示名称, 供前端调用" type="VARCHAR(50)"/>
+            <column name="code" remarks="装备编号" type="VARCHAR(10)"/>
+            <column name="hassErr" remarks="该装备对应的显示名称是否有Err" type="TINYINT(3)"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="sortKey" remarks="排序字段" type="INT"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="taskId" remarks="外键-任务id" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="nash5 (generated)" id="1630566618258-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="test_res_advice"/>
+            </not>
+        </preConditions>
+        <createTable tableName="test_res_advice">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="l1Name" remarks="测试项(1级)名称" type="VARCHAR(50)">
+                <constraints unique="true"/>
+            </column>
+            <column name="l2Name" remarks="测试项子项(2级)名称" type="VARCHAR(50)">
+                <constraints unique="true"/>
+            </column>
+            <column name="l2HasErr" remarks="l2是否有Err" type="TINYINT(3)"/>
+            <column name="advice" remarks="对策建议" type="VARCHAR(10000)"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="sortKey" remarks="排序字段" type="INT"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="taskId" remarks="外键-任务id" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="nash5 (generated)" id="1630566618258-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="history"/>
+            </not>
+        </preConditions>
+        <createTable tableName="history">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="res" remarks="对策建议" type="MEDIUMBLOB"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="sortKey" remarks="排序字段" type="INT"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="taskId" remarks="外键-任务id" type="VARCHAR(50)"/>
+            <column name="pipeTestId" remarks="外键-测试项id" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="nash5 (generated)" id="1630566618258-6">
+        <createIndex indexName="pipeTestId" tableName="history">
+            <column name="pipeTestId"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="nash5 (generated)" id="1630566618258-7">
+        <createIndex indexName="taskId" tableName="history">
+            <column name="taskId"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="nash5 (generated)" id="1630566618258-8">
+        <createIndex indexName="taskId" tableName="pipe_test">
+            <column name="taskId"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="nash5 (generated)" id="1630566618258-9">
+        <createIndex indexName="taskId" tableName="self_check">
+            <column name="taskId"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="nash5 (generated)" id="1630566618258-10">
+        <createIndex indexName="taskId" tableName="test_res_advice">
+            <column name="taskId"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="nash5 (generated)" id="1630566618258-11">
+        <addForeignKeyConstraint baseColumnNames="taskId" baseTableName="history" constraintName="history_ibfk_1" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="pipe_task" validate="true"/>
+    </changeSet>
+    <changeSet author="nash5 (generated)" id="1630566618258-12">
+        <addForeignKeyConstraint baseColumnNames="pipeTestId" baseTableName="history" constraintName="history_ibfk_2" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="pipe_test" validate="true"/>
+    </changeSet>
+    <changeSet author="nash5 (generated)" id="1630566618258-13">
+        <addForeignKeyConstraint baseColumnNames="taskId" baseTableName="pipe_test" constraintName="pipe_test_ibfk_1" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="pipe_task" validate="true"/>
+    </changeSet>
+    <changeSet author="nash5 (generated)" id="1630566618258-14">
+        <addForeignKeyConstraint baseColumnNames="taskId" baseTableName="self_check" constraintName="self_check_ibfk_1" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="pipe_task" validate="true"/>
+    </changeSet>
+    <changeSet author="nash5 (generated)" id="1630566618258-15">
+        <addForeignKeyConstraint baseColumnNames="taskId" baseTableName="test_res_advice" constraintName="test_res_advice_ibfk_1" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="pipe_task" validate="true"/>
+    </changeSet>
 </databaseChangeLog>

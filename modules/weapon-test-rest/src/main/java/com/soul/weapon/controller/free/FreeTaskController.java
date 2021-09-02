@@ -1,5 +1,6 @@
 package com.soul.weapon.controller.free;
 
+import com.egova.web.annotation.Api;
 import com.soul.weapon.entity.Task;
 import com.soul.weapon.service.TaskService;
 import lombok.RequiredArgsConstructor;
@@ -23,16 +24,25 @@ public class FreeTaskController {
     @Autowired
     public TaskService taskService;
 
+    @Api
     @GetMapping(value = "/test")
     Task test() {
         return taskService.getById("1");
         // Task byId = taskService.getById(id);
     };
 
+    /**
+     * get task by id
+     * @param id
+     * @return the coressponding task
+     */
+    @Api
     @GetMapping(value = "/{id}")
     Task getByIdx(@PathVariable("id") String id) {
         return taskService.getById(id);
         // Task byId = taskService.getById(id);
     };
+
+    // Task getByName(),
 
 }

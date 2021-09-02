@@ -14,6 +14,12 @@
     <packaging>jar</packaging>
 
     <dependencies>
+        <!--    自动生成接口文档供yapi调用    -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>1.5.10</version>
+        </dependency>
         <dependency>
             <groupId>com.egova</groupId>
             <artifactId>egova-framework-redis</artifactId>

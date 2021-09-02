@@ -41,7 +41,7 @@
                     <propertyFile>src/main/resources/db/liquibase.properties</propertyFile>
                     <propertyFileWillOverride>true</propertyFileWillOverride>
                     <!--生成文件的路径-->
-                    <outputChangeLogFile>src/main/resources/db/changelog/fire-test.changelog-table.xml</outputChangeLogFile>
+                    <outputChangeLogFile>src/main/resources/db/changelog/weapon-test.changelog-table.xml</outputChangeLogFile>
                 </configuration>
                 <executions>
                 </executions>
