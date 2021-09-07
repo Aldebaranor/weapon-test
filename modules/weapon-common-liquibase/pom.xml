@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.soul</groupId>
         <artifactId>weapon-test</artifactId>
-        <version>5.0.3-SNAPSHOT</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 

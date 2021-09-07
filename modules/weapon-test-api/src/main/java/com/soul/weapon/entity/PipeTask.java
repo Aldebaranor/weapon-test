@@ -57,6 +57,12 @@ public class PipeTask extends BaseEntity {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Timestamp modifyTime;
 
+    @Display("结束时间")
+    @Column(name = "endTime")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    private Timestamp endTime;
+
     @Display("创建人")
     @Column(name="creator")
     private String creator;

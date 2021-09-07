@@ -1,6 +1,7 @@
 package com.soul.weapon.service;
 
 import com.soul.weapon.entity.PipeTask;
+import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 

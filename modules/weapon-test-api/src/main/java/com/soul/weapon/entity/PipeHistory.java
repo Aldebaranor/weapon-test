@@ -16,7 +16,7 @@ import java.sql.Timestamp;
 @Data
 @Entity
 @Table(name = "history")
-@Display("自检表")
+@Display("历史表")
 @EqualsAndHashCode(callSuper = true)
 public class PipeHistory extends BaseEntity {
 

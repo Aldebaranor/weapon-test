@@ -12,7 +12,7 @@
 
     <groupId>com.soul</groupId>
     <artifactId>weapon-test</artifactId>
-    <version>5.0.3-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -21,7 +21,7 @@
         <egova.base.version>5.0.4-SNAPSHOT</egova.base.version>
         <egova.ddcat.version>1.1.0-SNAPSHOT</egova.ddcat.version>
         <egova.bunches.version>2.0.6-SNAPSHOT</egova.bunches.version>
-        <project.snapshot.version>5.0.3-SNAPSHOT</project.snapshot.version>
+        <project.snapshot.version>1.0.1-SNAPSHOT</project.snapshot.version>
         <maven-compiler-plugin.version>3.3</maven-compiler-plugin.version>
         <jdk.version>1.8</jdk.version>
     </properties>

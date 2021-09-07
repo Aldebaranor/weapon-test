@@ -5,6 +5,7 @@ import com.soul.weapon.entity.PipeHistory;
 import com.soul.weapon.service.PipeHistoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,7 +16,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FreePipeHistoryController {
 
-    public PipeHistoryService pipeHistoryService;
+    @Autowired
+    private final PipeHistoryService pipeHistoryService;
 
     @Api
     @GetMapping(value = "/{id}")

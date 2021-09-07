@@ -24,7 +24,7 @@ import java.util.List;
 @CacheConfig(cacheNames = PipeAdvice.NAME)
 public class PipeAdviceServiceImpl extends TemplateService<PipeAdvice,String> implements PipeAdviceService {
 
-    public PipeAdviceRepository pipeAdviceRepository;
+    public final PipeAdviceRepository pipeAdviceRepository;
 
     @Override
     protected AbstractRepositoryBase<PipeAdvice,String> getRepository(){

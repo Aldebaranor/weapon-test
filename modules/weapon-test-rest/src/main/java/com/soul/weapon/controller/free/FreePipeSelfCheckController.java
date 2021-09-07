@@ -14,8 +14,8 @@ import java.util.List;
 @RequestMapping("/free/selfCheck")
 @RequiredArgsConstructor
 public class FreePipeSelfCheckController {
-    
-    public PipeSelfCheckService pipeSelfCheckService;
+
+    private final PipeSelfCheckService pipeSelfCheckService;
 
     @Api
     @GetMapping(value = "/{id}")

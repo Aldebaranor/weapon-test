@@ -24,7 +24,7 @@ import java.util.List;
 @CacheConfig(cacheNames = PipeTest.NAME)
 public class PipeTestServiceImpl extends TemplateService<PipeTest,String> implements PipeTestService {
 
-    public PipeTestRepository pipeTestRepository;
+    private final PipeTestRepository pipeTestRepository;
 
     @Override
     protected AbstractRepositoryBase<PipeTest,String> getRepository(){

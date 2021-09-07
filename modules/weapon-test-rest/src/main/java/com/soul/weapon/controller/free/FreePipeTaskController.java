@@ -5,7 +5,7 @@ import com.soul.weapon.entity.PipeTask;
 import com.soul.weapon.service.PipeTaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.checkerframework.checker.units.qual.A;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FreePipeTaskController {
 
-    public PipeTaskService pipeTaskService;
+    private final PipeTaskService pipeTaskService;
 
     @Api
     @GetMapping(value = "/{id}")

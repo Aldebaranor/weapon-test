@@ -14,8 +14,8 @@ import java.util.List;
 @RequestMapping("/free/advice")
 @RequiredArgsConstructor
 public class FreePipeAdviceController {
-    
-    public PipeAdviceService pipeAdviceService;
+
+    public final PipeAdviceService pipeAdviceService;
 
     @Api
     @GetMapping(value = "/{id}")

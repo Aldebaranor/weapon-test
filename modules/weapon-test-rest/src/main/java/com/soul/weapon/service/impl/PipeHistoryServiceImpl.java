@@ -24,7 +24,7 @@ import java.util.List;
 @CacheConfig(cacheNames = PipeHistory.NAME)
 public class PipeHistoryServiceImpl extends TemplateService<PipeHistory,String> implements PipeHistoryService {
 
-    public PipeHistoryRepository pipeHistoryRepository;
+    private final PipeHistoryRepository pipeHistoryRepository;
 
     @Override
     protected AbstractRepositoryBase<PipeHistory,String> getRepository(){

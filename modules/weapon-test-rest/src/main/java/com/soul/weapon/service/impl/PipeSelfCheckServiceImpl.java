@@ -24,7 +24,7 @@ import java.util.List;
 @CacheConfig(cacheNames = PipeSelfCheck.NAME)
 public class PipeSelfCheckServiceImpl extends TemplateService<PipeSelfCheck,String> implements PipeSelfCheckService {
 
-    public PipeSelfCheckRepository pipeSelfCheckRepository;
+    private final PipeSelfCheckRepository pipeSelfCheckRepository;
 
     @Override
     protected AbstractRepositoryBase<PipeSelfCheck,String> getRepository(){

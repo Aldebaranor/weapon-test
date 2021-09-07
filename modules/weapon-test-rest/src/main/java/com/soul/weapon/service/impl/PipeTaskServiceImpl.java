@@ -5,9 +5,11 @@ import com.egova.data.service.TemplateService;
 import com.flagwind.persistent.model.SingleClause;
 import com.soul.weapon.domain.PipeTaskRepository;
 import com.soul.weapon.entity.PipeTask;
+import com.soul.weapon.entity.PipeTest;
 import com.soul.weapon.service.PipeTaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +26,7 @@ import java.util.List;
 @CacheConfig(cacheNames = PipeTask.NAME)
 public class PipeTaskServiceImpl extends TemplateService<PipeTask,String> implements PipeTaskService {
 
-    public PipeTaskRepository pipeTaskRepository;
+    private final PipeTaskRepository pipeTaskRepository;
 
     @Override
     protected AbstractRepositoryBase<PipeTask,String> getRepository(){
@@ -34,6 +36,10 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask,String> implem
     @Override
     public PipeTask getById(String id)
     {
+//        System.out.println("????");
+//        PipeTask p = new PipeTask();
+//        p.setId("1");
+//        return p;
         return pipeTaskRepository.query(SingleClause.equal("id",id)).stream().findFirst().orElse(null);
     }
 

@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FreePipeTestController {
 
-    public PipeTestService pipeTestService;
+    private final PipeTestService pipeTestService;
 
     @Api
     @GetMapping(value = "/{id}")
