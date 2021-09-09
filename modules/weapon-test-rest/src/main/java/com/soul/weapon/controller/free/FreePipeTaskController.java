@@ -1,6 +1,9 @@
 package com.soul.weapon.controller.free;
 
+import com.egova.model.PageResult;
+import com.egova.model.QueryModel;
 import com.egova.web.annotation.Api;
+import com.soul.weapon.condition.PipeTaskCondition;
 import com.soul.weapon.entity.PipeTask;
 import com.soul.weapon.service.PipeTaskService;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +37,7 @@ public class FreePipeTaskController {
 
     @Api
     @PostMapping
-    public String inset(@RequestBody PipeTask pipeTask)
+    public String insert(@RequestBody PipeTask pipeTask)
     {
         return pipeTaskService.insert(pipeTask);
     }
@@ -56,5 +59,12 @@ public class FreePipeTaskController {
         return pipeTaskService.deleteById(id);
     }
 
+    @Api
+    @PostMapping(value = "/page")
+    public PageResult<PipeTask> page(@RequestBody QueryModel<PipeTaskCondition> con) {
+    // public QueryModel<PipeTaskCondition> page() {
+        // QueryModel<PipeTaskCondition> con = new QueryModel<PipeTaskCondition>();
+        return  pipeTaskService.page(con);
+    }
 
 }

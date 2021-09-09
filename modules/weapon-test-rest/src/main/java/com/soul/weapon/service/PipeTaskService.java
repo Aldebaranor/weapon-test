@@ -1,5 +1,8 @@
 package com.soul.weapon.service;
 
+import com.egova.model.PageResult;
+import com.egova.model.QueryModel;
+import com.soul.weapon.condition.PipeTaskCondition;
 import com.soul.weapon.entity.PipeTask;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,4 +21,7 @@ public interface PipeTaskService {
     void update(@RequestBody PipeTask pipeTask);
 
     int deleteById(@PathVariable("id") String id);
+
+    PageResult<PipeTask> page(QueryModel<PipeTaskCondition> model);
+    // QueryModel<PipeTaskCondition> page(QueryModel<PipeTaskCondition> model);
 }

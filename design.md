@@ -1,7 +1,8 @@
 # 0 一些规范以及参考
 ## 0.1 restful风格 [https://www.cnblogs.com/MTRD/p/12153561.html](https://www.cnblogs.com/MTRD/p/12153561.html)
-## 0.2 sprint boot处理各种需求[https://spring.io/guides](https://spring.io/guides)
-## 0.3 使用maven完成liquibase的changelog自动生成：
+## 0.2 url规范 [https://www.cnblogs.com/hduwbf/p/7300794.html](https://www.cnblogs.com/hduwbf/p/7300794.html)
+## 0.3 sprint boot处理各种需求[https://spring.io/guides](https://spring.io/guides))
+## 0.4 使用maven完成liquibase的changelog自动生成：
 在对应的数据库中使用相应的sql建好需要的表, 进入对应的模块的根目录，也就是含有pom.xml的目录）执行如下命令：
 ```sh
 mvn liquibase:generateChangeLog
@@ -87,20 +88,24 @@ CREATE TABLE `history`  (
   foreign key (`taskId`) references  pipe_task(`id`),
   foreign key (`pipeTestId`) references  pipe_test(`id`)
 );
-
-
-
 ```
 
 # 2 武器测试(weapon test pr)
 ## 2.0 任务管理 pipe_task
-### 2.0.1 get /free/task/allTask 获取所有任务
+### 2.0.1 post /free/task/page 有一个page参数，为{}时获取所有任务
+### 2.0.2 post /free/task 新建一个任务
+### 2.0.3 put /free/task 更新一个任务
+### 2.0.4 delete /free/task/{id} delete by id
 
 ## 2.1 测试项 pipe_test
 ### 2.1.1 get /free/task/allPipeTest 获取所有测试项
 
 ## 2.2 状态分析
-### 2.2.1 对空/水下防御 根据“传感器—指控设备—WQ”表做成表，从报文中获取对应的装备类型的自检状态，然后在该表中映射到前端显示，然后得到一个全局的[{"显示项": true/false, ...}, ]，做成接口给前端调用，所以就是一个四栏目的表 selfCheck： taskId, 装备名称, 显示名称, 显示状态
+### 2.2.1  自检表 
+> 对空/水下防御 根据“传感器—指控设备—WQ”表做成表，从报文中获取对应的装备类型的自检状态，然后在该表中映射到前端显示
+> 然后得到一个全局的[{"显示项": true/false, ...}, ]，做成接口给前端调用，所以就是一个四栏目的表 selfCheck： taskId, 装备名称, 显示名称, 显示状态
+#### 2.2.1.0 get 
+
 ### 2.2.2 分析弹窗 测试结果以及对策表: L2Name, L1Name, res, 对策建议（全部初始化为true）
 
 ## 2.3 对策建议信息管理 更改2.2.2中的测试结果以及对策表的对策建议即可
