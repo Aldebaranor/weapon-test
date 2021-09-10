@@ -10,6 +10,8 @@ public interface PipeSelfCheckService {
 
     PipeSelfCheck getById(String id);
 
+    PipeSelfCheck getByName(String Name);
+
     List<PipeSelfCheck> getAll();
 
     String insert(@RequestBody PipeSelfCheck pipeSelfCheck);

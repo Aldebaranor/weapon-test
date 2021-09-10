@@ -47,7 +47,7 @@ CREATE TABLE `self_check`  (
   `name` varchar(50)  COMMENT '装备名称' unique,
   `showName` varchar(50)  COMMENT '显示名称, 供前端调用',
   `code` varchar(10)  COMMENT '装备编号',
-  `hassErr` tinyint  COMMENT '该装备对应的显示名称是否有Err',
+  `hasErr` tinyint  COMMENT '该装备对应的显示名称是否有Err',
   `createTime` datetime  COMMENT '创建时间',
   `modifyTime` datetime  COMMENT '修改时间',
   `creator` varchar(50)  COMMENT '创建人',
@@ -103,8 +103,10 @@ CREATE TABLE `history`  (
 ## 2.2 状态分析
 ### 2.2.1  自检表 
 > 对空/水下防御 根据“传感器—指控设备—WQ”表做成表，从报文中获取对应的装备类型的自检状态，然后在该表中映射到前端显示
-> 然后得到一个全局的[{"显示项": true/false, ...}, ]，做成接口给前端调用，所以就是一个四栏目的表 selfCheck： taskId, 装备名称, 显示名称, 显示状态
-#### 2.2.1.0 get 
+> 然后得到一个全局的[{"显示项": true/false, ...}, ]，做成接口给前端调用，所以就是一个四栏目的表 selfCheck： 
+> taskId, 装备名称, 显示名称, 显示状态
+#### 2.2.1.0 get /free/self-check/list-all 获取所有自检项
+#### 2.2.1.1 put /free/self-check 更新一个自检状态
 
 ### 2.2.2 分析弹窗 测试结果以及对策表: L2Name, L1Name, res, 对策建议（全部初始化为true）
 

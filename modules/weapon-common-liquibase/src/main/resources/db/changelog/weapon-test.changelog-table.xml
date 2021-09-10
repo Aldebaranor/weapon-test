@@ -66,7 +66,7 @@
             </column>
             <column name="showName" remarks="显示名称, 供前端调用" type="VARCHAR(50)"/>
             <column name="code" remarks="装备编号" type="VARCHAR(10)"/>
-            <column name="hassErr" remarks="该装备对应的显示名称是否有Err" type="TINYINT(3)"/>
+            <column name="hasErr" remarks="该装备对应的显示名称是否有Err" type="TINYINT(3)"/>
             <column name="createTime" remarks="创建时间" type="datetime"/>
             <column name="modifyTime" remarks="修改时间" type="datetime"/>
             <column name="creator" remarks="创建人" type="VARCHAR(50)"/>

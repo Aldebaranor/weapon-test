@@ -5,6 +5,7 @@ import com.egova.data.service.TemplateService;
 import com.flagwind.persistent.model.SingleClause;
 import com.soul.weapon.domain.PipeSelfCheckRepository;
 import com.soul.weapon.entity.PipeSelfCheck;
+import com.soul.weapon.entity.PipeTask;
 import com.soul.weapon.service.PipeSelfCheckService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +36,12 @@ public class PipeSelfCheckServiceImpl extends TemplateService<PipeSelfCheck,Stri
     public PipeSelfCheck getById(String id)
     {
         return pipeSelfCheckRepository.query(SingleClause.equal("id",id)).stream().findFirst().orElse(null);
+    }
+
+    @Override
+    public PipeSelfCheck getByName(String name)
+    {
+        return pipeSelfCheckRepository.query(SingleClause.equal("name", name)).stream().findFirst().orElse(null);
     }
 
     @Override

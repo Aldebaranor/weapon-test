@@ -11,7 +11,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/free/selfCheck")
+@RequestMapping("/free/self-check")
 @RequiredArgsConstructor
 public class FreePipeSelfCheckController {
 
