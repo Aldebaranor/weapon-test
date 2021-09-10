@@ -13,6 +13,10 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.sql.Timestamp;
 
+/**
+ * @Author: nash5
+ * @Date: 2021/9/10 15:35
+ */
 @Data
 @Entity
 @Table(name = "test_res_advice")

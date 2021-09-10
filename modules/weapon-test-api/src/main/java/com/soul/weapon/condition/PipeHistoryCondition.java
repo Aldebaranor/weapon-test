@@ -6,6 +6,10 @@ import com.flagwind.persistent.annotation.ConditionOperator;
 import com.flagwind.persistent.model.ClauseOperator;
 import lombok.Data;
 
+/**
+ * @Author: nash5
+ * @Date: 2021/9/10 15:35
+ */
 @Data
 @Condition
 public class PipeHistoryCondition {

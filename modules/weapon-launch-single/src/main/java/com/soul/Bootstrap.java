@@ -17,6 +17,10 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
+/**
+ * @Author: nash5
+ * @Date: 2021/9/10 15:35
+ */
 @EgovaAuthorizationServer
 @EgovaResourceServer
 @EgovaPlatform
@@ -29,7 +33,6 @@ import org.springframework.web.filter.CorsFilter;
         nameGenerator = PackageBeanNameGenerator.class,
         basePackages = {"com.soul.**.domain"}
 )
-//@EnableIotdb
 public class Bootstrap {
 
     public static void main(String[] args) {
