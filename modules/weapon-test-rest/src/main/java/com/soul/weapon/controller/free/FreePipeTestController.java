@@ -2,6 +2,7 @@ package com.soul.weapon.controller.free;
 
 
 import com.egova.web.annotation.Api;
+import com.soul.weapon.algorithm.AlgoFactoryContext;
 import com.soul.weapon.entity.PipeTest;
 import com.soul.weapon.service.PipeTestService;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,9 @@ public class FreePipeTestController {
     @GetMapping(value = "/{id}")
     public PipeTest getById(@PathVariable("id") String id)
     {
+        // add test for the algo factory:
+        AlgoFactoryContext ctx = new AlgoFactoryContext("airMissilePipeTest");
+        ctx.execAlgo("telegram from socket!");
         return pipeTestService.getById(id);
     }
 

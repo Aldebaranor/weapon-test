@@ -3,6 +3,7 @@ package com.soul.weapon.entity;
 import com.egova.model.BaseEntity;
 import com.egova.model.annotation.Display;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.soul.weapon.entity.codes.PipeTestType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -41,7 +42,7 @@ public class PipeTest extends BaseEntity {
 
     @Display("测试类别")
     @Column(name = "type")
-    private String type;
+    private PipeTestType pipeTest;
 
     @Display("测试阈值")
     @Column(name = "threshold")

@@ -26,5 +26,10 @@
             <artifactId>springdoc-openapi-ui</artifactId>
             <version>1.5.10</version>
         </dependency>
+        <dependency>
+            <groupId>org.reflections</groupId>
+            <artifactId>Reflections</artifactId>
+            <version>0.9.12</version>
+        </dependency>
     </dependencies>
 </project>

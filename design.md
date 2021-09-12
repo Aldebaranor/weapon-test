@@ -6,6 +6,8 @@
 在对应的数据库中使用相应的sql建好需要的表, 进入对应的模块的根目录，也就是含有pom.xml的目录）执行如下命令：
 ```sh
 mvn liquibase:generateChangeLog
+# 进入到包含pom.xml的目标目录, 手动下载依赖
+mvn dependency:get -DremoteRepositories=http://repo1.maven.org/maven2/ -DgroupId=org.reflections -DartifactId=Reflections -Dversion=0.11.7 
 ```
 # 1 总体数据库表
 ```sql
