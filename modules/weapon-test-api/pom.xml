@@ -22,6 +22,10 @@
             <artifactId>egova-generic-api</artifactId>
             <version>5.0.4-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>com.egova</groupId>
+            <artifactId>egova-generic-api</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

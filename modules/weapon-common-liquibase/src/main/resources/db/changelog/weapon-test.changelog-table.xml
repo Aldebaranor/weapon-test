@@ -122,12 +122,12 @@
         </createTable>
     </changeSet>
     <changeSet author="nash5 (generated)" id="1630566618258-6">
-        <createIndex indexName="pipeTestId" tableName="history">
+        <createIndex indexName="pipeTestId" tableName="pipe_history">
             <column name="pipeTestId"/>
         </createIndex>
     </changeSet>
     <changeSet author="nash5 (generated)" id="1630566618258-7">
-        <createIndex indexName="taskId" tableName="history">
+        <createIndex indexName="taskId" tableName="pipe_history">
             <column name="taskId"/>
         </createIndex>
     </changeSet>
@@ -137,28 +137,28 @@
         </createIndex>
     </changeSet>
     <changeSet author="nash5 (generated)" id="1630566618258-9">
-        <createIndex indexName="taskId" tableName="self_check">
+        <createIndex indexName="taskId" tableName="pipe_self_check">
             <column name="taskId"/>
         </createIndex>
     </changeSet>
     <changeSet author="nash5 (generated)" id="1630566618258-10">
-        <createIndex indexName="taskId" tableName="test_res_advice">
+        <createIndex indexName="taskId" tableName="pipe_advice">
             <column name="taskId"/>
         </createIndex>
     </changeSet>
     <changeSet author="nash5 (generated)" id="1630566618258-11">
-        <addForeignKeyConstraint baseColumnNames="taskId" baseTableName="history" constraintName="history_ibfk_1" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="pipe_task" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="taskId" baseTableName="pipe_history" constraintName="pipe_history_ibfk_1" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="pipe_task" validate="true"/>
     </changeSet>
     <changeSet author="nash5 (generated)" id="1630566618258-12">
-        <addForeignKeyConstraint baseColumnNames="pipeTestId" baseTableName="history" constraintName="history_ibfk_2" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="pipe_test" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="pipeTestId" baseTableName="pipe_history" constraintName="pipe_history_ibfk_2" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="pipe_test" validate="true"/>
     </changeSet>
     <changeSet author="nash5 (generated)" id="1630566618258-13">
         <addForeignKeyConstraint baseColumnNames="taskId" baseTableName="pipe_test" constraintName="pipe_test_ibfk_1" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="pipe_task" validate="true"/>
     </changeSet>
     <changeSet author="nash5 (generated)" id="1630566618258-14">
-        <addForeignKeyConstraint baseColumnNames="taskId" baseTableName="self_check" constraintName="self_check_ibfk_1" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="pipe_task" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="taskId" baseTableName="pipe_self_check" constraintName="pipe_self_check_ibfk_1" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="pipe_task" validate="true"/>
     </changeSet>
     <changeSet author="nash5 (generated)" id="1630566618258-15">
-        <addForeignKeyConstraint baseColumnNames="taskId" baseTableName="test_res_advice" constraintName="test_res_advice_ibfk_1" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="pipe_task" validate="true"/>
+        <addForeignKeyConstraint baseColumnNames="taskId" baseTableName="pipe_advice" constraintName="pipe_advice_ibfk_1" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="pipe_task" validate="true"/>
     </changeSet>
 </databaseChangeLog>
