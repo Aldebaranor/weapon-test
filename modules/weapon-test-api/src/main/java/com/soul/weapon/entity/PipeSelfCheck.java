@@ -19,7 +19,7 @@ import java.sql.Timestamp;
  */
 @Data
 @Entity
-@Table(name = "self_check")
+@Table(name = "pipe_self_check")
 @Display("自检表")
 @EqualsAndHashCode(callSuper = true)
 public class PipeSelfCheck extends BaseEntity {

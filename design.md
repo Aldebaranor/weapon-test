@@ -9,87 +9,105 @@ mvn liquibase:generateChangeLog
 # 进入到包含pom.xml的目标目录, 手动下载依赖
 mvn dependency:get -DremoteRepositories=http://repo1.maven.org/maven2/ -DgroupId=org.reflections -DartifactId=Reflections -Dversion=0.11.7 
 ```
-# 1 总体数据库表
+# 1 相关sql
+## 1.1 数据库表
 ```sql
 CREATE TABLE `pipe_task`  (
-  `id` varchar(50)  COMMENT '主键',
-  `name` varchar(50)  COMMENT '任务名称' unique,
-  `code` varchar(10)  COMMENT '任务编号',
-  `description` varchar(1000)  COMMENT '任务内容',
-  `startTime` datetime  COMMENT '开始时间',
-  `createTime` datetime(0)  COMMENT '创建时间',
-  `modifyTime` datetime  COMMENT '修改时间',
-  `endTime` datetime(0)  COMMENT '结束时间',
-  `creator` varchar(50)  COMMENT '创建人',
-  `disabled` tinyint  COMMENT '废弃标志',
-  `status` tinyint  COMMENT '运行状态, 0: 未执行, 1: 执行中, 2: 执行完',
-  PRIMARY KEY (`id`)
+    `id` varchar(50)  COMMENT '主键',
+    `name` varchar(50)  COMMENT '任务名称' unique,
+    `code` varchar(10)  COMMENT '任务编号',
+    `description` varchar(1000)  COMMENT '任务内容',
+    `startTime` datetime  COMMENT '开始时间',
+    `createTime` datetime(0)  COMMENT '创建时间',
+    `modifyTime` datetime  COMMENT '修改时间',
+    `endTime` datetime(0)  COMMENT '结束时间',
+    `creator` varchar(50)  COMMENT '创建人',
+    `disabled` tinyint  COMMENT '废弃标志',
+    `status` tinyint  COMMENT '运行状态, 0: 未执行, 1: 执行中, 2: 执行完',
+    PRIMARY KEY (`id`)
 );
 
 
 CREATE TABLE `pipe_test`  (
-  `id` varchar(50)  COMMENT '主键',
-  `name` varchar(50)  COMMENT '测试名称' unique,
-  `code` varchar(10)  COMMENT '测试编号',
-  `type` varchar(50)  COMMENT '测试类别(单武器通道测试, 自动防御系统测试)',
-  `createTime` datetime  COMMENT '创建时间',
-  `modifyTime` datetime  COMMENT '修改时间',
-  `creator` varchar(50)  COMMENT '创建人',
-  `sortKey` int  COMMENT '排序字段',
-  `threshold` varchar(100) COMMENT '阈值, eg: [{"time": "5", ...}]',
-  `disabled` tinyint  COMMENT '废弃字段',
-  `status` tinyint  COMMENT '运行状态, 0: 未执行, 1: 执行中, 2: 执行完',
-  `taskId` varchar(50)  COMMENT '外键-任务id',
-  PRIMARY KEY (`id`),
-  foreign key (`taskId`) references  pipe_task(`id`)
+    `id` varchar(50)  COMMENT '主键',
+    `name` varchar(50)  COMMENT '测试名称' unique,
+    `code` varchar(10)  COMMENT '测试编号',
+    `type` varchar(50)  COMMENT '测试类别(单武器通道测试, 自动防御系统测试)',
+    `createTime` datetime  COMMENT '创建时间',
+    `modifyTime` datetime  COMMENT '修改时间',
+    `creator` varchar(50)  COMMENT '创建人',
+    `sortKey` int  COMMENT '排序字段',
+    `threshold` varchar(100) COMMENT '阈值, eg: [{"time": "5", ...}]',
+    `disabled` tinyint  COMMENT '废弃字段',
+    `status` tinyint  COMMENT '运行状态, 0: 未执行, 1: 执行中, 2: 执行完',
+    `taskId` varchar(50)  COMMENT '外键-任务id',
+    PRIMARY KEY (`id`),
+    foreign key (`taskId`) references  pipe_task(`id`)
 );
 
-CREATE TABLE `self_check`  (
-  `id` varchar(50)  COMMENT '主键',
-  `name` varchar(50)  COMMENT '装备名称' unique,
-  `showName` varchar(50)  COMMENT '显示名称, 供前端调用',
-  `code` varchar(10)  COMMENT '装备编号',
-  `hasErr` tinyint  COMMENT '该装备对应的显示名称是否有Err',
-  `createTime` datetime  COMMENT '创建时间',
-  `modifyTime` datetime  COMMENT '修改时间',
-  `creator` varchar(50)  COMMENT '创建人',
-  `sortKey` int  COMMENT '排序字段',
-  `disabled` tinyint  COMMENT '废弃字段',
-  `taskId` varchar(50)  COMMENT '外键-任务id',
-  PRIMARY KEY (`id`),
-  foreign key (`taskId`) references  pipe_task(`id`)
+CREATE TABLE `pipe_self_check`  (
+    `id` varchar(50)  COMMENT '主键',
+    `name` varchar(50)  COMMENT '装备名称' unique,
+    `showName` varchar(50)  COMMENT '显示名称, 供前端调用',
+    `code` varchar(10)  COMMENT '装备编号',
+    `hasErr` tinyint  COMMENT '该装备对应的显示名称是否有Err',
+    `createTime` datetime  COMMENT '创建时间',
+    `modifyTime` datetime  COMMENT '修改时间',
+    `creator` varchar(50)  COMMENT '创建人',
+    `sortKey` int  COMMENT '排序字段',
+    `disable` tinyint  COMMENT '废弃字段',
+    `taskId` varchar(50)  COMMENT '外键-任务id',
+    PRIMARY KEY (`id`),
+    foreign key (`taskId`) references  pipe_task(`id`)
 );
 
 CREATE TABLE `test_res_advice`  (
-  `id` varchar(50)  COMMENT '主键',
-  `l1Name` varchar(50)  COMMENT '测试项(1级)名称' unique,
-  `l2Name` varchar(50)  COMMENT '测试项子项(2级)名称' unique,
-  `l2HasErr` tinyint  COMMENT 'l2是否有Err',
-  `advice` varchar(10000)  COMMENT '对策建议',
-  `createTime` datetime  COMMENT '创建时间',
-  `modifyTime` datetime  COMMENT '修改时间',
-  `creator` varchar(50)  COMMENT '创建人',
-  `sortKey` int  COMMENT '排序字段',
-  `disabled` tinyint  COMMENT '废弃字段',
-  `taskId` varchar(50)  COMMENT '外键-任务id',
-  PRIMARY KEY (`id`),
-  foreign key (`taskId`) references  pipe_task(`id`)
+    `id` varchar(50)  COMMENT '主键',
+    `l1Name` varchar(50)  COMMENT '测试项(1级)名称' unique,
+    `l2Name` varchar(50)  COMMENT '测试项子项(2级)名称' unique,
+    `l2HasErr` tinyint  COMMENT 'l2是否有Err',
+    `advice` varchar(10000)  COMMENT '对策建议',
+    `createTime` datetime  COMMENT '创建时间',
+    `modifyTime` datetime  COMMENT '修改时间',
+    `creator` varchar(50)  COMMENT '创建人',
+    `sortKey` int  COMMENT '排序字段',
+    `disabled` tinyint  COMMENT '废弃字段',
+    `taskId` varchar(50)  COMMENT '外键-任务id',
+    PRIMARY KEY (`id`),
+    foreign key (`taskId`) references  pipe_task(`id`)
 );
 
-CREATE TABLE `history`  (
-  `id` varchar(50)  COMMENT '主键',
-  `res` blob(100000)  COMMENT '对策建议',
-  `createTime` datetime  COMMENT '创建时间',
-  `modifyTime` datetime  COMMENT '修改时间',
-  `creator` varchar(50)  COMMENT '创建人',
-  `sortKey` int  COMMENT '排序字段',
-  `disabled` tinyint  COMMENT '废弃字段',
-  `taskId` varchar(50)  COMMENT '外键-任务id',
-  `pipeTestId` varchar(50)  COMMENT '外键-测试项id',
-  PRIMARY KEY (`id`),
-  foreign key (`taskId`) references  pipe_task(`id`),
-  foreign key (`pipeTestId`) references  pipe_test(`id`)
+CREATE TABLE `pipe_history`  (
+    `id` varchar(50)  COMMENT '主键',
+    `res` blob(100000)  COMMENT '对策建议',
+    `createTime` datetime  COMMENT '创建时间',
+    `modifyTime` datetime  COMMENT '修改时间',
+    `creator` varchar(50)  COMMENT '创建人',
+    `sortKey` int  COMMENT '排序字段',
+    `disabled` tinyint  COMMENT '废弃字段',
+    `taskId` varchar(50)  COMMENT '外键-任务id',
+    `pipeTestId` varchar(50)  COMMENT '外键-测试项id',
+    PRIMARY KEY (`id`),
+    foreign key (`taskId`) references  pipe_task(`id`),
+    foreign key (`pipeTestId`) references  pipe_test(`id`)
 );
+```
+
+## 1.1 测试数据生成
+```sql
+# 插入任务表项
+INSERT INTO `weapon-test`.`pipe_task` (`id`, `name`, `code`, `description`, `createTime`, `creator`, `disabled`, `status`) VALUES ('1', 'task1', '1', 'task1', '2021-09-09 14:23:28', 'nash5', '0', '0');
+INSERT INTO `weapon-test`.`pipe_task` (`id`, `name`, `code`, `description`, `createTime`, `creator`, `disabled`, `status`) VALUES ('2', 'task2', '2', 'task2', '2021-09-09 14:23:26', 'nash5', '0', '0');
+INSERT INTO `weapon-test`.`pipe_task` (`id`, `name`, `code`, `description`, `createTime`, `creator`, `disabled`, `status`) VALUES ('4', 'task4', '4', 'task4', '2021-09-09 14:24:28', 'nash5', '0', '0');
+INSERT INTO `weapon-test`.`pipe_task` (`id`, `name`, `code`, `description`, `createTime`, `creator`, `disabled`, `status`) VALUES ('5', 'task5', '5', 'task5', '2021-09-09 14:25:28', 'nash5', '0', '0');
+
+# 插入自检表表项
+INSERT INTO `weapon-test`.`pipe_self_check` (`id`, `name`, `showName`, `code`, `hasErr`, `creator`, `sortKey`, `disabled`, `taskId`) VALUES ('1', '声呐', '舰壳声呐', '1', '0', 'nash5', '0', '0', '1');
+
+# 插入测试项
+INSERT INTO `weapon-test`.`pipe_test` (`id`, `name`, `code`, `type`, `creator`, `threshold`, `disabled`, `status`, `taskId`) VALUES ('1', '航空弹道武器通道', '1', '1', 'nash5', '{\"v\": \"15km/h\"}', '0', '1', '1');
+INSERT INTO `weapon-test`.`pipe_test` (`id`, `name`, `code`, `type`, `creator`, `threshold`, `disabled`, `status`, `taskId`) VALUES ('2', '反舰炮武器通道', '2', '1', 'nash5', '{\"v\": \"15km/h\"}', '0', '1', '1');
+INSERT INTO `weapon-test`.`pipe_test` (`id`, `name`, `code`, `type`, `creator`, `threshold`, `disabled`, `status`, `taskId`) VALUES ('3', '信息流程测试', '3', '2', 'nash5', '{\"time\": \"5s\"}', '0', '1', '1');
 ```
 
 # 2 武器测试(weapon test pr)

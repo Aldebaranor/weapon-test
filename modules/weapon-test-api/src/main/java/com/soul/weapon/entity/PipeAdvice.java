@@ -19,7 +19,7 @@ import java.sql.Timestamp;
  */
 @Data
 @Entity
-@Table(name = "test_res_advice")
+@Table(name = "pipe_advice")
 @Display("自检表")
 @EqualsAndHashCode(callSuper = true)
 public class PipeAdvice extends BaseEntity {

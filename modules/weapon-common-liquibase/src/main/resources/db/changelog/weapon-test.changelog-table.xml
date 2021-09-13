@@ -54,10 +54,10 @@
     <changeSet author="nash5 (generated)" id="1630566618258-4">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="self_check"/>
+                <tableExists tableName="pipe_self_check"/>
             </not>
         </preConditions>
-        <createTable tableName="self_check">
+        <createTable tableName="pipe_self_check">
             <column name="id" remarks="主键" type="VARCHAR(50)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -78,10 +78,10 @@
     <changeSet author="nash5 (generated)" id="1630566618258-5">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="test_res_advice"/>
+                <tableExists tableName="pipe_advice"/>
             </not>
         </preConditions>
-        <createTable tableName="test_res_advice">
+        <createTable tableName="pipe_advice">
             <column name="id" remarks="主键" type="VARCHAR(50)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
@@ -104,10 +104,10 @@
     <changeSet author="nash5 (generated)" id="1630566618258-1">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="history"/>
+                <tableExists tableName="pipe_history"/>
             </not>
         </preConditions>
-        <createTable tableName="history">
+        <createTable tableName="pipe_history">
             <column name="id" remarks="主键" type="VARCHAR(50)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
