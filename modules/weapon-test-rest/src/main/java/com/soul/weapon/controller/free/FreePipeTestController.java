@@ -7,6 +7,7 @@ import com.soul.weapon.entity.PipeTest;
 import com.soul.weapon.service.PipeTestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FreePipeTestController {
 
+    @Autowired
+    private AlgoFactoryContext ctx;
+
     private final PipeTestService pipeTestService;
 
     @Api
@@ -28,8 +32,7 @@ public class FreePipeTestController {
     public PipeTest getById(@PathVariable("id") String id)
     {
         // add test for the algo factory:
-        AlgoFactoryContext ctx = new AlgoFactoryContext("airMissilePipeTest");
-        ctx.execAlgo("telegram from socket!");
+        ctx.execAlgo("airMissilePipeTest", "telegram from socket!");
         return pipeTestService.getById(id);
     }
 

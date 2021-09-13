@@ -1,5 +1,7 @@
 package com.soul.weapon.algorithm;
 
+import org.springframework.stereotype.Service;
+
 /**
  * @Author: nash5
  * @Date: 2021/9/12 16:29

@@ -5,12 +5,13 @@ import com.soul.weapon.algorithm.Algorithm;
 import com.soul.weapon.algorithm.annotation.WeaponAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 /**
  * @Author: nash5
  * @Date: 2021/9/12 16:18
  */
-@WeaponAlgorithm(algoName = "airMissilePipeTest")
+@Service(value = "airMissilePipeTest")
 public class AirMissilePipeTest implements Algorithm {
 
     @Override
