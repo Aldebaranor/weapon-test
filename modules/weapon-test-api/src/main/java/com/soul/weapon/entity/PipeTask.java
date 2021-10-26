@@ -3,6 +3,7 @@ package com.soul.weapon.entity;
 import com.egova.model.BaseEntity;
 import com.egova.model.annotation.Display;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.soul.weapon.entity.codes.PipeState;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -77,5 +78,5 @@ public class PipeTask extends BaseEntity {
 
     @Display("运行状态")
     @Column(name="status")
-    private Integer status;
+    private PipeState status;
 }

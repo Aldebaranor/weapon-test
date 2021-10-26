@@ -16,4 +16,10 @@ public class PipeAdviceCondition {
     @Display("主键")
     @ConditionOperator(name="id", operator = ClauseOperator.Equal)
     private String id;
+
+    @Display("外键-任务")
+    @ConditionOperator(name = "taskId",operator = ClauseOperator.Equal)
+    private String taskId;
+
+
 }

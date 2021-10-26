@@ -44,17 +44,6 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask,String> implem
     }
 
     @Override
-    public PipeTask getById(String id)
-    {
-        return pipeTaskRepository.query(SingleClause.equal("id",id)).stream().findFirst().orElse(null);
-    }
-
-    @Override
-    public List<PipeTask> getAll(){
-        return pipeTaskRepository.query(SingleClause.equal("disabled",0));
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public String insert(@RequestBody PipeTask pipeTask){
             pipeTask.setCreateTime(new Timestamp(System.currentTimeMillis()));

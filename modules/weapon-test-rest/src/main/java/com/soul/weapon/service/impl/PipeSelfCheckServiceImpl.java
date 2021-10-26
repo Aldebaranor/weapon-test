@@ -3,6 +3,7 @@ package com.soul.weapon.service.impl;
 import com.egova.data.service.AbstractRepositoryBase;
 import com.egova.data.service.TemplateService;
 import com.flagwind.persistent.model.SingleClause;
+import com.soul.weapon.condition.PipeSelfCheckCondition;
 import com.soul.weapon.domain.PipeSelfCheckRepository;
 import com.soul.weapon.entity.PipeSelfCheck;
 import com.soul.weapon.entity.PipeTask;
@@ -36,21 +37,13 @@ public class PipeSelfCheckServiceImpl extends TemplateService<PipeSelfCheck,Stri
         return pipeSelfCheckRepository;
     }
 
-    @Override
-    public PipeSelfCheck getById(String id)
-    {
-        return pipeSelfCheckRepository.query(SingleClause.equal("id",id)).stream().findFirst().orElse(null);
-    }
 
     @Override
     public PipeSelfCheck getByName(String name)
     {
-        return pipeSelfCheckRepository.query(SingleClause.equal("name", name)).stream().findFirst().orElse(null);
-    }
-
-    @Override
-    public List<PipeSelfCheck> getAll(){
-        return pipeSelfCheckRepository.query(SingleClause.equal("disabled",0));
+        PipeSelfCheckCondition pipeSelfCheckCondition = new PipeSelfCheckCondition();
+        pipeSelfCheckCondition.setName(name);
+        return super.query(pipeSelfCheckCondition).stream().findFirst().orElse(null);
     }
 
     @Override

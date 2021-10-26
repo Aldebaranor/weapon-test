@@ -6,31 +6,26 @@ import com.egova.lang.DataDict;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Description;
 import org.springframework.context.annotation.Scope;
-
 import org.springframework.stereotype.Component;
 
-import java.nio.channels.Pipe;
-
 /**
- * @Author: nash5
- * @Date: 2021/9/11 9:56
+ * @Author: XinLai
+ * @Date: 2021/9/15 14:36
  */
+
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-@Description("测试项类型字典表")
+@Description("运动状态字典表")
 @Associative(name = "_${name}", providerClass = CodeTypeProvider.class)
-public class PipeTestType extends DataDict {
+public class PipeState extends DataDict {
 
-    public static final String type = "weapon-test:pipeTestType";
+    public static final String type = "weapon-test:pipeState";
 
-    public PipeTestType() { super(type, null); }
+    public PipeState() { super(type, null); }
 
-    public PipeTestType(String value) { super(type, value); };
+    public PipeState(String value) { super(type, value); };
 
-    public static PipeTestType of(String value) {
-        return new PipeTestType(value);
+    public static PipeState of(String value) {
+        return new PipeState(value);
     }
-
 }
-
-

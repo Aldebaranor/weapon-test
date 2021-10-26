@@ -36,17 +36,6 @@ public class PipeAdviceServiceImpl extends TemplateService<PipeAdvice,String> im
     }
 
     @Override
-    public PipeAdvice getById(String id)
-    {
-        return pipeAdviceRepository.query(SingleClause.equal("id",id)).stream().findFirst().orElse(null);
-    }
-
-    @Override
-    public List<PipeAdvice> getAll(){
-        return pipeAdviceRepository.query(SingleClause.equal("disabled",0));
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public String insert(@RequestBody PipeAdvice pipeAdvice){
         pipeAdvice.setCreateTime(new Timestamp(System.currentTimeMillis()));

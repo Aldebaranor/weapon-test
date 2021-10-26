@@ -4,12 +4,14 @@ package com.soul.weapon.controller.free;
 import com.egova.web.annotation.Api;
 import com.soul.weapon.algorithm.AlgoFactoryContext;
 import com.soul.weapon.entity.PipeTest;
+import com.soul.weapon.model.MissileWeapon;
 import com.soul.weapon.service.PipeTestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -32,8 +34,15 @@ public class FreePipeTestController {
     public PipeTest getById(@PathVariable("id") String id)
     {
         // add test for the algo factory:
-        ctx.execAlgo("airMissilePipeTest", "telegram from socket!");
         return pipeTestService.getById(id);
+    }
+
+    @Api
+    @PostMapping(value = "/exec/{algorithm}")
+    public void execAlgo(@PathVariable("algorithm") String algorithm,@RequestBody List<MissileWeapon> missileInfo)
+    {
+        System.out.println(missileInfo.toString());
+        ctx.execAlgo(algorithm, missileInfo.toString());
     }
 
     @Api

@@ -16,4 +16,12 @@ public class PipeSelfCheckCondition {
     @Display("主键")
     @ConditionOperator(name="id", operator = ClauseOperator.Equal)
     private String id;
+
+    @Display("装备名称")
+    @ConditionOperator(name="name", operator = ClauseOperator.Equal)
+    private String name;
+
+    @Display("外键-任务")
+    @ConditionOperator(name = "taskId",operator = ClauseOperator.Equal)
+    private String taskId;
 }

@@ -36,17 +36,6 @@ public class PipeHistoryServiceImpl extends TemplateService<PipeHistory,String> 
     }
 
     @Override
-    public PipeHistory getById(String id)
-    {
-        return pipeHistoryRepository.query(SingleClause.equal("id",id)).stream().findFirst().orElse(null);
-    }
-
-    @Override
-    public List<PipeHistory> getAll(){
-        return pipeHistoryRepository.query(SingleClause.equal("disabled",0));
-    }
-
-    @Override
     @Transactional(rollbackFor = Exception.class)
     public String insert(@RequestBody PipeHistory pipeHistory){
         pipeHistory.setCreateTime(new Timestamp(System.currentTimeMillis()));
