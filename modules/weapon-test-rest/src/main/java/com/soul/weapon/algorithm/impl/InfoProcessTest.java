@@ -1,6 +1,7 @@
 package com.soul.weapon.algorithm.impl;
 
 import com.soul.weapon.algorithm.Algorithm;
+import com.soul.weapon.algorithm.annotation.WeaponAlgorithm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
