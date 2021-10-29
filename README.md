@@ -10,6 +10,10 @@
 │    ├── weapon-common-base                 #  基础设计
 │    ├── weapon-common-liquibase            #  数据库管理工程
 │    ├── weapon-launch-single               #  单体应用启动
+│    ├── weapon-test-api                    #  武器通道测试接口
+│    ├── weapon-test-rest                   #  武器通道测试实现
+│    ├── weapon-fire-api                    #  火力兼容测试接口
+│    ├── weapon-fire-rest                   #  火力兼容测试实现
 ├── pom.xml                                 
 └── readme.md                               
 ```

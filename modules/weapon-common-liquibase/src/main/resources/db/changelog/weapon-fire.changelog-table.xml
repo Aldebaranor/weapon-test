@@ -1,0 +1,316 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
+
+    <changeSet author="admin (generated)" id="1630288315483-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="fire_conflict"/>
+            </not>
+        </preConditions>
+        <createTable tableName="fire_conflict">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="code" remarks="任务编号" type="VARCHAR(10)"/>
+            <column name="name" remarks="兼容预判任务名称" type="VARCHAR(50)"/>
+            <column name="conflictType" remarks="冲突类型(火力兼容，电磁兼容，水声兼容)[dic]" type="VARCHAR(255)"/>
+            <column name="taskId" remarks="外键-任务" type="VARCHAR(50)"/>
+            <column name="conflictTime" remarks="冲突发生时间" type="datetime"/>
+            <column name="conflictObjects" remarks="[{id: , name: }, ...],总共三个键值对，最后一个代表受控实体" type="VARCHAR(500)"/>
+            <column name="conflictSolution" remarks="冲突解决" type="VARCHAR(500)"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="disabled" remarks="废弃标志" type="TINYINT(3)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="admin (generated)" id="1630288315483-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="fire_priority"/>
+            </not>
+        </preConditions>
+        <createTable tableName="fire_priority">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="code" remarks="规则序号" type="VARCHAR(10)"/>
+            <column name="conflictType" remarks="冲突类型" type="VARCHAR(10)"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="ABetterThanB" remarks="A对B的优先级" type="TINYINT(3)"/>
+            <column name="weaponAId" remarks="外键-武器Aid" type="VARCHAR(50)"/>
+            <column name="weaponBId" remarks="外键-武器Bid" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="admin (generated)" id="1630288315483-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="fire_task"/>
+            </not>
+        </preConditions>
+        <createTable tableName="fire_task">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" remarks="兼容预判任务名称" type="VARCHAR(50)"/>
+            <column name="code" remarks="任务编号" type="VARCHAR(10)"/>
+            <column name="startTime" remarks="开始时间" type="datetime"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="endTime" remarks="结束时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="disabled" remarks="废弃标志" type="TINYINT(3)"/>
+            <column name="running" remarks="运行标志" type="TINYINT(3)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="admin (generated)" id="1630288315483-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="fire_threshold"/>
+            </not>
+        </preConditions>
+        <createTable tableName="fire_threshold">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="name" remarks="阈值名称" type="VARCHAR(50)"/>
+            <column name="code" remarks="阈值序号" type="VARCHAR(10)"/>
+            <column name="type" remarks="冲突类型" type="VARCHAR(10)"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="sortKey" remarks="排序字段" type="INT"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="thresholdValue" remarks="安全阈值" type="VARCHAR(255)"/>
+        </createTable>
+    </changeSet>
+    <changeSet author="admin (generated)" id="1630288315483-5">
+    <preConditions onFail="MARK_RAN">
+        <not>
+            <tableExists tableName="fire_weapon"/>
+        </not>
+    </preConditions>
+    <createTable tableName="fire_weapon">
+        <column name="id" remarks="主键" type="VARCHAR(50)">
+            <constraints nullable="false" primaryKey="true"/>
+        </column>
+        <column name="name" remarks="武器名称" type="VARCHAR(50)"/>
+        <column name="code" remarks="武器编号" type="VARCHAR(10)"/>
+        <column name="type" remarks="武器类型" type="VARCHAR(10)"/>
+        <column name="createTime" remarks="创建时间" type="datetime"/>
+        <column name="modifyTime" remarks="修改时间" type="datetime"/>
+        <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+        <column name="sortKey" remarks="排序字段" type="INT"/>
+        <column name="controlled" remarks="管控标识" type="TINYINT(3)"/>
+        <column name="selfCheck" remarks="自检字段" type="TINYINT(3)"/>
+        <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+    </createTable>
+    </changeSet>
+
+    <changeSet author="admin (generated)" id="1630288315483-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="fire_conflict_priority"/>
+            </not>
+        </preConditions>
+        <createTable tableName="fire_conflict_priority">
+            <column name="conflictType" remarks="主键-冲突类型" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="conflictPriority" remarks="优先级-冲突类型" type="int"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="0" author="Xinlai">
+        <insert tableName="fire_weapon">
+            <column name="id" value="1"/>
+            <column name="name" value="近程防空导弹"/>
+            <column name="code" value="001"/>
+            <column name="type" value="硬杀伤WQ"/>
+            <column name="creator" value="Xinlai"/>
+            <column name="sortKey" value="1"/>
+            <column name="selfCheck" value="0"/>
+            <column name="disabled" value="0"/>
+        </insert>
+        <insert tableName="fire_weapon">
+            <column name="id" value="2"/>
+            <column name="name" value="中程防空导弹"/>
+            <column name="code" value="002"/>
+            <column name="type" value="硬杀伤WQ"/>
+            <column name="creator" value="Xinlai"/>
+            <column name="sortKey" value="2"/>
+            <column name="selfCheck" value="0"/>
+            <column name="disabled" value="0"/>
+        </insert>
+        <insert tableName="fire_weapon">
+            <column name="id" value="3"/>
+            <column name="name" value="远程防空导弹"/>
+            <column name="code" value="003"/>
+            <column name="type" value="硬杀伤WQ"/>
+            <column name="creator" value="Xinlai"/>
+            <column name="sortKey" value="3"/>
+            <column name="selfCheck" value="0"/>
+            <column name="disabled" value="0"/>
+        </insert>
+        <insert tableName="fire_weapon">
+            <column name="id" value="4"/>
+            <column name="name" value="反舰导弹"/>
+            <column name="code" value="004"/>
+            <column name="type" value="硬杀伤WQ"/>
+            <column name="creator" value="Xinlai"/>
+            <column name="sortKey" value="4"/>
+            <column name="selfCheck" value="0"/>
+            <column name="disabled" value="0"/>
+        </insert>
+        <insert tableName="fire_weapon">
+            <column name="id" value="5"/>
+            <column name="name" value="反潜导弹"/>
+            <column name="code" value="005"/>
+            <column name="type" value="硬杀伤WQ"/>
+            <column name="creator" value="Xinlai"/>
+            <column name="sortKey" value="5"/>
+            <column name="selfCheck" value="0"/>
+            <column name="disabled" value="0"/>
+        </insert>
+        <insert tableName="fire_weapon">
+            <column name="id" value="6"/>
+            <column name="name" value="主炮"/>
+            <column name="code" value="006"/>
+            <column name="type" value="硬杀伤WQ"/>
+            <column name="creator" value="Xinlai"/>
+            <column name="sortKey" value="6"/>
+            <column name="selfCheck" value="0"/>
+            <column name="disabled" value="0"/>
+        </insert>
+        <insert tableName="fire_weapon">
+            <column name="id" value="7"/>
+            <column name="name" value="万发炮"/>
+            <column name="code" value="007"/>
+            <column name="type" value="硬杀伤WQ"/>
+            <column name="creator" value="Xinlai"/>
+            <column name="sortKey" value="7"/>
+            <column name="selfCheck" value="0"/>
+            <column name="disabled" value="0"/>
+        </insert>
+        <insert tableName="fire_weapon">
+            <column name="id" value="8"/>
+            <column name="name" value="舷外有源电子干扰弹"/>
+            <column name="code" value="008"/>
+            <column name="type" value="软杀伤WQ"/>
+            <column name="creator" value="Xinlai"/>
+            <column name="sortKey" value="8"/>
+            <column name="selfCheck" value="0"/>
+            <column name="disabled" value="0"/>
+        </insert>
+        <insert tableName="fire_weapon">
+            <column name="id" value="9"/>
+            <column name="name" value="舷外无源电子干扰弹"/>
+            <column name="code" value="009"/>
+            <column name="type" value="软杀伤WQ"/>
+            <column name="creator" value="Xinlai"/>
+            <column name="sortKey" value="9"/>
+            <column name="selfCheck" value="0"/>
+            <column name="disabled" value="0"/>
+        </insert>
+        <insert tableName="fire_weapon">
+            <column name="id" value="10"/>
+            <column name="name" value="舷内电子干扰设备"/>
+            <column name="code" value="010"/>
+            <column name="type" value="软杀伤WQ"/>
+            <column name="creator" value="Xinlai"/>
+            <column name="sortKey" value="10"/>
+            <column name="selfCheck" value="0"/>
+            <column name="disabled" value="0"/>
+        </insert>
+        <insert tableName="fire_weapon">
+            <column name="id" value="11"/>
+            <column name="name" value="舰载电子干扰设备"/>
+            <column name="code" value="011"/>
+            <column name="type" value="软杀伤WQ"/>
+            <column name="creator" value="Xinlai"/>
+            <column name="sortKey" value="11"/>
+            <column name="selfCheck" value="0"/>
+            <column name="disabled" value="0"/>
+        </insert>
+        <insert tableName="fire_weapon">
+            <column name="id" value="12"/>
+            <column name="name" value="水声对抗器材"/>
+            <column name="code" value="012"/>
+            <column name="type" value="软杀伤WQ"/>
+            <column name="creator" value="Xinlai"/>
+            <column name="sortKey" value="12"/>
+            <column name="selfCheck" value="0"/>
+            <column name="disabled" value="0"/>
+        </insert>
+        <insert tableName="fire_weapon">
+            <column name="id" value="13"/>
+            <column name="name" value="舰壳声呐"/>
+            <column name="code" value="013"/>
+            <column name="type" value="传感器"/>
+            <column name="creator" value="Xinlai"/>
+            <column name="sortKey" value="13"/>
+            <column name="selfCheck" value="0"/>
+            <column name="disabled" value="0"/>
+        </insert>
+        <insert tableName="fire_weapon">
+            <column name="id" value="14"/>
+            <column name="name" value="拖拽声呐"/>
+            <column name="code" value="014"/>
+            <column name="type" value="传感器"/>
+            <column name="creator" value="Xinlai"/>
+            <column name="sortKey" value="14"/>
+            <column name="selfCheck" value="0"/>
+            <column name="disabled" value="0"/>
+        </insert>
+        <insert tableName="fire_weapon">
+            <column name="id" value="15"/>
+            <column name="name" value="搜索雷达"/>
+            <column name="code" value="015"/>
+            <column name="type" value="传感器"/>
+            <column name="creator" value="Xinlai"/>
+            <column name="sortKey" value="15"/>
+            <column name="selfCheck" value="0"/>
+            <column name="disabled" value="0"/>
+        </insert>
+        <insert tableName="fire_weapon">
+            <column name="id" value="16"/>
+            <column name="name" value="主炮跟踪雷达"/>
+            <column name="code" value="016"/>
+            <column name="type" value="传感器"/>
+            <column name="creator" value="Xinlai"/>
+            <column name="sortKey" value="16"/>
+            <column name="selfCheck" value="0"/>
+            <column name="disabled" value="0"/>
+        </insert>
+        <insert tableName="fire_weapon">
+            <column name="id" value="17"/>
+            <column name="name" value="万发炮跟踪雷达"/>
+            <column name="code" value="017"/>
+            <column name="type" value="传感器"/>
+            <column name="creator" value="Xinlai"/>
+            <column name="sortKey" value="17"/>
+            <column name="selfCheck" value="0"/>
+            <column name="disabled" value="0"/>
+        </insert>
+
+        <insert tableName="fire_conflict_priority">
+            <column name="conflictType" value="火力兼容"></column>
+            <column name="conflictPriority" value="0"></column>
+        </insert>
+        <insert tableName="fire_conflict_priority">
+            <column name="conflictType" value="电磁兼容"></column>
+            <column name="conflictPriority" value="1"></column>
+        </insert>
+        <insert tableName="fire_conflict_priority">
+            <column name="conflictType" value="水声兼容"></column>
+            <column name="conflictPriority" value="2"></column>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

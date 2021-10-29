@@ -39,12 +39,22 @@
         <dependency>
             <groupId>com.soul</groupId>
             <artifactId>weapon-test-api</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.soul</groupId>
             <artifactId>weapon-test-rest</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.soul</groupId>
+            <artifactId>weapon-fire-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.soul</groupId>
+            <artifactId>weapon-fire-rest</artifactId>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>com.egova</groupId>

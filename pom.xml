@@ -251,6 +251,8 @@
         <module>modules/weapon-launch-single</module>
         <module>modules/weapon-test-rest</module>
         <module>modules/weapon-test-api</module>
+        <module>modules/weapon-fire-api</module>
+        <module>modules/weapon-fire-rest</module>
     </modules>
 
 </project>

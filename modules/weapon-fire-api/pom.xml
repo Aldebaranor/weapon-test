@@ -10,18 +10,19 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>weapon-test-api</artifactId>
-
+    <artifactId>weapon-fire-api</artifactId>
     <dependencies>
         <dependency>
             <groupId>com.soul</groupId>
             <artifactId>weapon-common-base</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.egova</groupId>
-            <artifactId>egova-generic-api</artifactId>
-        </dependency>
+
     </dependencies>
+
+
+
+
+
 
 </project>
