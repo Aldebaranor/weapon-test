@@ -45,8 +45,8 @@ public class PipeAdviceServiceImpl extends TemplateService<PipeAdvice,String> im
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(@RequestBody PipeAdvice pipeAdvice){
+
         pipeAdvice.setModifyTime(new Timestamp(System.currentTimeMillis()));
-        pipeAdvice.setCreateTime(pipeAdviceRepository.query(SingleClause.equal("id", pipeAdvice.getId())).stream().findFirst().orElse(null).getCreateTime());
         super.update(pipeAdvice);
     }
 

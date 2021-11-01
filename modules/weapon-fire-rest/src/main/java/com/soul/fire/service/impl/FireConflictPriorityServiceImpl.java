@@ -28,19 +28,7 @@ public class FireConflictPriorityServiceImpl extends TemplateService<FireConflic
         return fireConflictPriorityRepository;
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public List<FireConflictPriority> listPriorities() {
-        return super.getAll();
-    }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updatePriorities(List<FireConflictPriority> priorities) {
-        super.updateList(priorities);
-        // for (FireConflictPriority priority: priorities) {
-        //     super.update(priority);
-        // }
-    }
+
 
 }

@@ -46,7 +46,6 @@ public class PipeTestServiceImpl extends TemplateService<PipeTest,String> implem
     @Transactional(rollbackFor = Exception.class)
     public void update(@RequestBody PipeTest pipeTest){
         pipeTest.setModifyTime(new Timestamp(System.currentTimeMillis()));
-        pipeTest.setCreateTime(pipeTestRepository.query(SingleClause.equal("id", pipeTest.getId())).stream().findFirst().orElse(null).getCreateTime());
         super.update(pipeTest);
     }
     

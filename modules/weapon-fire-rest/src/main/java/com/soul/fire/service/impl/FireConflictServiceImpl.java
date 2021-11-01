@@ -47,16 +47,13 @@ public class FireConflictServiceImpl extends TemplateService<FireConflict, Strin
     @Transactional(rollbackFor = Exception.class)
     public void update(FireConflict fireConflict) {
         fireConflict.setModifyTime(new Timestamp(System.currentTimeMillis()));
-        //fireConflict.setCreateTime(fireConflictRepository.query(SingleClause.equal("id", fireConflict.getId())).stream().findFirst().orElse(null).getCreateTime());
-        super.update(fireConflict);
+         super.update(fireConflict);
     }
 
     //TODO:使用super的方法
 
     @Override
     public FireConflict getById(String id){
-//        System.out.println(id);
-//        return fireConflictRepository.query(SingleClause.equal("id", id)).stream().findFirst().orElse(null);
           FireConflictCondition conflictCondition = new FireConflictCondition();
           conflictCondition.setId(id);
           conflictCondition.setDisabled(false);
@@ -79,6 +76,7 @@ public class FireConflictServiceImpl extends TemplateService<FireConflict, Strin
      * @param taskId
      * @return 冲突表
      */
+    @Override
     public List<FireConflict> getByTypeAndTask(String type,String taskId){
 
         FireConflictCondition conflictCondition = new FireConflictCondition();

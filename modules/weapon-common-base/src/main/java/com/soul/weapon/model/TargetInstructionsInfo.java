@@ -1,11 +1,13 @@
 package com.soul.weapon.model;
 
 import com.egova.model.annotation.Display;
+import lombok.Data;
 
 /**
  * @Author: XinLai
  * @Date: 2021/10/28 15:50
  */
+@Data
 public class TargetInstructionsInfo {
     @Display("发送方编号")
     private String sender;

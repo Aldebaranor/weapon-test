@@ -5,6 +5,7 @@ import com.soul.weapon.algorithm.AlgoFactoryContext;
 import com.soul.weapon.algorithm.Algorithm;
 import com.soul.weapon.algorithm.annotation.WeaponAlgorithm;
 import com.soul.weapon.model.MissileWeapon;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
  * @Date: 2021/9/12 16:18
  */
 @Service(value = "airMissilePipeTest")
+@Slf4j
 public class AirMissilePipeTest implements Algorithm {
 
     @Override
@@ -36,8 +38,7 @@ public class AirMissilePipeTest implements Algorithm {
             Boolean selfCheck = missileWeapon.get(i).getSelfCheck();
             System.out.println("id: " + id +" timestamp: " +timestamp+" "+" type: " + type + " selfCheck: " + selfCheck);
         }
-        Logger LOG = LoggerFactory.getLogger(AirMissilePipeTest.class);
-        LOG.info("airMissilePipeTest algo executing!");
+        log.info("airMissilePipeTest algo executing!");
         return input;
     }
 }

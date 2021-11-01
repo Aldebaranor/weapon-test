@@ -10,11 +10,11 @@ public interface FireConflictPriorityService {
      * 获取所有的冲突类型优先级规则
      * @return 
      */
-    List<FireConflictPriority> listPriorities();
+    List<FireConflictPriority> getAll();
 
     /**
      * 按照更新所有的冲突类型优先级
-     * @param p
+     * @param list
      */
-    void updatePriorities(List<FireConflictPriority> priorities);
+    void updateList(List<FireConflictPriority> list);
 }

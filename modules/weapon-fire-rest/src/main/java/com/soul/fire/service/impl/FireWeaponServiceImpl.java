@@ -9,6 +9,7 @@ import com.flagwind.persistent.model.Sorting;
 import com.soul.fire.condition.FireThresholdCondition;
 import com.soul.fire.condition.FireWeaponCondition;
 import com.soul.fire.domain.FireWeaponRepository;
+import com.soul.fire.entity.FireThreshold;
 import com.soul.fire.entity.FireWeapon;
 import com.soul.fire.service.FireWeaponService;
 import lombok.RequiredArgsConstructor;
@@ -49,13 +50,7 @@ public class FireWeaponServiceImpl extends TemplateService<FireWeapon, String> i
     @Transactional(rollbackFor = Exception.class)
     public void update(FireWeapon fireWeapon) {
         fireWeapon.setModifyTime(new Timestamp(System.currentTimeMillis()));
-        fireWeapon.setCreateTime(fireWeaponRepository.query(SingleClause.equal("id", fireWeapon.getId())).stream().findFirst().orElse(null).getCreateTime());
         super.update(fireWeapon);
-    }
-
-    @Override
-    public FireWeapon getById(String id){
-        return fireWeaponRepository.query(SingleClause.equal("id", id)).stream().findFirst().orElse(null);
     }
 
     @Override

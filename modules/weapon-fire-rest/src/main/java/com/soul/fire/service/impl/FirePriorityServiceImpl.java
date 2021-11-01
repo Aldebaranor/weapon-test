@@ -13,9 +13,11 @@ import com.soul.fire.entity.FireTask;
 import com.soul.fire.service.FirePriorityService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ehcache.core.util.CollectionUtil;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Priority;
 import java.util.List;
@@ -34,6 +36,7 @@ public class FirePriorityServiceImpl extends TemplateService<FirePriority, Strin
         return firePriorityRepository;
     }
 
+    //TODO :逻辑有问题。
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePriorityByPair(FirePriority modPriority) {
@@ -42,31 +45,27 @@ public class FirePriorityServiceImpl extends TemplateService<FirePriority, Strin
                 SingleClause.equal("weaponAId", modPriority.getWeaponAId()),
                 SingleClause.equal("weaponBId", modPriority.getWeaponBId())
         )).stream().findFirst().orElse(null);
-        if (null == tmp) {
+        if (tmp != null) {
             return;
         }
         tmp.setABetterThanB(modPriority.isABetterThanB());
         super.update(tmp);
+        return;
+
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public List<FirePriority> getPriorityByType(String conflictType) {
-        return firePriorityRepository.query(
-                SingleClause.equal("conflictType", conflictType)
-        );
+        FirePriorityCondition condition = new FirePriorityCondition();
+        condition.setConflictType(conflictType);
+        return super.query(condition);
+
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public List<FirePriority> listPriorities(FirePriorityCondition con) {
-        return super.query(con, Sorting.descending("modifyTime", "createTime"));
-        // return fireTaskRepository.query(SingleClause.equal("disabled", 0));
+    public List<FirePriority> list(FirePriorityCondition condition) {
+        return super.query(condition, Sorting.descending("modifyTime", "createTime"));
+
     }
 
-    @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void updatePriority(FirePriority p) {
-        super.update(p);
-    }
 }

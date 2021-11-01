@@ -46,8 +46,7 @@ public class PipeHistoryServiceImpl extends TemplateService<PipeHistory,String> 
     @Transactional(rollbackFor = Exception.class)
     public void update(@RequestBody PipeHistory pipeHistory){
         pipeHistory.setModifyTime(new Timestamp(System.currentTimeMillis()));
-        pipeHistory.setCreateTime(pipeHistoryRepository.query(SingleClause.equal("id", pipeHistory.getId())).stream().findFirst().orElse(null).getCreateTime());
-        super.update(pipeHistory);
+       super.update(pipeHistory);
     }
     
 }

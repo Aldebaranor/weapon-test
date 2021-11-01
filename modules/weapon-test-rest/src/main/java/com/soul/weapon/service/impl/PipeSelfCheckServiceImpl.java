@@ -57,7 +57,6 @@ public class PipeSelfCheckServiceImpl extends TemplateService<PipeSelfCheck,Stri
     @Transactional(rollbackFor = Exception.class)
     public void update(@RequestBody PipeSelfCheck pipeSelfCheck){
         pipeSelfCheck.setModifyTime(new Timestamp(System.currentTimeMillis()));
-        pipeSelfCheck.setCreateTime(pipeSelfCheckRepository.query(SingleClause.equal("id", pipeSelfCheck.getId())).stream().findFirst().orElse(null).getCreateTime());
         super.update(pipeSelfCheck);
     }
 }

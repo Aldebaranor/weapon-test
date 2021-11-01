@@ -21,13 +21,13 @@ public interface FireTaskService {
      * @param running 新的running
      * @return
      */
-    void updateTask(@RequestBody FireTask task);
+    void update(@RequestBody FireTask task);
 
     /**
      * 插入兼容预判任务
      * @param task
      */
-    String insertTask(@RequestBody FireTask task);
+    String insert(@RequestBody FireTask task);
 
 
     /**

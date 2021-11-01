@@ -27,11 +27,11 @@ public interface FirePriorityService{
      * @param con
      * @return
      */
-    List<FirePriority> listPriorities(FirePriorityCondition con);
+    List<FirePriority> list(FirePriorityCondition con);
 
     /**
      * 按照p更新p
      * @param p
      */
-    void updatePriority(FirePriority p);
+    void update(FirePriority p);
 }

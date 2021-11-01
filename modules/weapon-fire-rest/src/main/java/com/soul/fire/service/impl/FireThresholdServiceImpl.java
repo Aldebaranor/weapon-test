@@ -49,17 +49,15 @@ public class FireThresholdServiceImpl extends TemplateService<FireThreshold, Str
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(FireThreshold fireThreshold) {
+//        FireThreshold oldFir = fireThresholdRepository.getById(fireThreshold.getId());
+//        if(oldFir != null ){
+//            fireThreshold.setCreateTime(oldFir.getCreateTime());
+//        }
         fireThreshold.setModifyTime(new Timestamp(System.currentTimeMillis()));
-        fireThreshold.setCreateTime(fireThresholdRepository.query(SingleClause.equal("id", fireThreshold.getId())).stream().findFirst().orElse(null).getCreateTime());
         super.update(fireThreshold);
     }
 
-    @Override
-    public FireThreshold getById(String id){
-        FireThresholdCondition fireThresholdCondition = new FireThresholdCondition();
-        fireThresholdCondition.setId(id);
-        return super.query(fireThresholdCondition).stream().findFirst().orElse(null);
-    }
+
 
     @Override
     public PageResult<FireThreshold> page(QueryModel<FireThresholdCondition> model) {
@@ -75,7 +73,7 @@ public class FireThresholdServiceImpl extends TemplateService<FireThreshold, Str
     public List<FireThreshold> getAll() {
         FireThresholdCondition fireThresholdCondition = new FireThresholdCondition();
         fireThresholdCondition.setDisabled(false);
-        return super.query(fireThresholdCondition);//.stream().collect(Collectors.toList());
+        return super.query(fireThresholdCondition);
     }
 
     @Override
