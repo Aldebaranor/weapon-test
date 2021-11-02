@@ -11,7 +11,7 @@ public interface FireWeaponService {
 
     /**
      * 根据id查询结果
-     *
+     * @param id 武器id
      * @return 武器表
      */
     FireWeapon getById(String id);

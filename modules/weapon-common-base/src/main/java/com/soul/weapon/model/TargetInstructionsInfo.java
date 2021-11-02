@@ -8,6 +8,7 @@ import lombok.Data;
  * @Date: 2021/10/28 15:50
  */
 @Data
+@Display("目标指示信息")
 public class TargetInstructionsInfo {
     @Display("发送方编号")
     private String sender;

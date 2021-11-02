@@ -25,7 +25,7 @@ public class FirePriorityController {
     @Api
     @PutMapping()
     public void updateTask(@RequestBody FirePriority modPriority) {
-        firePriorityService.updatePriority(modPriority);
+        firePriorityService.update(                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       modPriority);
         // firePriorityService.updatePriorityByPair(modPriority);
     }
 
@@ -38,6 +38,6 @@ public class FirePriorityController {
     @Api
     @PostMapping("/list")
     public List<FirePriority> getPriorityByType(@RequestBody FirePriorityCondition con) {
-        return firePriorityService.listPriorities(con);
+        return firePriorityService.list(con);
     }
 }

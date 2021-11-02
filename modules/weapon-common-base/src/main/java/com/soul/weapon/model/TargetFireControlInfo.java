@@ -8,6 +8,7 @@ import lombok.Data;
  * @Date: 2021/10/28 15:51
  */
 @Data
+@Display("目标火控信息")
 public class TargetFireControlInfo {
     @Display("发送方编号")
     private String sender;

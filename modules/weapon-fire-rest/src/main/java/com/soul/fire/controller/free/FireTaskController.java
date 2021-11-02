@@ -36,13 +36,13 @@ public class FireTaskController {
     @Api
     @PutMapping("/current")
     public void updateTask(@RequestBody FireTask task) {
-        fireTaskService.updateTask(task);
+        fireTaskService.update(task);
     }
 
     @Api
     @PostMapping("/current")
     public String insertTask(@RequestBody FireTask task) {
-        return fireTaskService.insertTask(task);
+        return fireTaskService.insert(task);
     }
 
     @Api

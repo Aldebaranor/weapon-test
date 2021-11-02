@@ -8,6 +8,7 @@ import lombok.Data;
  * @Date: 2021/10/28 15:54
  */
 @Data
+@Display("发射架调转信息")
 public class LauncherRotationInfo {
 
     @Display("发送方编号")

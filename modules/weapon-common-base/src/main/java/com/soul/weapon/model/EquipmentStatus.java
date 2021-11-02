@@ -6,6 +6,7 @@ import lombok.Data;
 /**
  * @Author: XinLai
  * @Date: 2021/10/28 15:32
+ * 装备状态信息
  */
 @Data
 public class EquipmentStatus {
@@ -25,6 +26,9 @@ public class EquipmentStatus {
     @Display("装备型号")
     private String equipmentMode;
 
+    @Display("自检状态")
+    private Boolean checkStatus;
+
     @Display("信息采集时间")
     private Long time;
 
@@ -36,6 +40,9 @@ public class EquipmentStatus {
 
     @Display("发射俯仰角")
     private Float launchPitchAngle;
+
+    @Display("电子装备计划工作频率")
+    private Float electromagneticFrequency;
 
     @Display("最小工作频率")
     private Float MinFrequency;

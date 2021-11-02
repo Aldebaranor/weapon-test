@@ -56,6 +56,8 @@ public class FireConflictChargeImpl implements FireConflictCharge {
                 chargeReport.setChargeType(0);
                 GenerateDetail(equipmentStatusA,equipmentStatusB);
                 /*
+                     根据装备A和装备B去管控措施表中查询相关信息
+                     （需要多加一个措施表项？）
                      ......
                      输出具体的管控措施
                      ......
@@ -126,5 +128,5 @@ public class FireConflictChargeImpl implements FireConflictCharge {
         chargeReportDetailB.setLaunchAzimuth(equipmentStatusB.getLaunchAzimuth());
         chargeReportDetailB.setLaunchPitchAngle(equipmentStatusB.getLaunchPitchAngle());
     }
-    
+
 }

@@ -8,6 +8,7 @@ import lombok.Data;
  * @Date: 2021/10/28 15:43
  */
 @Data
+@Display("武器发射使用信息")
 public class EquipmentLaunchStatus {
     @Display("发送方编号")
     private String sender;

@@ -8,6 +8,7 @@ import lombok.Data;
  * @Date: 2021/10/28 15:58
  */
 @Data
+@Display("海洋战场环境信息")
 public class EnvironmentInfo {
     @Display("发送方编号")
     private String sender;

@@ -14,7 +14,7 @@ public interface FireConflictCharge {
     /**
      * 预判作战方案之间是否存在火力冲突
      * @param equipmentStatusA 作战方案A
-     * @param equipmentStatusA 作战方案B
+     * @param equipmentStatusB 作战方案B
      * @return 冲突报告
      */
     ChargeReport chargeReport(EquipmentStatus equipmentStatusA , EquipmentStatus equipmentStatusB);
