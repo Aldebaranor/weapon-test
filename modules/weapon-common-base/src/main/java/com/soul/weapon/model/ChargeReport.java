@@ -6,9 +6,10 @@ import lombok.Data;
 /**
  * @Author: XinLai
  * @Date: 2021/11/1 11:04
+ * 兼容管控结果报文
  */
 @Data
-@Display("兼容管控结果报文")
+@Display("兼容管控结果")
 public class ChargeReport {
 
     @Display("管控序号")

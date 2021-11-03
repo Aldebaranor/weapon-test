@@ -16,8 +16,8 @@ public class FireConflictCondition {
     @ConditionOperator(name = "id", operator = ClauseOperator.Equal)
     private String id;
 
-    @Display("conflictType")
-    @ConditionOperator(name = "conflictType", operator = ClauseOperator.Equal)
+    @Display("ConflictType")
+    @ConditionOperator(name = "ConflictType", operator = ClauseOperator.Equal)
     private String conflictType;
 
     @Display("taskId")

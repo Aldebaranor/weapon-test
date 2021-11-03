@@ -36,7 +36,8 @@ public class FirePriorityServiceImpl extends TemplateService<FirePriority, Strin
         return firePriorityRepository;
     }
 
-    //TODO :逻辑有问题。
+    //TODO :逻辑有问题。是不是应该根据主键
+
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void updatePriorityByPair(FirePriority modPriority) {

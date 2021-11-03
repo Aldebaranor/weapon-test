@@ -23,10 +23,10 @@ public class FireConflictPriority extends BaseEntity {
 
     @Id
     @Display("主键")
-    @Column(name = "conflictType")
+    @Column(name = "ConflictType")
     private String id;
 
-    @Display("冲突类型")
+    @Display("冲突优先级")
     @Column(name = "conflictPriority")
     private Integer conflictPriority;
 }

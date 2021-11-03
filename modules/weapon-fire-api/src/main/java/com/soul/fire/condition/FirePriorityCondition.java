@@ -24,7 +24,7 @@ public class FirePriorityCondition implements Serializable {
     private String code;
 
     @Display("冲突类型")
-    @ConditionOperator(name = "conflictType", operator = ClauseOperator.Equal)
+    @ConditionOperator(name = "ConflictType", operator = ClauseOperator.Equal)
     private String ConflictType;
 
 }

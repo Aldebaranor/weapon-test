@@ -3,7 +3,7 @@ package com.soul.fire.algorithm.impl;
 import com.soul.fire.algorithm.FireConflictCharge;
 import com.soul.fire.config.ChargeConfig;
 import com.soul.weapon.model.ChargeReport;
-import com.soul.weapon.model.EquipmentStatus;
+import com.soul.weapon.model.dds.EquipmentStatus;
 import com.soul.weapon.model.ReportDetail;
 
 /**

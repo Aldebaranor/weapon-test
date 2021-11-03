@@ -6,6 +6,7 @@ import lombok.Data;
 /**
  * @Author: XinLai
  * @Date: 2021/10/29 16:22
+ * 冲突管控对象信息
  */
 @Data
 @Display("冲突管控对象信息")

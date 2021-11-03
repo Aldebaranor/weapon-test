@@ -3,6 +3,7 @@ package com.soul.fire.entity;
 import com.egova.model.BaseEntity;
 import com.egova.model.annotation.Display;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.soul.fire.entity.enums.ConflictType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -37,7 +38,7 @@ public class FireThreshold extends BaseEntity{
 
     @Display("冲突类型")
     @Column(name = "type")
-    private String type;
+    private ConflictType type;
 
     @Display("安全阈值")
     @Column(name = "thresholdValue")

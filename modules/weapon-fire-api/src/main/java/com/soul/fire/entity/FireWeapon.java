@@ -3,6 +3,7 @@ package com.soul.fire.entity;
 import com.egova.model.BaseEntity;
 import com.egova.model.annotation.Display;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.soul.fire.entity.codes.WeaponType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -37,7 +38,7 @@ public class FireWeapon extends BaseEntity{
 
     @Display("武器类型")
     @Column(name = "type")
-    private String type;
+    private WeaponType type;
 
     @Display("创建人")
     @Column(name = "creator")

@@ -3,6 +3,8 @@ package com.soul.fire.entity;
 import com.egova.model.BaseEntity;
 import com.egova.model.annotation.Display;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.soul.fire.entity.enums.ConflictSourceType;
+import com.soul.fire.entity.enums.ConflictType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -12,6 +14,12 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import java.sql.Timestamp;
+
+/**
+ * @Auther: 码头工人
+ * @Date: 2021/11/01/2:10 下午
+ * @Description:
+ */
 
 @Data
 @Entity
@@ -35,12 +43,12 @@ public class FireConflict extends BaseEntity {
     private String name;
 
     @Display("冲突类型")
-    @Column(name = "conflictType")
-    private String conflictType;
+    @Column(name = "ConflictType")
+    private ConflictType conflictType;
 
     @Display("管控，预判")
     @Column(name = "conflictSource")
-    private String conflictSource;
+    private ConflictSourceType conflictSource;
 
     @Display("外键-任务")
     @Column(name = "taskId")

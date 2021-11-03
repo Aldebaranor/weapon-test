@@ -1,4 +1,4 @@
-package com.soul.weapon.model;
+package com.soul.weapon.model.dds;
 
 import com.egova.model.annotation.Display;
 import lombok.Data;
@@ -6,6 +6,7 @@ import lombok.Data;
 /**
  * @Author: XinLai
  * @Date: 2021/10/28 15:27
+ * 作战方案信息
  */
 @Data
 @Display("作战方案信息")
