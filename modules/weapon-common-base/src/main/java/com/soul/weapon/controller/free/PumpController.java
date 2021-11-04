@@ -56,10 +56,8 @@ public class PumpController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-
         if(StringUtils.equalsIgnoreCase("EquipmentStatus",structName)){
             EquipmentStatus equipmentStatus = new EquipmentStatus();
-
             equipmentStatus.setSender("juntai");
             equipmentStatus.setMsgTime(System.currentTimeMillis());
             equipmentStatus.setEquipmentId("1");
