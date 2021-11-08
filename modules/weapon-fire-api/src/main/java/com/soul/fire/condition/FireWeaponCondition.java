@@ -25,10 +25,6 @@ public class FireWeaponCondition {
     @ConditionOperator(name = "code", operator = ClauseOperator.Equal)
     private String code;
 
-//    @Display("controlled")
-//    @ConditionOperator(name = "controlled",operator = ClauseOperator.Equal)
-//    private boolean controlled;
-
     @Display("selfCheck")
     @ConditionOperator(name = "selfCheck",operator = ClauseOperator.Equal)
     private boolean selfCheck;
