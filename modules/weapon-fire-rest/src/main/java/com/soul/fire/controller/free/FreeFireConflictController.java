@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/free/conflict")
 @RequiredArgsConstructor
-public class FireConflictController {
+public class FreeFireConflictController {
     
     private final FireConflictService fireConflictService;
 

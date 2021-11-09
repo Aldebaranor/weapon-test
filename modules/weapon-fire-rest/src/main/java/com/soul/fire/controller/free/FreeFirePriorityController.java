@@ -18,14 +18,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/free/priority")
 @RequiredArgsConstructor
-public class FirePriorityController {
+public class FreeFirePriorityController {
 
     private final FirePriorityService firePriorityService;
 
     @Api
     @PutMapping()
     public void updateTask(@RequestBody FirePriority modPriority) {
-        firePriorityService.update(                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       modPriority);
+        firePriorityService.update(modPriority);
         // firePriorityService.updatePriorityByPair(modPriority);
     }
 

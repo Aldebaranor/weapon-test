@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/free/conflict-priority")
 @RequiredArgsConstructor
-public class FireConflictPriorityController {
+public class FreeFireConflictPriorityController {
 
     private final FireConflictPriorityService fireConflictPriorityService;
 

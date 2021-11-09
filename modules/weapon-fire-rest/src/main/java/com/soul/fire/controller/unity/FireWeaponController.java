@@ -1,4 +1,4 @@
-package com.soul.fire.controller.free;
+package com.soul.fire.controller.unity;
 
 import com.egova.web.annotation.Api;
 import com.soul.fire.condition.FireWeaponCondition;
@@ -12,7 +12,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/free/weapon")
+@RequestMapping("/unity/weapon")
 @RequiredArgsConstructor
 public class FireWeaponController {
     

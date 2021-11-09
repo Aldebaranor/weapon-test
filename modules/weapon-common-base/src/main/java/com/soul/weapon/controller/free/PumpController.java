@@ -13,6 +13,7 @@ import org.codehaus.jackson.JsonNode;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +38,7 @@ public class PumpController {
     @Api
     @PostMapping(value = "/{structName}")
     public Boolean pumpByStruct(@PathVariable String structName,@RequestBody Map<String,String> msg) {
+
         if(StringUtils.isBlank(structName)){
             throw ExceptionUtils.api("structName can not be null");
         }
@@ -73,7 +75,10 @@ public class PumpController {
             equipmentStatus.setMaxFrequency(0.1F);
 
             HttpEntity<Object> request = new HttpEntity<>(equipmentStatus, headers);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/"+structName,request,String.class);
+            ResponseEntity<String> responseEntity = restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/"+structName,request,String.class);
+
+
+
 
         }
         return true;

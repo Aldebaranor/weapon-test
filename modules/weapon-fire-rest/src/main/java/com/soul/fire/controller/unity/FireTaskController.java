@@ -1,4 +1,4 @@
-package com.soul.fire.controller.free;
+package com.soul.fire.controller.unity;
 
 import com.egova.web.annotation.Api;
 import com.soul.fire.condition.FireTaskCondition;
@@ -6,16 +6,13 @@ import com.soul.fire.entity.FireTask;
 import com.soul.fire.service.FireTaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.parameters.P;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.concurrent.locks.Condition;
 
 @Slf4j
 @RestController
-@RequestMapping("/free/task")
+@RequestMapping("/unity/task")
 @RequiredArgsConstructor
 public class FireTaskController {
 

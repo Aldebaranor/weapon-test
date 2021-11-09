@@ -1,4 +1,4 @@
-package com.soul.weapon.controller.free;
+package com.soul.weapon.controller.unity;
 
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
@@ -8,7 +8,6 @@ import com.soul.weapon.entity.PipeTask;
 import com.soul.weapon.service.PipeTaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,9 +18,9 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/pipe/free/task")
+@RequestMapping("/pipe/unity/task")
 @RequiredArgsConstructor
-public class FreePipeTaskController {
+public class PipeTaskController {
 
     private final PipeTaskService pipeTaskService;
 

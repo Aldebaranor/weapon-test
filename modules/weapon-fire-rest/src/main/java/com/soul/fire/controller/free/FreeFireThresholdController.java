@@ -18,7 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/free/threshold")
 @RequiredArgsConstructor
-public class FireThresholdController {
+public class FreeFireThresholdController {
 
     private final FireThresholdService fireThresholdService;
 

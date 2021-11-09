@@ -16,6 +16,8 @@ public class FireConflictChargeImpl implements FireConflictCharge {
     ReportDetail chargeReportDetailB = new ReportDetail();
     ChargeReport chargeReport = new ChargeReport();
     ChargeConfig chargeConfig = new ChargeConfig();
+
+    // 从阈值表项中获取阈值
     private Long fireChargeTimeThreshold = 3L;
     private Float fireChargePitchAngleThreshold = 0.05F;
     private Float fireChargeAzimuthThreshold = 0.05F;
@@ -38,7 +40,9 @@ public class FireConflictChargeImpl implements FireConflictCharge {
         Long timeA = equipmentStatusA.getTime();
         Long timeB = equipmentStatusB.getTime();
 
+        // 设置管控时间
         chargeReport.setTime(Math.min(timeA,timeB));
+        // 此处设置管控装备和自由装备id（应该根据管控措施具体实现）
         chargeReport.setChargeEquipId(equipmentStatusA.getEquipmentId());
         chargeReport.setFreeEquipId(equipmentStatusB.getEquipmentId());
         // 是否都处于工作状态

@@ -3,6 +3,7 @@ package com.soul.fire.entity.enums;
 import com.egova.associative.Associative;
 import com.egova.associative.CodeTypeProvider;
 import com.egova.model.PropertyDescriptor;
+import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -19,7 +20,7 @@ public enum ConflictSourceType implements PropertyDescriptor {
 
     REALTIME("0", "管控"),
 
-    ANTICIPATION("1", "预判"),
+    ANTICIPATION("1", "预判")
 
     ;
 

@@ -18,7 +18,7 @@ public interface FireTaskService {
 
     /**
      * 兼容预判任务的更新
-     * @param running 新的running
+     * @param task 新的task
      * @return
      */
     void update(@RequestBody FireTask task);
