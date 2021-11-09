@@ -110,6 +110,8 @@
         <column name="controlled" remarks="管控标识" type="TINYINT(3)"/>
         <column name="selfCheck" remarks="自检字段" type="TINYINT(3)"/>
         <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+        <column name="x" remarks="装备位置x" type="FLOAT"/>
+        <column name="y" remarks="装备位置y" type="FLOAT"/>
     </createTable>
     </changeSet>
 
@@ -137,6 +139,8 @@
             <column name="sortKey" value="1"/>
             <column name="selfCheck" value="0"/>
             <column name="disabled" value="0"/>
+            <column name="x" value="0.0"/>
+            <column name="y" value="0.0"/>
         </insert>
         <insert tableName="fire_weapon">
             <column name="id" value="2"/>
@@ -147,6 +151,8 @@
             <column name="sortKey" value="2"/>
             <column name="selfCheck" value="0"/>
             <column name="disabled" value="0"/>
+            <column name="x" value="0.0"/>
+            <column name="y" value="0.0"/>
         </insert>
         <insert tableName="fire_weapon">
             <column name="id" value="3"/>
@@ -157,6 +163,8 @@
             <column name="sortKey" value="3"/>
             <column name="selfCheck" value="0"/>
             <column name="disabled" value="0"/>
+            <column name="x" value="0.0"/>
+            <column name="y" value="0.0"/>
         </insert>
         <insert tableName="fire_weapon">
             <column name="id" value="4"/>
@@ -167,6 +175,8 @@
             <column name="sortKey" value="4"/>
             <column name="selfCheck" value="0"/>
             <column name="disabled" value="0"/>
+            <column name="x" value="0.0"/>
+            <column name="y" value="0.0"/>
         </insert>
         <insert tableName="fire_weapon">
             <column name="id" value="5"/>
@@ -177,6 +187,8 @@
             <column name="sortKey" value="5"/>
             <column name="selfCheck" value="0"/>
             <column name="disabled" value="0"/>
+            <column name="x" value="0.0"/>
+            <column name="y" value="0.0"/>
         </insert>
         <insert tableName="fire_weapon">
             <column name="id" value="6"/>
@@ -187,6 +199,8 @@
             <column name="sortKey" value="6"/>
             <column name="selfCheck" value="0"/>
             <column name="disabled" value="0"/>
+            <column name="x" value="0.0"/>
+            <column name="y" value="0.0"/>
         </insert>
         <insert tableName="fire_weapon">
             <column name="id" value="7"/>
@@ -197,6 +211,8 @@
             <column name="sortKey" value="7"/>
             <column name="selfCheck" value="0"/>
             <column name="disabled" value="0"/>
+            <column name="x" value="0.0"/>
+            <column name="y" value="0.0"/>
         </insert>
         <insert tableName="fire_weapon">
             <column name="id" value="8"/>
@@ -207,6 +223,8 @@
             <column name="sortKey" value="8"/>
             <column name="selfCheck" value="0"/>
             <column name="disabled" value="0"/>
+            <column name="x" value="0.0"/>
+            <column name="y" value="0.0"/>
         </insert>
         <insert tableName="fire_weapon">
             <column name="id" value="9"/>
@@ -217,6 +235,8 @@
             <column name="sortKey" value="9"/>
             <column name="selfCheck" value="0"/>
             <column name="disabled" value="0"/>
+            <column name="x" value="0.0"/>
+            <column name="y" value="0.0"/>
         </insert>
         <insert tableName="fire_weapon">
             <column name="id" value="10"/>
@@ -227,6 +247,8 @@
             <column name="sortKey" value="10"/>
             <column name="selfCheck" value="0"/>
             <column name="disabled" value="0"/>
+            <column name="x" value="0.0"/>
+            <column name="y" value="0.0"/>
         </insert>
         <insert tableName="fire_weapon">
             <column name="id" value="11"/>
@@ -237,6 +259,8 @@
             <column name="sortKey" value="11"/>
             <column name="selfCheck" value="0"/>
             <column name="disabled" value="0"/>
+            <column name="x" value="0.0"/>
+            <column name="y" value="0.0"/>
         </insert>
         <insert tableName="fire_weapon">
             <column name="id" value="12"/>
@@ -247,6 +271,8 @@
             <column name="sortKey" value="12"/>
             <column name="selfCheck" value="0"/>
             <column name="disabled" value="0"/>
+            <column name="x" value="0.0"/>
+            <column name="y" value="0.0"/>
         </insert>
         <insert tableName="fire_weapon">
             <column name="id" value="13"/>
@@ -257,6 +283,8 @@
             <column name="sortKey" value="13"/>
             <column name="selfCheck" value="0"/>
             <column name="disabled" value="0"/>
+            <column name="x" value="0.0"/>
+            <column name="y" value="0.0"/>
         </insert>
         <insert tableName="fire_weapon">
             <column name="id" value="14"/>
@@ -267,6 +295,8 @@
             <column name="sortKey" value="14"/>
             <column name="selfCheck" value="0"/>
             <column name="disabled" value="0"/>
+            <column name="x" value="0.0"/>
+            <column name="y" value="0.0"/>
         </insert>
         <insert tableName="fire_weapon">
             <column name="id" value="15"/>
@@ -277,6 +307,8 @@
             <column name="sortKey" value="15"/>
             <column name="selfCheck" value="0"/>
             <column name="disabled" value="0"/>
+            <column name="x" value="0.0"/>
+            <column name="y" value="0.0"/>
         </insert>
         <insert tableName="fire_weapon">
             <column name="id" value="16"/>
@@ -287,6 +319,8 @@
             <column name="sortKey" value="16"/>
             <column name="selfCheck" value="0"/>
             <column name="disabled" value="0"/>
+            <column name="x" value="0.0"/>
+            <column name="y" value="0.0"/>
         </insert>
         <insert tableName="fire_weapon">
             <column name="id" value="17"/>
@@ -297,6 +331,8 @@
             <column name="sortKey" value="17"/>
             <column name="selfCheck" value="0"/>
             <column name="disabled" value="0"/>
+            <column name="x" value="0.0"/>
+            <column name="y" value="0.0"/>
         </insert>
 
         <insert tableName="fire_conflict_priority">

@@ -2,9 +2,16 @@ package com.soul.fire.algorithm.impl;
 
 import com.soul.fire.algorithm.FireConflictCharge;
 import com.soul.fire.config.ChargeConfig;
+import com.soul.fire.controller.free.FreeFireThresholdController;
+import com.soul.fire.controller.unity.FireThresholdController;
+import com.soul.fire.controller.unity.FireWeaponController;
+import com.soul.fire.entity.FireThreshold;
 import com.soul.weapon.model.ChargeReport;
 import com.soul.weapon.model.dds.EquipmentStatus;
 import com.soul.weapon.model.ReportDetail;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import javax.sql.DataSource;
 
 /**
  * @Author: XinLai
@@ -17,10 +24,13 @@ public class FireConflictChargeImpl implements FireConflictCharge {
     ChargeReport chargeReport = new ChargeReport();
     ChargeConfig chargeConfig = new ChargeConfig();
 
+    public FireThresholdController fireThresholdController;
+    public FireWeaponController fireWeaponController;
+
     // 从阈值表项中获取阈值
-    private Long fireChargeTimeThreshold = 3L;
-    private Float fireChargePitchAngleThreshold = 0.05F;
-    private Float fireChargeAzimuthThreshold = 0.05F;
+    private Long  fireChargeTimeThreshold = 3L;
+    private Float fireChargePitchAngleThreshold = Float.valueOf(fireThresholdController.getById("2").getThresholdValue());
+    private Float fireChargeAzimuthThreshold = Float.valueOf(fireThresholdController.getById("3").getThresholdValue());
     private Float posAx = 0.0F;
     private Float posAy = 0.0F;
     private Float posBx = 0.0F;
@@ -131,6 +141,24 @@ public class FireConflictChargeImpl implements FireConflictCharge {
         chargeReportDetailB.setMaxFrequency(equipmentStatusB.getMaxFrequency());
         chargeReportDetailB.setLaunchAzimuth(equipmentStatusB.getLaunchAzimuth());
         chargeReportDetailB.setLaunchPitchAngle(equipmentStatusB.getLaunchPitchAngle());
+    }
+
+    /**
+     * 从数据库中读取阈值
+     */
+    private void ReadThreshold(EquipmentStatus equipmentStatusA,EquipmentStatus equipmentStatusB){
+        FireThreshold fireThreshold = fireThresholdController.getById("0");
+        if(fireThreshold!=null) fireChargeTimeThreshold = Long.valueOf(fireThresholdController.getById("0").getThresholdValue());
+
+        fireChargePitchAngleThreshold = ((fireThreshold=fireThresholdController.getById("1"))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):0.05F;
+        fireChargeAzimuthThreshold = ((fireThreshold=fireThresholdController.getById("2"))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):0.05F;
+
+        posAx = fireWeaponController.getById(equipmentStatusA.getEquipmentId()).getX();
+        posAy = fireWeaponController.getById(equipmentStatusA.getEquipmentId()).getY();
+        posBx = fireWeaponController.getById(equipmentStatusB.getEquipmentId()).getX();
+        posBy = fireWeaponController.getById(equipmentStatusB.getEquipmentId()).getY();
+
+
     }
 
 }

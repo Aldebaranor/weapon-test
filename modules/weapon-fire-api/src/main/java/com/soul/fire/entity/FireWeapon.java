@@ -60,6 +60,14 @@ public class FireWeapon extends BaseEntity{
     @Column(name = "disabled")
     private Boolean disabled;
 
+    @Display("装备位置")
+    @Column(name = "x")
+    private Float x;
+
+    @Display("装备位置")
+    @Column(name = "y")
+    private Float y;
+
     @Display("创建时间")
     @Column(name = "createTime")
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
