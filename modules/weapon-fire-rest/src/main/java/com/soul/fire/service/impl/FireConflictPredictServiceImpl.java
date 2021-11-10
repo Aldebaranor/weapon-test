@@ -1,21 +1,48 @@
-package com.soul.fire.algorithm.impl;
+package com.soul.fire.service.impl;
 
-import com.soul.fire.algorithm.FireConflictPredict;
+import com.egova.json.utils.JsonUtils;
+import com.egova.redis.RedisUtils;
+import com.soul.fire.entity.FireConflictPriority;
+import com.soul.fire.service.FireConflictPredictService;
 import com.soul.fire.config.PredictConfig;
+import com.soul.fire.controller.unity.FireThresholdController;
+import com.soul.fire.controller.unity.FireWeaponController;
+import com.soul.fire.entity.FireThreshold;
+import com.soul.fire.service.FireThresholdService;
+import com.soul.fire.service.FireWeaponService;
 import com.soul.weapon.model.ConflictReport;
 import com.soul.weapon.model.ReportDetail;
 import com.soul.weapon.model.ScenariosInfo;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Priority;
 
 /**
  * @Author: XinLai
  * @Date: 2021/10/29 16:35
  */
-public class FireConflictPredictImpl implements FireConflictPredict {
+@Slf4j
+@Service
+@Priority(5)
+@RequiredArgsConstructor
+public class FireConflictPredictServiceImpl implements FireConflictPredictService {
+
+    private final String TIME_ID = "1";
+    private final String PITCH_ID = "2";
+    private final String AZIMUTH_ID = "3";
+    private final String ELECTFREQUENCY_ID = "12";
+    private final String WATERFREQUENCY_ID = "13";
+
+    public final FireThresholdService fireThresholdService;
+    public final FireWeaponService fireWeaponService;
 
     ReportDetail conflictReportDetailA = new ReportDetail();
     ReportDetail conflictReportDetailB = new ReportDetail();
     ConflictReport conflictReport = new ConflictReport();
-    PredictConfig predictConfig = new PredictConfig();
+
     private Long fireConflictTimeThreshold = 3L;
     private Float fireConflictPitchAngleThreshold = 0.05F;
     private Float fireConflictAzimuthThreshold = 0.05F;
@@ -30,6 +57,7 @@ public class FireConflictPredictImpl implements FireConflictPredict {
     @Override
     public ConflictReport conflictPredict(ScenariosInfo scenariosA , ScenariosInfo scenariosB) {
 
+        ReadThreshold(scenariosA,scenariosB);
         conflictReport.setId(scenariosA.getEquipmentId()+" " +scenariosB.getEquipmentId());
 
         Long timeA = scenariosA.getBeginTime();
@@ -44,12 +72,14 @@ public class FireConflictPredictImpl implements FireConflictPredict {
             // 火力冲突预判
             boolean timeState = Math.abs(scenariosA.getBeginTime()-scenariosB.getBeginTime())<fireConflictTimeThreshold;
             boolean pitchState = Math.abs(scenariosA.getLaunchPitchAngle()-scenariosB.getLaunchPitchAngle())<fireConflictPitchAngleThreshold;
-
-            boolean azimuthState = Math.sqrt((Math.exp(posAx-posBx)+Math.exp(posAy-posBy)/100))<fireConflictAzimuthThreshold;
+            boolean azimuthState = Math.sqrt((Math.pow((posAx-posBx),2)+Math.pow((posAy-posBy),2)/100))<fireConflictAzimuthThreshold;
 
             if(timeState && pitchState && azimuthState ){
                 conflictReport.setConflictType(0);
                 GenerateDetail(scenariosA,scenariosB);
+                RedisUtils.getService().opsForHash().put(PredictConfig.PREDICT_KEY,conflictReport.getId(), JsonUtils.serialize(conflictReport));
+                RedisUtils.getService().opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,conflictReportDetailA.getId(), JsonUtils.serialize(conflictReportDetailA));
+                RedisUtils.getService().opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,conflictReportDetailB.getId(), JsonUtils.serialize(conflictReportDetailB));
                 return conflictReport;
             }else {
                 return null;
@@ -116,5 +146,25 @@ public class FireConflictPredictImpl implements FireConflictPredict {
         conflictReportDetailB.setLaunchPitchAngle(scenariosInfoB.getLaunchPitchAngle());
     }
 
+    /**
+     * 从数据库中读取阈值
+     */
+    private void ReadThreshold(ScenariosInfo scenariosA, ScenariosInfo scenariosB){
+        FireThreshold fireThreshold;
+        fireConflictTimeThreshold = ((fireThreshold=fireThresholdService.getById(TIME_ID))!=null)?Long.valueOf(fireThreshold.getThresholdValue()):3L;
+
+        fireConflictPitchAngleThreshold = ((fireThreshold=fireThresholdService.getById(PITCH_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):0.05F;
+        fireConflictAzimuthThreshold = ((fireThreshold=fireThresholdService.getById(AZIMUTH_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):0.05F;
+
+        posAx = fireWeaponService.getById(scenariosA.getEquipmentId()).getX();
+        posAy = fireWeaponService.getById(scenariosA.getEquipmentId()).getY();
+        posBx = fireWeaponService.getById(scenariosB.getEquipmentId()).getX();
+        posBy = fireWeaponService.getById(scenariosB.getEquipmentId()).getY();
+
+        electFrequency = ((fireThreshold=fireThresholdService.getById(ELECTFREQUENCY_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):10.0F;
+        waterFrequency = ((fireThreshold=fireThresholdService.getById(WATERFREQUENCY_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):5.0F;
+    }
 
 }
+
+

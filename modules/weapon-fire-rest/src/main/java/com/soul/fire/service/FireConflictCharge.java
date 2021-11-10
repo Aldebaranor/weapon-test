@@ -1,4 +1,4 @@
-package com.soul.fire.algorithm;
+package com.soul.fire.service;
 
 import com.soul.weapon.model.ChargeReport;
 import com.soul.weapon.model.ConflictReport;

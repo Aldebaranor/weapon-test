@@ -16,5 +16,9 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "fire.predict")
 public class PredictConfig {
 
-    private int dataBase;
+    public int dataBase;
+
+    public static String PREDICT_KEY = "fire:predict";
+
+    public static String PREDICTDETAIL_KEY = "fire:predict_detail";
 }

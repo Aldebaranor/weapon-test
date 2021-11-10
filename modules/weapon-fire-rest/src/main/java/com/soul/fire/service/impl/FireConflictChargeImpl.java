@@ -1,28 +1,37 @@
-package com.soul.fire.algorithm.impl;
+package com.soul.fire.service.impl;
 
-import com.soul.fire.algorithm.FireConflictCharge;
-import com.soul.fire.config.ChargeConfig;
-import com.soul.fire.controller.free.FreeFireThresholdController;
+import com.soul.fire.service.FireConflictCharge;
 import com.soul.fire.controller.unity.FireThresholdController;
 import com.soul.fire.controller.unity.FireWeaponController;
 import com.soul.fire.entity.FireThreshold;
 import com.soul.weapon.model.ChargeReport;
 import com.soul.weapon.model.dds.EquipmentStatus;
 import com.soul.weapon.model.ReportDetail;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
-import javax.sql.DataSource;
+import javax.annotation.Priority;
 
 /**
  * @Author: XinLai
  * @Date: 2021/11/1 11:11
  */
+@Slf4j
+@Service
+@Priority(5)
+@RequiredArgsConstructor
 public class FireConflictChargeImpl implements FireConflictCharge {
+
+    private final String TIME_ID = "1";
+    private final String PITCH_ID = "2";
+    private final String AZIMUTH_ID = "3";
+    private final String ELECTFREQUENCY_ID = "12";
+    private final String WATERFREQUENCY_ID = "13";
 
     ReportDetail chargeReportDetailA = new ReportDetail();
     ReportDetail chargeReportDetailB = new ReportDetail();
     ChargeReport chargeReport = new ChargeReport();
-    ChargeConfig chargeConfig = new ChargeConfig();
 
     public FireThresholdController fireThresholdController;
     public FireWeaponController fireWeaponController;
@@ -45,6 +54,8 @@ public class FireConflictChargeImpl implements FireConflictCharge {
     @Override
     public ChargeReport chargeReport(EquipmentStatus equipmentStatusA,EquipmentStatus equipmentStatusB){
 
+        ReadThreshold(equipmentStatusA,equipmentStatusB);
+
         chargeReport.setId(equipmentStatusA.getEquipmentId()+" " +equipmentStatusB.getEquipmentId());
 
         Long timeA = equipmentStatusA.getTime();
@@ -64,7 +75,7 @@ public class FireConflictChargeImpl implements FireConflictCharge {
             boolean timeState = Math.abs(equipmentStatusA.getTime()-equipmentStatusB.getTime())<fireChargeTimeThreshold;
             boolean pitchState = Math.abs(equipmentStatusA.getLaunchPitchAngle()-equipmentStatusB.getLaunchPitchAngle())<fireChargePitchAngleThreshold;
 
-            boolean azimuthState = Math.sqrt((Math.exp(posAx-posBx)+Math.exp(posAy-posBy)/100))<fireChargeAzimuthThreshold;
+            boolean azimuthState = Math.sqrt((Math.pow((posAx-posBx),2)+Math.pow((posAy-posBy),2)/100))<fireChargeAzimuthThreshold;
 
             if(timeState && pitchState && azimuthState && beWork){
                 chargeReport.setChargeType(0);
@@ -147,17 +158,19 @@ public class FireConflictChargeImpl implements FireConflictCharge {
      * 从数据库中读取阈值
      */
     private void ReadThreshold(EquipmentStatus equipmentStatusA,EquipmentStatus equipmentStatusB){
-        FireThreshold fireThreshold = fireThresholdController.getById("0");
-        if(fireThreshold!=null) fireChargeTimeThreshold = Long.valueOf(fireThresholdController.getById("0").getThresholdValue());
+        FireThreshold fireThreshold;
+        fireChargeTimeThreshold = ((fireThreshold=fireThresholdController.getById(TIME_ID))!=null)?Long.valueOf(fireThreshold.getThresholdValue()):3L;
 
-        fireChargePitchAngleThreshold = ((fireThreshold=fireThresholdController.getById("1"))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):0.05F;
-        fireChargeAzimuthThreshold = ((fireThreshold=fireThresholdController.getById("2"))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):0.05F;
+        fireChargePitchAngleThreshold = ((fireThreshold=fireThresholdController.getById(PITCH_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):0.05F;
+        fireChargeAzimuthThreshold = ((fireThreshold=fireThresholdController.getById(AZIMUTH_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):0.05F;
 
         posAx = fireWeaponController.getById(equipmentStatusA.getEquipmentId()).getX();
         posAy = fireWeaponController.getById(equipmentStatusA.getEquipmentId()).getY();
         posBx = fireWeaponController.getById(equipmentStatusB.getEquipmentId()).getX();
         posBy = fireWeaponController.getById(equipmentStatusB.getEquipmentId()).getY();
 
+        electFrequencyThreshold = ((fireThreshold=fireThresholdController.getById(ELECTFREQUENCY_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):10.0F;
+        waterFrequencyThreshold = ((fireThreshold=fireThresholdController.getById(WATERFREQUENCY_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):5.0F;
 
     }
 

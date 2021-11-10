@@ -1,4 +1,4 @@
-package com.soul.fire.algorithm;
+package com.soul.fire.service;
 
 import com.soul.weapon.model.ConflictReport;
 import com.soul.weapon.model.ScenariosInfo;
@@ -7,7 +7,7 @@ import com.soul.weapon.model.ScenariosInfo;
  * @Author: XinLai
  * @Date: 2021/10/29 16:20
  */
-public interface FireConflictPredict {
+public interface FireConflictPredictService {
 
 
     /**
