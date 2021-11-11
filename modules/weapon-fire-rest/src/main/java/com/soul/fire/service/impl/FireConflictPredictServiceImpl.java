@@ -92,6 +92,9 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
             if(timeState && frequencyState){
                 conflictReport.setConflictType(1);
                 GenerateDetail(scenariosA,scenariosB);
+                RedisUtils.getService().opsForHash().put(PredictConfig.PREDICT_KEY,conflictReport.getId(), JsonUtils.serialize(conflictReport));
+                RedisUtils.getService().opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,conflictReportDetailA.getId(), JsonUtils.serialize(conflictReportDetailA));
+                RedisUtils.getService().opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,conflictReportDetailB.getId(), JsonUtils.serialize(conflictReportDetailB));
                 return conflictReport;
             }else{
                 return null;
@@ -110,6 +113,9 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
             if(timeState && frequencyState){
                 conflictReport.setConflictType(2);
                 GenerateDetail(scenariosA,scenariosB);
+                RedisUtils.getService().opsForHash().put(PredictConfig.PREDICT_KEY,conflictReport.getId(), JsonUtils.serialize(conflictReport));
+                RedisUtils.getService().opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,conflictReportDetailA.getId(), JsonUtils.serialize(conflictReportDetailA));
+                RedisUtils.getService().opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,conflictReportDetailB.getId(), JsonUtils.serialize(conflictReportDetailB));
                 return conflictReport;
             }else{
                 return null;

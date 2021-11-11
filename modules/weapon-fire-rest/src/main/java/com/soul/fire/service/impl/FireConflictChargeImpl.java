@@ -38,8 +38,8 @@ public class FireConflictChargeImpl implements FireConflictCharge {
 
     // 从阈值表项中获取阈值
     private Long  fireChargeTimeThreshold = 3L;
-    private Float fireChargePitchAngleThreshold = Float.valueOf(fireThresholdController.getById("2").getThresholdValue());
-    private Float fireChargeAzimuthThreshold = Float.valueOf(fireThresholdController.getById("3").getThresholdValue());
+    private Float fireChargePitchAngleThreshold = 0.05F;
+    private Float fireChargeAzimuthThreshold = 0.05F;
     private Float posAx = 0.0F;
     private Float posAy = 0.0F;
     private Float posBx = 0.0F;
