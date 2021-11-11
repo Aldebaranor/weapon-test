@@ -1,26 +1,25 @@
 package com.soul.weapon.controller.free;
-
-import com.egova.exception.ApiException;
 import com.egova.exception.ExceptionUtils;
 import com.egova.json.utils.JsonUtils;
 import com.egova.redis.RedisUtils;
 import com.egova.web.annotation.Api;
 import com.flagwind.commons.StringUtils;
+import com.soul.weapon.config.CommonRedisConfig;
+import com.soul.weapon.model.ScenariosInfo;
+import com.soul.weapon.model.dds.CombatScenariosInfo;
 import com.soul.weapon.model.dds.EquipmentStatus;
+import com.soul.weapon.utils.DateParserUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.codehaus.jackson.JsonNode;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import javax.websocket.server.PathParam;
 import java.util.Map;
+import com.soul.weapon.config.Constant;
 
 /**
  * @Auther: 码头工人
@@ -34,6 +33,7 @@ import java.util.Map;
 public class PumpController {
 
     private final RestTemplate restTemplate;
+    private final CommonRedisConfig commonRedisConfig;
 
     @Api
     @PostMapping(value = "/{structName}")
@@ -46,8 +46,56 @@ public class PumpController {
             throw ExceptionUtils.api("msg can not be null");
         }
         structName = StringUtils.trim(structName);
+        switch (structName) {
+            case "CombatScenariosInfo": {
+                CombatScenariosInfo combatScenariosInfo = new CombatScenariosInfo();
+                combatScenariosInfo.setSender(msg.get("sender"));
+                combatScenariosInfo.setMsgTime(DateParserUtils.convertTimeStrToLong(msg.get("msgTime")));
+                combatScenariosInfo.setTime(DateParserUtils.convertTimeStrToLong(msg.get("time")));
+                combatScenariosInfo.setScenarios(msg.get("scenarios"));
+                combatScenariosInfo.setScenariosList(JsonUtils.deserializeList(
+                        combatScenariosInfo.getScenarios(), ScenariosInfo.class));
+
+                RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).getTemplate().opsForValue().set(
+                        Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY, JsonUtils.serialize(combatScenariosInfo));
+            }break;
+            case "EnvironmentInfo": {
+                RedisUtils.getService().getTemplate().opsForValue().set(
+                        Constant.ENVIRONMENT_INFO_HTTP_KEY, JsonUtils.serialize(msg));
+            }break;
+            case "EquipmentLaunchStatus": {
+                RedisUtils.getService().getTemplate().opsForValue().set(
+                        Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, JsonUtils.serialize(msg));
+            }break;
+            case "EquipmentStatus": {
+                RedisUtils.getService().getTemplate().opsForValue().set(
+                        Constant.EQUIPMENT_STATUS_HTTP_KEY, JsonUtils.serialize(msg));
+            }break;
+            case "LauncherRotationInfo": {
+                RedisUtils.getService().getTemplate().opsForValue().set(
+                        Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY, JsonUtils.serialize(msg));
+            }break;
+            case "TargetFireControlInfo": {
+                RedisUtils.getService().getTemplate().opsForValue().set(
+                        Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, JsonUtils.serialize(msg));
+            }break;
+            case "TargetInfo": {
+                RedisUtils.getService().getTemplate().opsForValue().set(
+                        Constant.TARGET_INFO_HTTP_KEY, JsonUtils.serialize(msg));
+            }break;
+            case "TargetInstructionsInfo": {
+                RedisUtils.getService().getTemplate().opsForValue().set(
+                        Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, JsonUtils.serialize(msg));
+            }break;
+            default: {
+                log.error("unrecognized struct name for http telegram to redis");
+            }
+        }
+
+
         String key = String.format("weapon:pump:%s",structName.toLowerCase());
         RedisUtils.getService().opsForList().leftPush(key,JsonUtils.serialize(msg));
+        RedisUtils.getService().getTemplate().opsForValue().set(key, JsonUtils.serialize(msg));
         return true;
     }
 
