@@ -8,9 +8,11 @@ import com.soul.weapon.model.ScenariosInfo;
 import com.soul.weapon.model.dds.EquipmentStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.DisallowConcurrentExecution;
 import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -21,10 +23,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component("ConflictPredictJob")
 @com.egova.quartz.annotation.Job(name="ConflictPredictJob",group = "weapon",cron = "1000")
-@RequiredArgsConstructor
+@DisallowConcurrentExecution
 public class ConflictPredictJob implements Job {
 
-    private final FireConflictService fireConflictService;
+    @Autowired
+    public FireConflictService fireConflictService;
+
 
     private final Integer DBINDEX = 1;
 
@@ -41,7 +45,7 @@ public class ConflictPredictJob implements Job {
             }
             ScenariosInfo scenariosInfoA = JsonUtils.deserialize(scenariosStrA, ScenariosInfo.class);
             ScenariosInfo scenariosInfoB = JsonUtils.deserialize(scenariosStrB, ScenariosInfo.class);
-            // fireConflictService.conflictPredict(scenariosInfoA, scenariosInfoB);
+            //fireConflictService.getById("1");
 
         } catch (Exception e) {
             log.error("定时计算预判火力兼容预判任务失败！", e);

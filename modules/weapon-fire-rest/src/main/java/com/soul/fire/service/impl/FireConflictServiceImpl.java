@@ -24,7 +24,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-@Priority(5)
+@Priority(1)
 @RequiredArgsConstructor
 @CacheConfig(cacheNames = FireConflict.NAME)
 public class FireConflictServiceImpl extends TemplateService<FireConflict, String> implements FireConflictService {

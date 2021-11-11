@@ -1,7 +1,10 @@
 package com.soul.weapon.model.dds;
 
 import com.egova.model.annotation.Display;
+import com.soul.weapon.model.ScenariosInfo;
 import lombok.Data;
+
+import java.util.List;
 
 /**
  * @Author: XinLai
@@ -22,5 +25,7 @@ public class CombatScenariosInfo {
 
     @Display("作战方案信息实体")
     private String scenarios;
+
+    private List<ScenariosInfo> scenariosList;
 
 }
