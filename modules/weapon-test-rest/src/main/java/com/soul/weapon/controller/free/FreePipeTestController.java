@@ -39,7 +39,7 @@ public class FreePipeTestController {
 
     @Api
     @PostMapping(value = "/exec/{algorithm}")
-    public void execAlgo(@PathVariable("algorithm") String algorithm,@RequestBody List<MissileWeapon> missileInfo)
+    public void execAlgo(@PathVariable("algorithm") String algorithm, @RequestBody List<MissileWeapon> missileInfo)
     {
         System.out.println(missileInfo.toString());
         ctx.execAlgo(algorithm, missileInfo.toString());

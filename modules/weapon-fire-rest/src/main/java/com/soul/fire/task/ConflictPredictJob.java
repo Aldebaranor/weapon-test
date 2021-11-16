@@ -37,7 +37,7 @@ public class ConflictPredictJob implements Job {
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException{
         try {
-            String combatScenariosInfoStr = RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).extrasForValue().
+            String combatScenariosInfoStr = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).extrasForValue().
                     get(Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY);
             if(StringUtils.isBlank(combatScenariosInfoStr)) {
                 log.error("从Redis中获取冲突预判信息失败！");
