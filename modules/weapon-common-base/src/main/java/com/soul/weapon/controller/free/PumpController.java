@@ -63,10 +63,10 @@ public class PumpController {
                         Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, JsonUtils.serialize(msg));
             }break;
             case "EquipmentStatus": {
-                // RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().
-                //         boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).putAll(msg);
-                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().opsForValue().set(
-                        Constant.EQUIPMENT_STATUS_HTTP_KEY, JsonUtils.serialize(msg));
+                EquipmentStatus equipmentStatus = JsonUtils.deserialize(JsonUtils.serialize(msg), EquipmentStatus.class);
+                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().
+                        boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).put(
+                                equipmentStatus.getEquipmentId(), JsonUtils.serialize(equipmentStatus));
             }break;
             case "LauncherRotationInfo": {
                 RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().opsForValue().set(
@@ -126,22 +126,56 @@ public class PumpController {
                 return JsonUtils.serialize(new EquipmentLaunchStatus());
             }
             case "EquipmentStatus": {
-                EquipmentStatus equipmentStatus = new EquipmentStatus();
-                equipmentStatus.setSender("juntai");
-                equipmentStatus.setMsgTime(System.currentTimeMillis());
-                equipmentStatus.setEquipmentId("1");
-                equipmentStatus.setEquipmentTypeId("1");
-                equipmentStatus.setEquipmentMode("远程防空导弹");
-                equipmentStatus.setCheckStatus(true);
-                equipmentStatus.setTime(System.currentTimeMillis());
-                equipmentStatus.setBeWork(true);
-                equipmentStatus.setLaunchAzimuth(0.1F);
-                equipmentStatus.setLaunchPitchAngle(0.1F);
-                equipmentStatus.setElectromagneticFrequency(0.1F);
-                equipmentStatus.setMinFrequency(0.1F);
-                equipmentStatus.setMaxFrequency(0.1F);
-                HttpEntity<Object> request = new HttpEntity<>(equipmentStatus, headers);
-                ResponseEntity<String> responseEntity = restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/"+structName,request,String.class);
+                EquipmentStatus equipmentStatus1 = new EquipmentStatus();
+                equipmentStatus1.setSender("1");
+                equipmentStatus1.setMsgTime(System.currentTimeMillis());
+                equipmentStatus1.setEquipmentId("1");
+                equipmentStatus1.setEquipmentTypeId("1");
+                equipmentStatus1.setEquipmentMode("跟踪雷达");
+                equipmentStatus1.setCheckStatus(true);
+                equipmentStatus1.setTime(System.currentTimeMillis());
+                equipmentStatus1.setBeWork(true);
+                equipmentStatus1.setLaunchAzimuth(0.1F);
+                equipmentStatus1.setLaunchPitchAngle(0.1F);
+                equipmentStatus1.setElectromagneticFrequency(0.1F);
+                equipmentStatus1.setMinFrequency(0.1F);
+                equipmentStatus1.setMaxFrequency(0.1F);
+                EquipmentStatus equipmentStatus2 = new EquipmentStatus();
+                equipmentStatus2.setSender("2");
+                equipmentStatus2.setMsgTime(System.currentTimeMillis());
+                equipmentStatus2.setEquipmentId("2");
+                equipmentStatus2.setEquipmentTypeId("2");
+                equipmentStatus2.setEquipmentMode("反导舰炮武器火控系统");
+                equipmentStatus2.setCheckStatus(true);
+                equipmentStatus2.setTime(System.currentTimeMillis());
+                equipmentStatus2.setBeWork(true);
+                equipmentStatus2.setLaunchAzimuth(0.2F);
+                equipmentStatus2.setLaunchPitchAngle(0.2F);
+                equipmentStatus2.setElectromagneticFrequency(0.2F);
+                equipmentStatus2.setMinFrequency(0.2F);
+                equipmentStatus2.setMaxFrequency(0.2F);
+                EquipmentStatus equipmentStatus3 = new EquipmentStatus();
+                equipmentStatus3.setSender("3");
+                equipmentStatus3.setMsgTime(System.currentTimeMillis());
+                equipmentStatus3.setEquipmentId("3");
+                equipmentStatus3.setEquipmentTypeId("3");
+                equipmentStatus3.setEquipmentMode("反导舰炮");
+                equipmentStatus3.setCheckStatus(true);
+                equipmentStatus3.setTime(System.currentTimeMillis());
+                equipmentStatus3.setBeWork(true);
+                equipmentStatus3.setLaunchAzimuth(0.3F);
+                equipmentStatus3.setLaunchPitchAngle(0.3F);
+                equipmentStatus3.setElectromagneticFrequency(0.3F);
+                equipmentStatus3.setMinFrequency(0.3F);
+                equipmentStatus3.setMaxFrequency(0.3F);
+
+                HttpEntity<Object> request = new HttpEntity<>(equipmentStatus1, headers);
+                ResponseEntity<String> responseEntity = restTemplate.postForEntity(
+                        "http://127.0.0.1:8016/free/pump/" + structName, request, String.class);
+                HttpEntity<Object> request1 = new HttpEntity<>(equipmentStatus1, headers);
+                restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName, request1, String.class);
+                HttpEntity<Object> request2 = new HttpEntity<>(equipmentStatus3, headers);
+                restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName, request2, String.class);
                 return responseEntity.toString();
             }
             case "LauncherRotationInfo": {
