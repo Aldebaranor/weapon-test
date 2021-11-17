@@ -32,11 +32,11 @@ public class PipeAdvice extends BaseEntity {
     private String id;
 
     @Display("测试项(1级)名称")
-    @Column(name = "l1Name",unique = true)
+    @Column(name = "l1Name")
     private String l1Name;
 
     @Display("测试项子项(2级)名称")
-    @Column(name = "l2Name",unique = true)
+    @Column(name = "l2Name")
     private String l2Name;
 
     @Display("l2是否有Err")
@@ -71,7 +71,4 @@ public class PipeAdvice extends BaseEntity {
     @Column(name = "disabled")
     private boolean disabled;
 
-    @Display("关联任务id,外键")
-    @Column(name = "taskId")
-    private String taskId;
 }

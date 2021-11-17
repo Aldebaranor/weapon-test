@@ -16,6 +16,8 @@ public interface FirePriorityService{
      */
     List<FirePriority> getPriorityByType(String conflictType);
 
+    FirePriority getPriorityByIds(String idA,String idB);
+
     /**
      * 根据modPriority中的a,b和优先级，更新优先级
      * @param modPriority

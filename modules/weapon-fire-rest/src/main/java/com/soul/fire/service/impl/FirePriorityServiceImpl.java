@@ -56,6 +56,14 @@ public class FirePriorityServiceImpl extends TemplateService<FirePriority, Strin
     }
 
     @Override
+    public FirePriority getPriorityByIds(String idA,String idB){
+        FirePriorityCondition condition = new FirePriorityCondition();
+        condition.setWeaponAId(idA);
+        condition.setWeaponBId(idB);
+        return super.query(condition).stream().findFirst().orElse(null);
+    }
+
+    @Override
     public List<FirePriority> getPriorityByType(String conflictType) {
         FirePriorityCondition condition = new FirePriorityCondition();
         condition.setConflictType(conflictType);

@@ -1,17 +1,24 @@
 package com.soul.fire.service.impl;
 
+import com.soul.fire.entity.FirePriority;
 import com.soul.fire.service.FireConflictCharge;
 import com.soul.fire.controller.unity.FireThresholdController;
 import com.soul.fire.controller.unity.FireWeaponController;
 import com.soul.fire.entity.FireThreshold;
+import com.soul.fire.service.FirePriorityService;
+import com.soul.fire.service.FireWeaponService;
 import com.soul.weapon.model.ChargeReport;
 import com.soul.weapon.model.dds.EquipmentStatus;
 import com.soul.weapon.model.ReportDetail;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Priority;
+import java.util.Random;
 
 /**
  * @Author: XinLai
@@ -22,6 +29,9 @@ import javax.annotation.Priority;
 @Priority(5)
 @RequiredArgsConstructor
 public class FireConflictChargeImpl implements FireConflictCharge {
+
+    private final FirePriorityService firePriorityService;
+    private final FireWeaponService fireWeaponService;
 
     private final String TIME_ID = "1";
     private final String PITCH_ID = "2";
@@ -61,11 +71,12 @@ public class FireConflictChargeImpl implements FireConflictCharge {
         Long timeA = equipmentStatusA.getTime();
         Long timeB = equipmentStatusB.getTime();
 
+        Random random = new Random(System.currentTimeMillis());
+
         // 设置管控时间
         chargeReport.setTime(Math.min(timeA,timeB));
+        chargeReport.setId(String.valueOf(random.nextLong()));
         // 此处设置管控装备和自由装备id（应该根据管控措施具体实现）
-        chargeReport.setChargeEquipId(equipmentStatusA.getEquipmentId());
-        chargeReport.setFreeEquipId(equipmentStatusB.getEquipmentId());
         // 是否都处于工作状态
         boolean beWork = equipmentStatusA.getBeWork()&&equipmentStatusB.getBeWork();
 
@@ -80,6 +91,16 @@ public class FireConflictChargeImpl implements FireConflictCharge {
             if(timeState && pitchState && azimuthState && beWork){
                 chargeReport.setChargeType(0);
                 GenerateDetail(equipmentStatusA,equipmentStatusB);
+                FirePriority firePriority = firePriorityService.getPriorityByIds(equipmentStatusA.getEquipmentTypeId(),equipmentStatusB.getEquipmentTypeId());
+                if(firePriority.isABetterThanB()){
+                    chargeReport.setFreeEquipId(equipmentStatusA.getEquipmentId());
+                    chargeReport.setChargeEquipId(equipmentStatusB.getEquipmentId());
+                    chargeReport.setChargeMethod(fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getName()+"禁射3分钟");
+                }else{
+                    chargeReport.setFreeEquipId(equipmentStatusB.getEquipmentId());
+                    chargeReport.setChargeEquipId(equipmentStatusA.getEquipmentId());
+                    chargeReport.setChargeMethod(fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getName()+"禁射3分钟");
+                }
                 /*
                      根据装备A和装备B去管控措施表中查询相关信息
                      （需要多加一个措施表项？）
@@ -99,6 +120,16 @@ public class FireConflictChargeImpl implements FireConflictCharge {
             if(timeState && frequencyState && beWork){
                 chargeReport.setChargeType(1);
                 GenerateDetail(equipmentStatusA,equipmentStatusB);
+                FirePriority firePriority = firePriorityService.getPriorityByIds(equipmentStatusA.getEquipmentTypeId(),equipmentStatusB.getEquipmentTypeId());
+                if(firePriority.isABetterThanB()){
+                    chargeReport.setFreeEquipId(equipmentStatusA.getEquipmentId());
+                    chargeReport.setChargeEquipId(equipmentStatusB.getEquipmentId());
+                    chargeReport.setChargeMethod(fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getName()+"禁用3分钟");
+                }else{
+                    chargeReport.setFreeEquipId(equipmentStatusB.getEquipmentId());
+                    chargeReport.setChargeEquipId(equipmentStatusA.getEquipmentId());
+                    chargeReport.setChargeMethod(fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getName()+"禁用3分钟");
+                }
                 return chargeReport;
             }else{
                 return null;
@@ -117,6 +148,16 @@ public class FireConflictChargeImpl implements FireConflictCharge {
             if(timeState && frequencyState && beWork){
                 chargeReport.setChargeType(2);
                 GenerateDetail(equipmentStatusA,equipmentStatusB);
+                FirePriority firePriority = firePriorityService.getPriorityByIds(equipmentStatusA.getEquipmentTypeId(),equipmentStatusB.getEquipmentTypeId());
+                if(firePriority.isABetterThanB()){
+                    chargeReport.setFreeEquipId(equipmentStatusA.getEquipmentId());
+                    chargeReport.setChargeEquipId(equipmentStatusB.getEquipmentId());
+                    chargeReport.setChargeMethod(fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getName()+"禁用3分钟");
+                }else{
+                    chargeReport.setFreeEquipId(equipmentStatusB.getEquipmentId());
+                    chargeReport.setChargeEquipId(equipmentStatusA.getEquipmentId());
+                    chargeReport.setChargeMethod(fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getName()+"禁用3分钟");
+                }
                 return chargeReport;
             }else{
                 return null;
