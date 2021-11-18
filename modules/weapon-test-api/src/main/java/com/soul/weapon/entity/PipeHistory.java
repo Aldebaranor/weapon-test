@@ -31,6 +31,10 @@ public class PipeHistory extends BaseEntity {
     @Column(name = "id")
     private String id;
 
+    @Display("任务类型")
+    @Column(name="type")
+    private String type;
+
     @Display("测试值")
     @Column(name = "res",unique = true)
     private String res;

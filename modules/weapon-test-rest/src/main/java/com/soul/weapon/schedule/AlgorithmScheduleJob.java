@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 @com.egova.quartz.annotation.Job(name="AlgorithmScheduleJob",group = "weapon3",cron = "1000")
 @DisallowConcurrentExecution
 public class AlgorithmScheduleJob implements Job {
+
     @Autowired
     public CommonRedisConfig commonRedisConfig;
 

@@ -107,6 +107,7 @@
             <column name="id" remarks="主键" type="VARCHAR(50)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
+            <column name="type" remarks="任务类型" type="VARCHAR(50)"/>
             <column name="res" remarks="对策建议" type="MEDIUMBLOB"/>
             <column name="createTime" remarks="创建时间" type="datetime"/>
             <column name="modifyTime" remarks="修改时间" type="datetime"/>
