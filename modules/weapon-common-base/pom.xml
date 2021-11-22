@@ -18,6 +18,16 @@
             <groupId>com.egova</groupId>
             <artifactId>egova-starter-platform</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp</artifactId>
+            <version>3.14.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.influxdb</groupId>
+            <artifactId>influxdb-java</artifactId>
+            <version>2.21</version>
+        </dependency>
     </dependencies>
 
 </project>

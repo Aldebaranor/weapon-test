@@ -18,5 +18,4 @@ public class Constant {
     public static String TARGET_INFO_HTTP_KEY = "weapon:pump:target_info";
     public static String TARGET_INSTRUCTIONS_INFO_HTTP_KEY = "weapon:pump:target_instructions_info";
 
-    public static Integer[] AIR_MISSILE_WEAPON_PIPE_TEST_INDICES = {1,2,3,4};
 }

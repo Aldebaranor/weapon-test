@@ -6,8 +6,10 @@ import com.soul.weapon.config.CommonRedisConfig;
 import com.soul.weapon.config.Constant;
 import com.soul.weapon.entity.HistoryInfo;
 import com.soul.weapon.entity.PipeHistory;
+import com.soul.weapon.entity.enums.PipeWeaponIndices;
 import com.soul.weapon.model.dds.*;
 import com.soul.weapon.service.PipeHistoryService;
+import com.soul.weapon.utils.MathUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -27,16 +29,18 @@ import java.util.stream.Collectors;
 public class AllAlgorithm {
     private final CommonRedisConfig commonRedisConfig;
 
+    /** 通道测试的测试周期阈值 **/
+    private Long PIPETEST_CYCLE_THRESHOLD = 3L;
 
     /** 威胁判断-传感器探测时间阈值 **/
-    private Long DetectorTimeThreshold = 2L;
+    private Long DETECTOR_TIME_THRESHOLD = 2L;
 
-    private Long ExecutionTimeThreshold = 60L;
+    private Long EXECUTION_TIME_THRESHOLD = 60L;
 
     private final PipeHistoryService pipeHistoryService;
 
     /**
-     * 反导舰炮算法实现
+     * 反导舰炮算法-2
      */
     public void antiMissileShipGun() {
         if(!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
@@ -53,10 +57,44 @@ public class AllAlgorithm {
                     pair -> JsonUtils.deserialize(pair.getValue(), EquipmentStatus.class))
                 );
 
-        // TODO: 写一个处理通道测试的算法，主要就是传入不同通道的id即可，返回的是<时间 long, 0/1>;
+        HistoryInfo.AntiMissileShipGunTestReport tmpReport = new HistoryInfo.AntiMissileShipGunTestReport();
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.AntiMissileShipGun.getValue());
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.AntiMissileShipGunRadar.getValue());
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.AntiMissileShipGunControl.getValue());
 
-        return ;
+        tmpReport.setTime(System.currentTimeMillis());
+        tmpReport.setRadarId(
+                PipeWeaponIndices.AntiMissileShipGunRadar.getValue());
+        tmpReport.setRadarSelfCheck(allEquipmentStatus.get(
+                PipeWeaponIndices.AntiMissileShipGunRadar.getValue()).getCheckStatus());
+        tmpReport.setFireControlId(
+                PipeWeaponIndices.AntiMissileShipGunControl.getValue());
+        tmpReport.setFireControlSelfCheck(allEquipmentStatus.get(
+                PipeWeaponIndices.AntiMissileShipGunControl.getValue()).getCheckStatus());
+        tmpReport.setShipGunId(
+                PipeWeaponIndices.AntiMissileShipGun.getValue());
+        tmpReport.setShipGunSelfCheck(allEquipmentStatus.get(
+                PipeWeaponIndices.AntiMissileShipGun.getValue()).getCheckStatus());
+        long[] timeVec = {
+                allEquipmentStatus.get(PipeWeaponIndices.AntiMissileShipGun.getValue()).getTime(),
+                allEquipmentStatus.get(PipeWeaponIndices.AntiMissileShipGunControl.getValue()).getTime(),
+                allEquipmentStatus.get(PipeWeaponIndices.AntiMissileShipGunRadar.getValue()).getTime()
+        };
+        boolean pipeStatus = tmpReport.getRadarSelfCheck() &&
+                tmpReport.getFireControlSelfCheck() &&
+                tmpReport.getShipGunSelfCheck() &&
+                meetTestCycleHelper(timeVec, PIPETEST_CYCLE_THRESHOLD);
+        tmpReport.setStatus(pipeStatus);
+
+        PipeHistory pipeHistory = new PipeHistory();
+        pipeHistory.setId(tmpReport.getShipGunId() + "_" + tmpReport.getTime());
+        pipeHistory.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        pipeHistory.setType("2");
+        pipeHistory.setDisabled(false);
+        pipeHistory.setRes(JsonUtils.serialize(tmpReport));
+        pipeHistoryService.insert(pipeHistory);
     }
+
 
     /**
      * 威胁判断算法-7
@@ -93,7 +131,7 @@ public class AllAlgorithm {
 
                  if(targetInfo.getTargetId()==targetInstructionsInfo.getTargetId()){
 
-                     if(Math.abs(targetInfo.getTime()-targetInstructionsInfo.getTime())<DetectorTimeThreshold){
+                     if(Math.abs(targetInfo.getTime()-targetInstructionsInfo.getTime())<DETECTOR_TIME_THRESHOLD){
 
                          HistoryInfo.ThreatenReport threatenReport = new HistoryInfo.ThreatenReport();
                          threatenReport.setId(targetInfo.getTargetId());
@@ -168,7 +206,7 @@ public class AllAlgorithm {
                         HistoryInfo.ExecutionStatusReport executionStatusReport = new HistoryInfo.ExecutionStatusReport();
 
                         boolean b = equipmentLaunchStatus.getTime()>targetFireControlInfo.getTime() && targetFireControlInfo.getTime()>targetInstructionsInfo.getTime();
-                        boolean c = equipmentLaunchStatus.getTime()-targetInstructionsInfo.getTime()<ExecutionTimeThreshold;
+                        boolean c = equipmentLaunchStatus.getTime()-targetInstructionsInfo.getTime()< EXECUTION_TIME_THRESHOLD;
 
                         executionStatusReport.setTargetId(equipmentLaunchStatus.getTargetId());
                         executionStatusReport.setTime(equipmentLaunchStatus.getTime());
@@ -199,6 +237,32 @@ public class AllAlgorithm {
 
         }
 
+    /**
+    *
+    * @param allEquipmentStatus 所有的装备状态
+    * @param indices 通道测试涉及的装备下标
+    * @return bool 通道测试是否成功
+    */
+    public boolean pipeTestHelper(Map<String, EquipmentStatus> allEquipmentStatus, Integer[] indices) {
+        boolean res = true;
+        for(Integer idx : indices){
+            if (!allEquipmentStatus.containsKey(idx.toString())) {
+                return false;
+            }
+            res = res && allEquipmentStatus.get(idx.toString()).getCheckStatus();
+        }
+        return res;
+    }
 
 
+    /**
+     * 是否满足时间阈值
+     * @param timeVec 时间串
+     * @param pipeTestCycleThreshold 通道测试周期阈值，单位s
+     * @return 测试结果
+     */
+    public boolean meetTestCycleHelper(long[] timeVec, long pipeTestCycleThreshold) {
+        return MathUtils.findMaxByCollections(timeVec) - MathUtils.findMinByCollections(timeVec) <
+                pipeTestCycleThreshold * 1000;
+    }
 }

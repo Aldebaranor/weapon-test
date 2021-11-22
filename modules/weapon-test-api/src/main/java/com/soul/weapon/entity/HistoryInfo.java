@@ -53,7 +53,7 @@ public class HistoryInfo implements Serializable {
 
     @Data
     @Display("反导舰炮武器通道测试-2")
-    public static class AntiMissileTestReport implements  Serializable{
+    public static class AntiMissileShipGunTestReport implements  Serializable{
 
         @Display("测试时间")
         private Long time;
@@ -71,10 +71,10 @@ public class HistoryInfo implements Serializable {
         private Boolean fireControlSelfCheck;
 
         @Display("反导舰炮标识")
-        private String antiMissileId;
+        private String shipGunId;
 
         @Display("反导舰炮自检")
-        private Boolean antiMissileSelfCheck;
+        private Boolean shipGunSelfCheck;
 
         @Display("反导舰炮武器通道状态")
         private Boolean status;
