@@ -18,6 +18,8 @@ public class Constant {
     public static String TARGET_INFO_HTTP_KEY = "weapon:pump:target_info";
     public static String TARGET_INSTRUCTIONS_INFO_HTTP_KEY = "weapon:pump:target_instructions_info";
 
-
-
+    /**
+     * 目标信息(雷达探测到的目标信息)于influxdb中的表名
+     */
+    public static String TARGET_INFO_INFLUX_MEASURMENT_NAME = "target_info";
 }
