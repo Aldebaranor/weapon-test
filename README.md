@@ -36,3 +36,4 @@
 ## 文档
 
 - [时序数据库使用](./docs/时序数据库使用.md)
+- [influxdb部署](./docs/influxDB部署使用.md)

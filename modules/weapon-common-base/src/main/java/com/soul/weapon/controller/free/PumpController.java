@@ -6,10 +6,12 @@ import com.egova.redis.RedisUtils;
 import com.egova.web.annotation.Api;
 import com.flagwind.commons.StringUtils;
 import com.soul.weapon.config.CommonRedisConfig;
+import com.soul.weapon.influxdb.InfluxdbTemplate;
 import com.soul.weapon.model.ScenariosInfo;
 import com.soul.weapon.model.dds.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -17,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Map;
 import com.soul.weapon.config.Constant;
 
@@ -29,8 +32,9 @@ import com.soul.weapon.config.Constant;
 @RestController
 @RequestMapping("/free/pump")
 @RequiredArgsConstructor
+@ConditionalOnProperty(prefix = "influxdb",name = "enabled" ,havingValue = "true", matchIfMissing = false)
 public class PumpController {
-
+    private final InfluxdbTemplate influxdbTemplate;
     private final RestTemplate restTemplate;
     private final CommonRedisConfig commonRedisConfig;
 
@@ -77,8 +81,12 @@ public class PumpController {
                         Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, JsonUtils.serialize(msg));
             }break;
             case "TargetInfo": {
-                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().opsForValue().set(
-                        Constant.TARGET_INFO_HTTP_KEY, JsonUtils.serialize(msg));
+                TargetInfo tmpTargetInfo = JsonUtils.deserialize(JsonUtils.serialize(msg), TargetInfo.class);
+                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().boundHashOps(
+                        Constant.TARGET_INFO_HTTP_KEY).put(tmpTargetInfo.getTargetId(), JsonUtils.serialize(tmpTargetInfo));
+                // 添加一个field字段使得能够成功插入influxdb
+                msg.put("_uselessFiled", "useless");
+                influxdbTemplate.insert(Constant.TARGET_INFO_INFLUX_MEASURMENT_NAME, msg);
             }break;
             case "TargetInstructionsInfo": {
                 RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().opsForValue().set(
@@ -185,7 +193,20 @@ public class PumpController {
                 return JsonUtils.serialize(new TargetFireControlInfo());
             }
             case "TargetInfo": {
-                return JsonUtils.serialize(new TargetInfo());
+                TargetInfo tarInfo = new TargetInfo();
+                tarInfo.setSender("xxx");
+                tarInfo.setMsgTime(System.currentTimeMillis());
+                tarInfo.setTime(System.currentTimeMillis());
+                tarInfo.setTargetId("6");
+                tarInfo.setTargetTypeId("6");
+                tarInfo.setDistance(6.0F);
+                tarInfo.setSpeed(6.0F);
+                tarInfo.setAzimuth(6.0F);
+                tarInfo.setPitchAngle(6.0F);
+                tarInfo.setDepth(6.0F);
+                HttpEntity<Object> request2 = new HttpEntity<>(tarInfo, headers);
+                return restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName,
+                        request2, String.class).toString();
             }
             case "TargetInstructionsInfo": {
                 return JsonUtils.serialize(new TargetInstructionsInfo());
@@ -195,6 +216,19 @@ public class PumpController {
             }
         }
         return "";
+    }
+
+    /**
+     * 查询test数据库下的所有表名，仅供测试使用
+     */
+    @GetMapping("/table")
+    public void publish(){
+
+        List<String> tables = influxdbTemplate.tables();
+        for (String s:tables
+        ) {
+            log.info(s);
+        }
     }
 }
 
