@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -87,7 +88,7 @@ public class AllAlgorithm {
         tmpReport.setStatus(pipeStatus);
 
         PipeHistory pipeHistory = new PipeHistory();
-        pipeHistory.setId(tmpReport.getShipGunId() + "_" + tmpReport.getTime());
+        pipeHistory.setId(UUID.randomUUID().toString());
         pipeHistory.setCreateTime(new Timestamp(System.currentTimeMillis()));
         pipeHistory.setType("2");
         pipeHistory.setDisabled(false);
@@ -142,7 +143,7 @@ public class AllAlgorithm {
                          threatenReport.setSpeedOffset(Math.abs(targetInfo.getSpeed()-targetInstructionsInfo.getSpeed()));
 
                          PipeHistory pipeHistory = new PipeHistory();
-                         pipeHistory.setId(targetInfo.getTargetId()+"_"+targetInfo.getTime());
+                         pipeHistory.setId(UUID.randomUUID().toString());
                          pipeHistory.setCreateTime(new Timestamp(System.currentTimeMillis()));
                          pipeHistory.setType("7");
                          pipeHistory.setDisabled(false);
@@ -219,23 +220,17 @@ public class AllAlgorithm {
                         }
 
                         PipeHistory pipeHistory = new PipeHistory();
-                        pipeHistory.setId("executionStatus_"+equipmentLaunchStatus.getTargetId()+"_"+equipmentLaunchStatus.getTime());
+                        pipeHistory.setId(UUID.randomUUID().toString());
                         pipeHistory.setCreateTime(new Timestamp(System.currentTimeMillis()));
                         pipeHistory.setType("8");
                         pipeHistory.setDisabled(false);
                         pipeHistory.setRes(JsonUtils.serialize(executionStatusReport));
                         pipeHistoryService.insert(pipeHistory);
-
-
                     }
                 }
-
             }
-
         }
-
-
-        }
+    }
 
     /**
     *
