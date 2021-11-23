@@ -32,6 +32,7 @@ public class AlgorithmScheduleJob implements Job {
         try {
             // TODO: 待所有算法实现后，该定时任务轮询所有算法即可！
             allAlgorithm.antiMissileShipGun();
+            allAlgorithm.threatenEstimation();
 
         } catch (Exception e) {
             log.error("定时轮询所有算法失败！", e);

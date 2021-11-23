@@ -140,6 +140,7 @@ public class PumpController {
                 equipmentStatus1.setElectromagneticFrequency(0.1F);
                 equipmentStatus1.setMinFrequency(0.1F);
                 equipmentStatus1.setMaxFrequency(0.1F);
+
                 EquipmentStatus equipmentStatus2 = new EquipmentStatus();
                 equipmentStatus2.setSender("2");
                 equipmentStatus2.setMsgTime(System.currentTimeMillis());
@@ -154,6 +155,7 @@ public class PumpController {
                 equipmentStatus2.setElectromagneticFrequency(0.2F);
                 equipmentStatus2.setMinFrequency(0.2F);
                 equipmentStatus2.setMaxFrequency(0.2F);
+
                 EquipmentStatus equipmentStatus3 = new EquipmentStatus();
                 equipmentStatus3.setSender("3");
                 equipmentStatus3.setMsgTime(System.currentTimeMillis());
@@ -169,13 +171,15 @@ public class PumpController {
                 equipmentStatus3.setMinFrequency(0.3F);
                 equipmentStatus3.setMaxFrequency(0.3F);
 
-                HttpEntity<Object> request = new HttpEntity<>(equipmentStatus1, headers);
-                ResponseEntity<String> responseEntity = restTemplate.postForEntity(
-                        "http://127.0.0.1:8016/free/pump/" + structName, request, String.class);
                 HttpEntity<Object> request1 = new HttpEntity<>(equipmentStatus1, headers);
-                restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName, request1, String.class);
-                HttpEntity<Object> request2 = new HttpEntity<>(equipmentStatus3, headers);
+                ResponseEntity<String> responseEntity = restTemplate.postForEntity(
+                        "http://127.0.0.1:8016/free/pump/" + structName, request1, String.class);
+
+                HttpEntity<Object> request2 = new HttpEntity<>(equipmentStatus2, headers);
                 restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName, request2, String.class);
+
+                HttpEntity<Object> request3 = new HttpEntity<>(equipmentStatus3, headers);
+                restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName, request3, String.class);
                 return responseEntity.toString();
             }
             case "LauncherRotationInfo": {
@@ -185,9 +189,12 @@ public class PumpController {
                 return JsonUtils.serialize(new TargetFireControlInfo());
             }
             case "TargetInfo": {
+
+
                 return JsonUtils.serialize(new TargetInfo());
             }
             case "TargetInstructionsInfo": {
+
                 return JsonUtils.serialize(new TargetInstructionsInfo());
             }
             default: {

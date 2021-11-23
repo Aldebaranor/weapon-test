@@ -14,6 +14,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -29,6 +30,7 @@ public class AllAlgorithm {
 
 
     /** 威胁判断-传感器探测时间阈值 **/
+
     private Long DetectorTimeThreshold = 2L;
 
     private Long ExecutionTimeThreshold = 60L;
@@ -200,5 +202,22 @@ public class AllAlgorithm {
         }
 
 
+    public void interceptionDistanceTest(){
+
+        if(!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
+                .hasKey(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY))) {
+            log.error("从Redis中获取目标指示信息失败！");
+            return ;
+        }
+
+        Map<String, String> tmpInstructions = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY).entries();
+        assert tmpInstructions != null;
+
+        Map<String, EquipmentStatus> allEquipmentStatus = tmpInstructions.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                pair -> JsonUtils.deserialize(pair.getValue(), EquipmentStatus.class))
+        );
+
+    }
 
 }
