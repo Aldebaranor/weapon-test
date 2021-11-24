@@ -160,61 +160,61 @@ public class AllAlgorithm {
     /**
      * 执行情况测试-9
      */
-    public void executionStatusTest(){
+    public void executionStatusTest() {
 
         StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
-        if(!template.hasKey(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY)||!template.hasKey(Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY)||!template.hasKey(Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY)){
+        if (!template.hasKey(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY) || !template.hasKey(Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY) || !template.hasKey(Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY)) {
             log.error("从Redis中获取信息失败！");
-            return ;
+            return;
         }
 
-        Map<String,String> tmpFireControlInfos = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY).entries();
-        assert  tmpFireControlInfos != null;
+        Map<String, String> tmpFireControlInfos = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY).entries();
+        assert tmpFireControlInfos != null;
         Map<String, TargetFireControlInfo> allFireControlInfos = tmpFireControlInfos.entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
-                pair->JsonUtils.deserialize(pair.getValue(),TargetFireControlInfo.class))
+                pair -> JsonUtils.deserialize(pair.getValue(), TargetFireControlInfo.class))
         );
 
-        Map<String,String> tmpInstructionInfos = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY).entries();
-        assert  tmpInstructionInfos != null;
+        Map<String, String> tmpInstructionInfos = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY).entries();
+        assert tmpInstructionInfos != null;
         Map<String, TargetInstructionsInfo> allInstructionInfos = tmpInstructionInfos.entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
-                pair->JsonUtils.deserialize(pair.getValue(),TargetInstructionsInfo.class))
+                pair -> JsonUtils.deserialize(pair.getValue(), TargetInstructionsInfo.class))
         );
 
-        Map<String,String> tmpEquipmentLaunchInfos = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY).entries();
-        assert  tmpEquipmentLaunchInfos != null;
+        Map<String, String> tmpEquipmentLaunchInfos = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY).entries();
+        assert tmpEquipmentLaunchInfos != null;
         Map<String, EquipmentLaunchStatus> allEquipmentLaunchInfos = tmpEquipmentLaunchInfos.entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
-                pair->JsonUtils.deserialize(pair.getValue(),EquipmentLaunchStatus.class))
+                pair -> JsonUtils.deserialize(pair.getValue(), EquipmentLaunchStatus.class))
         );
 
-        for(String key:allFireControlInfos.keySet()) {
+        for (String key : allFireControlInfos.keySet()) {
 
             TargetFireControlInfo targetFireControlInfo = allFireControlInfos.get(key);
 
-            for(String key2:allInstructionInfos.keySet()){
+            for (String key2 : allInstructionInfos.keySet()) {
 
                 TargetInstructionsInfo targetInstructionsInfo = allInstructionInfos.get(key2);
 
-                for(String key3:allEquipmentLaunchInfos.keySet()){
+                for (String key3 : allEquipmentLaunchInfos.keySet()) {
 
                     EquipmentLaunchStatus equipmentLaunchStatus = allEquipmentLaunchInfos.get(key3);
 
-                    if(targetFireControlInfo.getTargetId() == targetInstructionsInfo.getTargetId() && targetFireControlInfo.getTargetId() == equipmentLaunchStatus.getTargetId()){
+                    if (targetFireControlInfo.getTargetId() == targetInstructionsInfo.getTargetId() && targetFireControlInfo.getTargetId() == equipmentLaunchStatus.getTargetId()) {
 
                         HistoryInfo.ExecutionStatusReport executionStatusReport = new HistoryInfo.ExecutionStatusReport();
 
-                        boolean b = equipmentLaunchStatus.getTime()>targetFireControlInfo.getTime() && targetFireControlInfo.getTime()>targetInstructionsInfo.getTime();
-                        boolean c = equipmentLaunchStatus.getTime()-targetInstructionsInfo.getTime()< EXECUTION_TIME_THRESHOLD;
+                        boolean b = equipmentLaunchStatus.getTime() > targetFireControlInfo.getTime() && targetFireControlInfo.getTime() > targetInstructionsInfo.getTime();
+                        boolean c = equipmentLaunchStatus.getTime() - targetInstructionsInfo.getTime() < EXECUTION_TIME_THRESHOLD;
 
                         executionStatusReport.setTargetId(equipmentLaunchStatus.getTargetId());
                         executionStatusReport.setTime(equipmentLaunchStatus.getTime());
                         executionStatusReport.setTargetType(equipmentLaunchStatus.getTargetTypeId());
 
-                        if(b&&c){
+                        if (b && c) {
                             executionStatusReport.setStatus(true);
-                        }else{
+                        } else {
                             executionStatusReport.setStatus(false);
                         }
 
@@ -226,14 +226,11 @@ public class AllAlgorithm {
                         pipeHistory.setRes(JsonUtils.serialize(executionStatusReport));
                         pipeHistoryService.insert(pipeHistory);
 
-
                     }
                 }
-
             }
-
         }
-
+    }
 
     /**
     *
