@@ -66,8 +66,8 @@ public class AllAlgorithm {
         tmpReport.setTime(System.currentTimeMillis());
         tmpReport.setRadarId(
                 PipeWeaponIndices.AntiMissileShipGunRadar.getValue());
-        tmpReport.setRadarSelfCheck(allEquipmentStatus.get(
-                PipeWeaponIndices.AntiMissileShipGunRadar.getValue()).getCheckStatus());
+        tmpReport.setRadarSelfCheck(allEquipmentStatus.get(PipeWeaponIndices.AntiMissileShipGunRadar.getValue())
+                .getCheckStatus());
         tmpReport.setFireControlId(
                 PipeWeaponIndices.AntiMissileShipGunControl.getValue());
         tmpReport.setFireControlSelfCheck(allEquipmentStatus.get(
