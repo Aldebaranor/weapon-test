@@ -96,7 +96,6 @@ public class AllAlgorithm {
         pipeHistoryService.insert(pipeHistory);
     }
 
-
     /**
      * 威胁判断算法-7
      */
@@ -226,11 +225,15 @@ public class AllAlgorithm {
                         pipeHistory.setDisabled(false);
                         pipeHistory.setRes(JsonUtils.serialize(executionStatusReport));
                         pipeHistoryService.insert(pipeHistory);
+
+
                     }
                 }
+
             }
+
         }
-    }
+
 
     /**
     *
