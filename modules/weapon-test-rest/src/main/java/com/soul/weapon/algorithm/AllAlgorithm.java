@@ -2,6 +2,7 @@ package com.soul.weapon.algorithm;
 
 import com.egova.json.utils.JsonUtils;
 import com.egova.redis.RedisUtils;
+import com.flagwind.commons.StringUtils;
 import com.soul.weapon.config.CommonRedisConfig;
 import com.soul.weapon.config.Constant;
 import com.soul.weapon.entity.HistoryInfo;
@@ -39,6 +40,21 @@ public class AllAlgorithm {
     private Long EXECUTION_TIME_THRESHOLD = 60L;
 
     private final PipeHistoryService pipeHistoryService;
+
+
+    /**
+     * 航空导弹-1
+     *
+     */
+    public void ShipToAirMissile(){
+        if(!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
+                .hasKey(Constant.EQUIPMENT_STATUS_HTTP_KEY))) {
+            log.error("从Redis中获取装备信息失败！");
+            return ;
+        }
+
+    }
+
 
     /**
      * 反导舰炮算法-2
@@ -129,7 +145,8 @@ public class AllAlgorithm {
 
                  TargetInstructionsInfo targetInstructionsInfo = allInstructionInfos.get(key2);
 
-                 if(targetInfo.getTargetId()==targetInstructionsInfo.getTargetId()){
+
+                 if(StringUtils.equals(targetInfo.getTargetId(),targetInstructionsInfo.getTargetId())){
 
                      if(Math.abs(targetInfo.getTime()-targetInstructionsInfo.getTime())<DETECTOR_TIME_THRESHOLD){
 

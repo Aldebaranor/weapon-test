@@ -190,29 +190,70 @@ public class PumpController {
                 return JsonUtils.serialize(new LauncherRotationInfo());
             }
             case "TargetFireControlInfo": {
-                return JsonUtils.serialize(new TargetFireControlInfo());
+                TargetFireControlInfo targetFireControlInfo=new TargetFireControlInfo();
+                targetFireControlInfo.setTargetId("2");
+                targetFireControlInfo.setSender("1");
+                targetFireControlInfo.setTargetTypeId("1");
+                targetFireControlInfo.setMsgTime(System.currentTimeMillis());
+                targetFireControlInfo.setDistance(1f);
+                targetFireControlInfo.setSpeed(2f);
+                targetFireControlInfo.setPitchAngle(2f);
+
+                HttpEntity<Object> request2 = new HttpEntity<>(targetFireControlInfo, headers);
+                ResponseEntity<String> responseEntity = restTemplate.postForEntity(
+                        "http://127.0.0.1:8016/free/pump/" + structName, request2, String.class);
+
+                return responseEntity.toString();
             }
             case "TargetInfo": {
-                TargetInfo tarInfo = new TargetInfo();
-                tarInfo.setSender("xxx");
-                tarInfo.setMsgTime(System.currentTimeMillis());
-                tarInfo.setTime(System.currentTimeMillis());
-                tarInfo.setTargetId("6");
-                tarInfo.setTargetTypeId("6");
-                tarInfo.setDistance(6.0F);
-                tarInfo.setSpeed(6.0F);
-                tarInfo.setAzimuth(6.0F);
-                tarInfo.setPitchAngle(6.0F);
-                tarInfo.setDepth(6.0F);
-                HttpEntity<Object> request2 = new HttpEntity<>(tarInfo, headers);
+                TargetInfo targetInfo=new TargetInfo();
+                targetInfo.setTargetId("1");
+                targetInfo.setSender("1");
+                targetInfo.setTargetTypeId("1");
+                targetInfo.setMsgTime(System.currentTimeMillis());
+                targetInfo.setDistance(1f);
+                targetInfo.setSpeed(2f);
+                targetInfo.setPitchAngle(2f);
+                targetInfo.setTime(1637643392281L);
+
+                HttpEntity<Object> request1 = new HttpEntity<>(targetInfo, headers);
+                ResponseEntity<String> responseEntity = restTemplate.postForEntity(
+                        "http://127.0.0.1:8016/free/pump/" + structName, request1, String.class);
+
+                TargetInfo tarInfo2 = new TargetInfo();
+                tarInfo2.setSender("xxx");
+                tarInfo2.setMsgTime(System.currentTimeMillis());
+                tarInfo2.setTime(System.currentTimeMillis());
+                tarInfo2.setTargetId("6");
+                tarInfo2.setTargetTypeId("6");
+                tarInfo2.setDistance(6.0F);
+                tarInfo2.setSpeed(6.0F);
+                tarInfo2.setAzimuth(6.0F);
+                tarInfo2.setPitchAngle(6.0F);
+                tarInfo2.setDepth(6.0F);
+                HttpEntity<Object> request2 = new HttpEntity<>(tarInfo2, headers);
                 return restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName,
                         request2, String.class).toString();
             }
             case "TargetInstructionsInfo": {
-                return JsonUtils.serialize(new TargetInstructionsInfo());
+                TargetInstructionsInfo targetInstructionsInfo=new TargetInstructionsInfo();
+                targetInstructionsInfo.setSender("1");
+                targetInstructionsInfo.setMsgTime(System.currentTimeMillis());
+                targetInstructionsInfo.setTargetId("1");
+                targetInstructionsInfo.setTargetTypeId("1");
+                targetInstructionsInfo.setDistance(1f);
+                targetInstructionsInfo.setSpeed(1f);
+                targetInstructionsInfo.setPitchAngle(1f);
+                targetInstructionsInfo.setTime(1637643392280L);
+
+                HttpEntity<Object> request2 = new HttpEntity<>(targetInstructionsInfo, headers);
+                ResponseEntity<String> responseEntity = restTemplate.postForEntity(
+                        "http://127.0.0.1:8016/free/pump/" + structName, request2, String.class);
+
+                return responseEntity.toString();
             }
             default: {
-                log.error("unrecognized struct name for http telegram test!");
+                   log.error("unrecognized struct name for http telegram test!");
             }
         }
         return "";
