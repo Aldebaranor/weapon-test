@@ -44,4 +44,9 @@ public interface PipeHistoryService {
      * @return
      */
     int deleteById(@PathVariable("id") String id);
+
+    /**
+     * get by time && id
+     */
+    List<PipeHistory> getByTimeAndId(String time,String taskId);
 }
