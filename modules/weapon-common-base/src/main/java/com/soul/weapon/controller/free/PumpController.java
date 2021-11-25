@@ -208,7 +208,20 @@ public class PumpController {
                 return JsonUtils.serialize(new LauncherRotationInfo());
             }
             case "TargetFireControlInfo": {
-                return JsonUtils.serialize(new TargetFireControlInfo());
+                TargetFireControlInfo targetFireControlInfo=new TargetFireControlInfo();
+                targetFireControlInfo.setTargetId("2");
+                targetFireControlInfo.setSender("1");
+                targetFireControlInfo.setTargetTypeId("1");
+                targetFireControlInfo.setMsgTime(System.currentTimeMillis());
+                targetFireControlInfo.setDistance(1f);
+                targetFireControlInfo.setSpeed(2f);
+                targetFireControlInfo.setPitchAngle(2f);
+
+                HttpEntity<Object> request2 = new HttpEntity<>(targetFireControlInfo, headers);
+                ResponseEntity<String> responseEntity = restTemplate.postForEntity(
+                        "http://127.0.0.1:8016/free/pump/" + structName, request2, String.class);
+
+                return responseEntity.toString();
             }
             case "TargetInfo": {
                 TargetInfo tarInfo = new TargetInfo();
@@ -258,7 +271,6 @@ public class PumpController {
                 HttpEntity<Object> request2 = new HttpEntity<>(tarInfo3, headers);
                 return restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName,
                         request2, String.class).toString();
-
             }
             case "TargetInstructionsInfo": {
 
@@ -312,7 +324,7 @@ public class PumpController {
 
             }
             default: {
-                log.error("unrecognized struct name for http telegram test!");
+                   log.error("unrecognized struct name for http telegram test!");
             }
         }
         return "";

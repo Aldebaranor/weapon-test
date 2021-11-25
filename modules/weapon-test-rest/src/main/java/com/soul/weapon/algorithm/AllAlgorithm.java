@@ -2,6 +2,7 @@ package com.soul.weapon.algorithm;
 
 import com.egova.json.utils.JsonUtils;
 import com.egova.redis.RedisUtils;
+import com.flagwind.commons.StringUtils;
 import com.soul.weapon.config.CommonRedisConfig;
 import com.soul.weapon.config.Constant;
 import com.soul.weapon.entity.HistoryInfo;
@@ -19,8 +20,6 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
-import javax.validation.constraints.Min;
-import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Map;
 import java.util.UUID;
@@ -66,6 +65,21 @@ public class AllAlgorithm {
     private Long LAUNCHER_ROTATION_TIME_THRESHOLD = 5L;
 
     private final PipeHistoryService pipeHistoryService;
+
+
+    /**
+     * 航空导弹-1
+     *
+     */
+    public void ShipToAirMissile(){
+        if(!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
+                .hasKey(Constant.EQUIPMENT_STATUS_HTTP_KEY))) {
+            log.error("从Redis中获取装备信息失败！");
+            return ;
+        }
+
+    }
+
 
     /**
      * 反导舰炮算法-2
@@ -122,7 +136,6 @@ public class AllAlgorithm {
         pipeHistory.setRes(JsonUtils.serialize(tmpReport));
         pipeHistoryService.insert(pipeHistory);
     }
-
 
     /**
      * 信息流程测试-6
