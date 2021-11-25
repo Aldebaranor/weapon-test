@@ -422,10 +422,10 @@ public class HistoryInfo implements Serializable {
         private String weaponType;
 
         @Display("发射架方位角调转精度")
-        private Long launcherPitchAccuracy;
+        private Float launcherPitchAccuracy;
 
         @Display("发射架俯仰角调转精度")
-        private Long launcherAzimuthAccuracy;
+        private Float launcherAzimuthAccuracy;
 
     }
 

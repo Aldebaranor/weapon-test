@@ -10,11 +10,17 @@ import com.soul.weapon.entity.enums.PipeWeaponIndices;
 import com.soul.weapon.model.dds.*;
 import com.soul.weapon.service.PipeHistoryService;
 import com.soul.weapon.utils.MathUtils;
+import com.squareup.moshi.Json;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.formula.functions.T;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.Min;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Map;
 import java.util.UUID;
@@ -47,8 +53,17 @@ public class AllAlgorithm {
     private Long RADARPATH_TIME_THRESHOLD = 2L;
     private String AIRTYPE = "对空目标";
 
+    /** 信息流程时间阈值 **/
+    private Long PROGRESS_TIME_THRESHOLD = 60L;
 
+    /** 执行时间阈值 **/
     private Long EXECUTION_TIME_THRESHOLD = 60L;
+
+    /** 火控解算时间阈值 **/
+    private Long FIRECONTROL_TIME_THRESHOLD = 5L;
+
+    /** 发射架调转时间阈值 **/
+    private Long LAUNCHER_ROTATION_TIME_THRESHOLD = 5L;
 
     private final PipeHistoryService pipeHistoryService;
 
@@ -108,12 +123,14 @@ public class AllAlgorithm {
         pipeHistoryService.insert(pipeHistory);
     }
 
+
     /**
      * 信息流程测试-6
      */
     public void infoProcessTest(){
 
     }
+
 
     /**
      * 威胁判断算法-7 指示处理精度测试-8 雷达航迹测试-10
@@ -154,10 +171,13 @@ public class AllAlgorithm {
                         HistoryInfo.ThreatenReport threatenReport = new HistoryInfo.ThreatenReport();
                         threatenReport.setId(targetInfo.getTargetId());
                         threatenReport.setType(targetInfo.getTargetTypeId());
-                        threatenReport.setDistanceOffset(Math.abs(targetInfo.getDistance() - targetInstructionsInfo.getDistance()));
+                        threatenReport.setDistanceOffset(
+                                Math.abs(targetInfo.getDistance() - targetInstructionsInfo.getDistance()));
                         threatenReport.setTime(targetInstructionsInfo.getTime());
-                        threatenReport.setPitchOffset(Math.abs(targetInfo.getPitchAngle() - targetInstructionsInfo.getPitchAngle()));
-                        threatenReport.setSpeedOffset(Math.abs(targetInfo.getSpeed() - targetInstructionsInfo.getSpeed()));
+                        threatenReport.setPitchOffset(
+                                Math.abs(targetInfo.getPitchAngle() - targetInstructionsInfo.getPitchAngle()));
+                        threatenReport.setSpeedOffset(
+                                Math.abs(targetInfo.getSpeed() - targetInstructionsInfo.getSpeed()));
 
                         PipeHistory threatenPipeHistory = new PipeHistory();
                         threatenPipeHistory.setId(UUID.randomUUID().toString());
@@ -172,7 +192,8 @@ public class AllAlgorithm {
                     }
 
                     // 指示处理精度测试
-                    if(!instructionState && Math.abs(targetInfo.getTime() - targetInstructionsInfo.getTime()) < INSTRUCTION_TIME_THRESHOLD){
+                    if(!instructionState &&
+                            Math.abs(targetInfo.getTime() - targetInstructionsInfo.getTime()) < INSTRUCTION_TIME_THRESHOLD){
 
                         HistoryInfo.InstructionAccuracyReport instructionAccuracyReport = new HistoryInfo.InstructionAccuracyReport();
                         instructionAccuracyReport.setTime(targetInstructionsInfo.getTime());
@@ -180,10 +201,15 @@ public class AllAlgorithm {
                         instructionAccuracyReport.setTargetType(targetInstructionsInfo.getTargetTypeId());
                         instructionAccuracyReport.setSensorId(targetInstructionsInfo.getEquipmentId());
                         instructionAccuracyReport.setSensorType(targetInstructionsInfo.getEquipmentTypeId());
-                        instructionAccuracyReport.setDistanceAccuracy(Math.abs(targetInstructionsInfo.getDistance()-targetInfo.getDistance()));
-                        instructionAccuracyReport.setAzimuthAccuracy(Math.abs(targetInstructionsInfo.getAzimuth()-targetInfo.getAzimuth()));
-                        instructionAccuracyReport.setDepthAccuracy(Math.abs(targetInstructionsInfo.getDepth()-targetInfo.getDepth()));
-                        instructionAccuracyReport.setPitchAccuracy(Math.abs(targetInstructionsInfo.getPitchAngle()-targetInfo.getPitchAngle()));
+
+                        instructionAccuracyReport.setDistanceAccuracy(
+                                Math.abs(targetInstructionsInfo.getDistance()-targetInfo.getDistance()));
+                        instructionAccuracyReport.setAzimuthAccuracy(
+                                Math.abs(targetInstructionsInfo.getAzimuth()-targetInfo.getAzimuth()));
+                        instructionAccuracyReport.setDepthAccuracy(
+                                Math.abs(targetInstructionsInfo.getDepth()-targetInfo.getDepth()));
+                        instructionAccuracyReport.setPitchAccuracy(
+                                Math.abs(targetInstructionsInfo.getPitchAngle()-targetInfo.getPitchAngle()));
 
                         PipeHistory accuracyPipeHistory = new PipeHistory();
                         accuracyPipeHistory.setId(UUID.randomUUID().toString());
@@ -239,11 +265,15 @@ public class AllAlgorithm {
     public void executionStatusTest() {
 
         StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
-        if (!template.hasKey(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY) || !template.hasKey(Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY) || !template.hasKey(Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY)) {
+        if (!template.hasKey(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY) ||
+                !template.hasKey(Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY)
+                || !template.hasKey(Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY)) {
             log.error("从Redis中获取信息失败！");
             return;
         }
-        Map<String, String> tmpFireControlInfos = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY).entries();
+        Map<String, String> tmpFireControlInfos = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+                Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY).entries();
+
         assert tmpFireControlInfos != null;
         Map<String, TargetFireControlInfo> allFireControlInfos = tmpFireControlInfos.entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
@@ -264,7 +294,8 @@ public class AllAlgorithm {
                         Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY + "_" +targetFireControlInfo.getTargetId()).index(i),
                         TargetInstructionsInfo.class);
 
-                Long m = template.boundListOps(Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + "_" +targetFireControlInfo.getTargetId()).size();
+                Long m = template.boundListOps(Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + "_" +
+                        targetFireControlInfo.getTargetId()).size();
 
                 for(int j =0;j<m;j++){
 
@@ -276,26 +307,44 @@ public class AllAlgorithm {
                             targetFireControlInfo.getTargetId() == equipmentLaunchStatus.getTargetId()) {
 
                         HistoryInfo.ExecutionStatusReport executionStatusReport = new HistoryInfo.ExecutionStatusReport();
+                        HistoryInfo.InfoProcessTestReport infoProcessTestReport = new HistoryInfo.InfoProcessTestReport();
 
-                        boolean b = equipmentLaunchStatus.getTime() > targetFireControlInfo.getTime() && targetFireControlInfo.getTime() > targetInstructionsInfo.getTime();
+                        boolean b = equipmentLaunchStatus.getTime() > targetFireControlInfo.getTime() &&
+                                targetFireControlInfo.getTime() > targetInstructionsInfo.getTime();
                         boolean c = equipmentLaunchStatus.getTime() - targetInstructionsInfo.getTime() < EXECUTION_TIME_THRESHOLD;
+                        boolean d = equipmentLaunchStatus.getTime() - targetInstructionsInfo.getTime() < PROGRESS_TIME_THRESHOLD;
 
+                        // 设置执行情况返回报文信息
                         executionStatusReport.setTargetId(equipmentLaunchStatus.getTargetId());
                         executionStatusReport.setTime(equipmentLaunchStatus.getTime());
                         executionStatusReport.setTargetType(equipmentLaunchStatus.getTargetTypeId());
-
                         if (b && c) {
                             executionStatusReport.setStatus(true);
                         } else {
                             executionStatusReport.setStatus(false);
                         }
 
+                        // 设置信息流程返回报文信息
+                        infoProcessTestReport.setId(equipmentLaunchStatus.getTargetId());
+                        infoProcessTestReport.setTime(equipmentLaunchStatus.getTime());
+                        infoProcessTestReport.setType(equipmentLaunchStatus.getTargetTypeId());
+                        if( b && d){
+                            infoProcessTestReport.setStatus(true);
+                        }else{
+                            infoProcessTestReport.setStatus(false);
+                        }
+
                         PipeHistory pipeHistory = new PipeHistory();
                         pipeHistory.setId(UUID.randomUUID().toString());
                         pipeHistory.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                        pipeHistory.setType("8");
+                        pipeHistory.setType("9");
                         pipeHistory.setDisabled(false);
                         pipeHistory.setRes(JsonUtils.serialize(executionStatusReport));
+                        pipeHistoryService.insert(pipeHistory);
+
+                        pipeHistory.setId(UUID.randomUUID().toString());
+                        pipeHistory.setType("6");
+                        pipeHistory.setRes(JsonUtils.serialize(infoProcessTestReport));
                         pipeHistoryService.insert(pipeHistory);
 
                         state = true;
@@ -312,11 +361,266 @@ public class AllAlgorithm {
      */
     public void interceptDistanceTest() {
         StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
-        if (!template.hasKey(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY) || !template.hasKey(Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY) || !template.hasKey(Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY)) {
-            log.error("从Redis中获取信息失败！");
+        if (!template.hasKey(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY)) {
+            log.error("从Redis中获取目标指示信息失败！");
             return;
         }
+
+        Map<String,String>  tempInstructions  = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+                Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY).entries();
+
+        assert tempInstructions != null;
+        Map<String,TargetInstructionsInfo> allInstructions = tempInstructions.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                pair -> JsonUtils.deserialize(pair.getValue(),TargetInstructionsInfo.class)
+        ));
+
+        for(TargetInstructionsInfo targetInstructionsInfo:allInstructions.values()){
+
+            Long n = template.boundListOps(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY + "_" +
+                    targetInstructionsInfo.getTargetId()).size();
+
+            Long MaxTime = 0L;
+            Float MinDistance = Float.MAX_VALUE;
+
+            for(int i =0;i<n;i++){
+
+                String tmpInstruction =  template.boundListOps(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY + "_" +
+                        targetInstructionsInfo.getTargetId()).index(i);
+
+                TargetInstructionsInfo targetInstructionsInfo1 = JsonUtils.deserialize(
+                        tmpInstruction,TargetInstructionsInfo.class);
+
+                if(targetInstructionsInfo1.getDistance()<50) continue;
+
+                MaxTime = targetInstructionsInfo1.getTime() > MaxTime ? targetInstructionsInfo1.getTime() : MaxTime;
+
+                MinDistance = targetInstructionsInfo1.getDistance() < MinDistance ?
+                        targetInstructionsInfo1.getDistance() : MinDistance;
+
+
+            }
+
+            if(MinDistance==Float.MAX_VALUE) continue;
+
+            HistoryInfo.InterceptDistanceReport interceptDistanceReport = new HistoryInfo.InterceptDistanceReport();
+            interceptDistanceReport.setInterceptDistance(MinDistance);
+            interceptDistanceReport.setTime(MaxTime);
+            interceptDistanceReport.setTargetType(targetInstructionsInfo.getTargetTypeId());
+            interceptDistanceReport.setTargetId(targetInstructionsInfo.getTargetId());
+
+            PipeHistory pipeHistory = new PipeHistory();
+            pipeHistory.setRes(JsonUtils.serialize(interceptDistanceReport));
+            pipeHistory.setType("11");
+            pipeHistory.setId(UUID.randomUUID().toString());
+            pipeHistory.setDisabled(false);
+            pipeHistory.setCreateTime(new Timestamp(System.currentTimeMillis()));
+            pipeHistoryService.insert(pipeHistory);
+
+        }
     }
+
+    /**
+     * 火控解算精度测试-12
+     */
+    public void fireControlTest() {
+        StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
+        if (!template.hasKey(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY) ||
+                !template.hasKey(Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY)) {
+            log.error("从Redis中获取目标指示信息或目标火控信息失败！");
+            return;
+        }
+
+        Map<String, String> tmpFireControls = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+                Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY).entries();
+        assert tmpFireControls != null;
+        Map<String, TargetFireControlInfo> allFireControlInfos = tmpFireControls.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                pair -> JsonUtils.deserialize(pair.getValue(), TargetFireControlInfo.class))
+        );
+
+        for (TargetFireControlInfo targetFireControlInfo : allFireControlInfos.values()) {
+
+            Long n = template.boundListOps(
+                    Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY + "_" + targetFireControlInfo.getTargetId()).size();
+
+
+            for (int i = 0; i < n; i++) {
+                TargetInstructionsInfo targetInstructionsInfo = JsonUtils.deserialize(template.boundListOps(
+                        Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY + "_" + targetFireControlInfo.getTargetId()).index(i),
+                        TargetInstructionsInfo.class);
+
+                assert targetInstructionsInfo != null;
+
+                if (targetInstructionsInfo.getTargetId().equals(targetFireControlInfo.getTargetId())) {
+
+                    if (Math.abs(targetFireControlInfo.getTime() - targetInstructionsInfo.getTime()) < FIRECONTROL_TIME_THRESHOLD) {
+
+                        HistoryInfo.FireControlReport fireControlReport = new HistoryInfo.FireControlReport();
+                        fireControlReport.setTargetId(targetInstructionsInfo.getTargetId());
+                        fireControlReport.setTargetType(targetInstructionsInfo.getTargetTypeId());
+                        fireControlReport.setFireControlId(targetFireControlInfo.getFireControlSystemId());
+                        fireControlReport.setFireControlType(targetFireControlInfo.getFireControlSystemTypeId());
+                        fireControlReport.setTime(targetFireControlInfo.getTime());
+
+                        fireControlReport.setTargetDistance(
+                                Math.abs(targetFireControlInfo.getDistance() - targetInstructionsInfo.getDistance()));
+                        fireControlReport.setTargetPitch(
+                                Math.abs(targetFireControlInfo.getPitchAngle() - targetInstructionsInfo.getPitchAngle()));
+                        fireControlReport.setTargetDepth(
+                                Math.abs(targetFireControlInfo.getDepth() - targetInstructionsInfo.getDepth()));
+                        fireControlReport.setTargetAzimuth(
+                                Math.abs(targetFireControlInfo.getAzimuth() - targetInstructionsInfo.getAzimuth()));
+
+                        PipeHistory fireControlPipeHistory = new PipeHistory();
+                        fireControlPipeHistory.setId(UUID.randomUUID().toString());
+                        fireControlPipeHistory.setCreateTime(new Timestamp(System.currentTimeMillis()));
+                        fireControlPipeHistory.setType("12");
+                        fireControlPipeHistory.setDisabled(false);
+                        fireControlPipeHistory.setRes(JsonUtils.serialize(fireControlReport));
+                        pipeHistoryService.insert(fireControlPipeHistory);
+
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+
+    /**
+     * 反应时间测试-13
+     */
+    public void reactionTimeTest(){
+
+        StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
+        if (!template.hasKey(Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY) ||
+                !template.hasKey(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY)) {
+            log.error("从Redis中获取武器发射或目标指示信息失败！");
+            return;
+        }
+
+        Map<String,String> tmpEqupimentLaunch = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+                Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY).entries();
+        assert tmpEqupimentLaunch!=null;
+
+        Map<String,EquipmentLaunchStatus> allEquipmentStatus = tmpEqupimentLaunch.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                pair -> JsonUtils.deserialize(pair.getValue(),EquipmentLaunchStatus.class)
+        ));
+
+        for(EquipmentLaunchStatus equipmentLaunchStatus:allEquipmentStatus.values()){
+
+            Long n = template.boundListOps(
+                    Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY + "_" + equipmentLaunchStatus.getTargetId()).size();
+
+            Long reactionTime = Long.MAX_VALUE;
+
+            TargetInstructionsInfo targetInstructionsInfo = new TargetInstructionsInfo();
+
+            for(int i=0;i<n;i++){
+                String tmpLaunch = template.boundListOps(
+                        Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY + "_" + equipmentLaunchStatus.getTargetId()).index(i);
+
+
+                TargetInstructionsInfo tmpInstruction = JsonUtils.deserialize(tmpLaunch,TargetInstructionsInfo.class);
+                if(reactionTime>equipmentLaunchStatus.getTime()-tmpInstruction.getTime()){
+                    reactionTime = equipmentLaunchStatus.getTime()-tmpInstruction.getTime();
+                    targetInstructionsInfo = tmpInstruction;
+                }
+
+            }
+
+            if(reactionTime == Long.MAX_VALUE) continue;
+
+            HistoryInfo.ReactionReport reactionReport = new HistoryInfo.ReactionReport();
+            reactionReport.setTime(equipmentLaunchStatus.getTime());
+            reactionReport.setReactionTime(reactionTime);
+            reactionReport.setTargetId(targetInstructionsInfo.getTargetId());
+            reactionReport.setTargetType(targetInstructionsInfo.getTargetTypeId());
+            reactionReport.setSensorId(targetInstructionsInfo.getEquipmentId());
+            reactionReport.setSensorType(targetInstructionsInfo.getEquipmentTypeId());
+            reactionReport.setWeaponId(equipmentLaunchStatus.getEquipmentId());
+            reactionReport.setWeaponType(equipmentLaunchStatus.getEquipmentTypeId());
+
+            PipeHistory reactionPipeHistory = new PipeHistory();
+            reactionPipeHistory.setId(UUID.randomUUID().toString());
+            reactionPipeHistory.setCreateTime(new Timestamp(System.currentTimeMillis()));
+            reactionPipeHistory.setType("13");
+            reactionPipeHistory.setDisabled(false);
+            reactionPipeHistory.setRes(JsonUtils.serialize(reactionReport));
+            pipeHistoryService.insert(reactionPipeHistory);
+        }
+    }
+
+
+    /**
+     * 发射架调转精度测试-14
+     */
+    public void launcherRotationTest(){
+
+        StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
+        if (!template.hasKey(Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY) ||
+                !template.hasKey(Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY)) {
+            log.error("从Redis中获取武器发射或目标火控信息失败！");
+            return;
+        }
+
+        Map<String, String> tmpFireControls = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+                Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY).entries();
+        assert tmpFireControls != null;
+        Map<String, TargetFireControlInfo> allFireControlInfos = tmpFireControls.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                pair -> JsonUtils.deserialize(pair.getValue(), TargetFireControlInfo.class))
+        );
+
+        for (TargetFireControlInfo targetFireControlInfo : allFireControlInfos.values()) {
+
+            Long n = template.boundListOps(
+                    Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + "_" + targetFireControlInfo.getTargetId()).size();
+
+
+            for (int i = 0; i < n; i++) {
+
+                EquipmentLaunchStatus equipmentLaunchStatus = JsonUtils.deserialize(template.boundListOps(
+                        Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + "_" + targetFireControlInfo.getTargetId()).index(i),
+                        EquipmentLaunchStatus.class);
+
+                assert equipmentLaunchStatus != null;
+
+                if (equipmentLaunchStatus.getTargetId().equals(targetFireControlInfo.getTargetId())) {
+
+                    if (equipmentLaunchStatus.getTime() - targetFireControlInfo.getTime() < LAUNCHER_ROTATION_TIME_THRESHOLD
+                            && 0 < equipmentLaunchStatus.getTime() - targetFireControlInfo.getTime()) {
+
+                        HistoryInfo.LauncherRotationReport launcherRotationReport = new HistoryInfo.LauncherRotationReport();
+                        launcherRotationReport.setTargetId(equipmentLaunchStatus.getTargetId());
+                        launcherRotationReport.setTargetType(equipmentLaunchStatus.getTargetTypeId());
+                        launcherRotationReport.setWeaponId(equipmentLaunchStatus.getEquipmentId());
+                        launcherRotationReport.setWeaponType(equipmentLaunchStatus.getEquipmentTypeId());
+                        launcherRotationReport.setTime(equipmentLaunchStatus.getTime());
+
+                        launcherRotationReport.setLauncherPitchAccuracy(Math.abs(targetFireControlInfo.getPitchAngle() -
+                                equipmentLaunchStatus.getLaunchPitchAngle()));;
+                        launcherRotationReport.setLauncherAzimuthAccuracy(Math.abs(targetFireControlInfo.getAzimuth() -
+                                equipmentLaunchStatus.getLaunchAzimuth()));
+
+                        PipeHistory launcherRotationPipeHistory = new PipeHistory();
+                        launcherRotationPipeHistory.setId(UUID.randomUUID().toString());
+                        launcherRotationPipeHistory.setCreateTime(new Timestamp(System.currentTimeMillis()));
+                        launcherRotationPipeHistory.setType("14");
+                        launcherRotationPipeHistory.setDisabled(false);
+                        launcherRotationPipeHistory.setRes(JsonUtils.serialize(launcherRotationReport));
+                        pipeHistoryService.insert(launcherRotationPipeHistory);
+
+                        break;
+                    }
+                }
+            }
+        }
+
+    }
+
 
     /**
     *
