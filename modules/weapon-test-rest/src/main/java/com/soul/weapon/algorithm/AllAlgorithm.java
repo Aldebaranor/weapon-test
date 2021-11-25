@@ -30,14 +30,10 @@ import java.util.stream.Collectors;
 public class AllAlgorithm {
     private final CommonRedisConfig commonRedisConfig;
 
-    /**
-     * 通道测试的测试周期阈值
-     **/
+    /** 通道测试的测试周期阈值 **/
     private Long PIPETEST_CYCLE_THRESHOLD = 3L;
 
-    /**
-     * 威胁判断-传感器探测时间阈值
-     **/
+    /** 威胁判断-传感器探测时间阈值 **/
     private Long DETECTOR_TIME_THRESHOLD = 2L;
 
     /**
@@ -60,19 +56,19 @@ public class AllAlgorithm {
      * 反导舰炮算法-2
      */
     public void antiMissileShipGun() {
-        if (!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
+        if(!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
                 .hasKey(Constant.EQUIPMENT_STATUS_HTTP_KEY))) {
             log.error("从Redis中获取装备信息失败！");
-            return;
+            return ;
         }
 
         Map<String, String> tmpEquipments = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
                 boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).entries();
         assert tmpEquipments != null;
         Map<String, EquipmentStatus> allEquipmentStatus = tmpEquipments.entrySet().stream().collect(Collectors.toMap(
-                Map.Entry::getKey,
-                pair -> JsonUtils.deserialize(pair.getValue(), EquipmentStatus.class))
-        );
+                    Map.Entry::getKey,
+                    pair -> JsonUtils.deserialize(pair.getValue(), EquipmentStatus.class))
+                );
 
         HistoryInfo.AntiMissileShipGunTestReport tmpReport = new HistoryInfo.AntiMissileShipGunTestReport();
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.AntiMissileShipGun.getValue());
@@ -237,7 +233,6 @@ public class AllAlgorithm {
     }
 
 
-
     /**
      * 执行情况测试-9
      */
@@ -324,13 +319,14 @@ public class AllAlgorithm {
     }
 
     /**
-     * @param allEquipmentStatus 所有的装备状态
-     * @param indices            通道测试涉及的装备下标
-     * @return bool 通道测试是否成功
-     */
+    *
+    * @param allEquipmentStatus 所有的装备状态
+    * @param indices 通道测试涉及的装备下标
+    * @return bool 通道测试是否成功
+    */
     public boolean pipeTestHelper(Map<String, EquipmentStatus> allEquipmentStatus, Integer[] indices) {
         boolean res = true;
-        for (Integer idx : indices) {
+        for(Integer idx : indices){
             if (!allEquipmentStatus.containsKey(idx.toString())) {
                 return false;
             }
@@ -342,8 +338,7 @@ public class AllAlgorithm {
 
     /**
      * 是否满足时间阈值
-     *
-     * @param timeVec                时间串
+     * @param timeVec 时间串
      * @param pipeTestCycleThreshold 通道测试周期阈值，单位s
      * @return 测试结果
      */
