@@ -137,6 +137,7 @@ public class AllAlgorithm {
         pipeHistoryService.insert(pipeHistory);
     }
 
+
     /**
      * 信息流程测试-6
      */
@@ -265,7 +266,7 @@ public class AllAlgorithm {
 
                 }
 
-                if(threatenState && radarState && instructionState) break;
+                if(threatenState && radarState && instructionState){break;}
 
             }
         }
@@ -364,7 +365,7 @@ public class AllAlgorithm {
                         break;
                     }
                 }
-                if(state) break;
+                if(state) {break;}
             }
         }
     }
@@ -404,7 +405,7 @@ public class AllAlgorithm {
                 TargetInstructionsInfo targetInstructionsInfo1 = JsonUtils.deserialize(
                         tmpInstruction,TargetInstructionsInfo.class);
 
-                if(targetInstructionsInfo1.getDistance()<50) continue;
+                if(targetInstructionsInfo1.getDistance()<50) {continue;}
 
                 MaxTime = targetInstructionsInfo1.getTime() > MaxTime ? targetInstructionsInfo1.getTime() : MaxTime;
 
@@ -414,7 +415,7 @@ public class AllAlgorithm {
 
             }
 
-            if(MinDistance==Float.MAX_VALUE) continue;
+            if(MinDistance==Float.MAX_VALUE) {continue;}
 
             HistoryInfo.InterceptDistanceReport interceptDistanceReport = new HistoryInfo.InterceptDistanceReport();
             interceptDistanceReport.setInterceptDistance(MinDistance);
@@ -544,7 +545,7 @@ public class AllAlgorithm {
 
             }
 
-            if(reactionTime == Long.MAX_VALUE) continue;
+            if(reactionTime == Long.MAX_VALUE) {continue;}
 
             HistoryInfo.ReactionReport reactionReport = new HistoryInfo.ReactionReport();
             reactionReport.setTime(equipmentLaunchStatus.getTime());
