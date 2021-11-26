@@ -137,7 +137,189 @@ public class AllAlgorithm {
         pipeHistoryService.insert(pipeHistory);
     }
 
+    /**
+     * 鱼类防御武器测试-3
+     */
+    public void torpedoDefense(){
+        if(!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
+                .hasKey(Constant.EQUIPMENT_STATUS_HTTP_KEY))) {
+            log.error("从Redis中获取装备信息失败！-3");
+            return ;
+        }
 
+        Map<String, String> tmpEquipments = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
+                boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).entries();
+        assert tmpEquipments != null;
+        Map<String, EquipmentStatus> allEquipmentStatus = tmpEquipments.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                pair -> JsonUtils.deserialize(pair.getValue(), EquipmentStatus.class))
+        );
+
+        HistoryInfo.TorpedoTestReport tmpReport = new HistoryInfo.TorpedoTestReport();
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.Sonar.getValue());
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.TorpedoFireControl.getValue());
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.TorpedoLauncher.getValue());
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.Torpedo.getValue());
+
+        tmpReport.setTime(System.currentTimeMillis());
+        tmpReport.setSonarId(PipeWeaponIndices.Sonar.getValue());
+        tmpReport.setSonarSelfCheck(
+                allEquipmentStatus.get(PipeWeaponIndices.Sonar.getValue()).getCheckStatus());
+        tmpReport.setFireControlId(PipeWeaponIndices.TorpedoFireControl.getValue());
+        tmpReport.setFireControlSelfCheck(
+                allEquipmentStatus.get(PipeWeaponIndices.TorpedoFireControl.getValue()).getCheckStatus());
+        tmpReport.setLauncherId(PipeWeaponIndices.TorpedoLauncher.getValue());
+        tmpReport.setLauncherSelfCheck(
+                allEquipmentStatus.get(PipeWeaponIndices.TorpedoLauncher.getValue()).getCheckStatus());
+        tmpReport.setTorpedoId(PipeWeaponIndices.Torpedo.getValue());
+        tmpReport.setTorpedoSelfCheck(
+                allEquipmentStatus.get(PipeWeaponIndices.Torpedo.getValue()).getCheckStatus());
+        long[] timeVec = {
+                allEquipmentStatus.get(PipeWeaponIndices.Sonar.getValue()).getTime(),
+                allEquipmentStatus.get(PipeWeaponIndices.TorpedoFireControl.getValue()).getTime(),
+                allEquipmentStatus.get(PipeWeaponIndices.TorpedoLauncher.getValue()).getTime(),
+                allEquipmentStatus.get(PipeWeaponIndices.Torpedo.getValue()).getTime()
+        };
+        boolean pipeStatus = tmpReport.getSonarSelfCheck() &&
+                tmpReport.getFireControlSelfCheck() &&
+                tmpReport.getLauncherSelfCheck() &&
+                tmpReport.getTorpedoSelfCheck() &&
+                meetTestCycleHelper(timeVec, PIPETEST_CYCLE_THRESHOLD);
+        tmpReport.setStatus(pipeStatus);
+
+        PipeHistory pipeHistory = new PipeHistory();
+        pipeHistory.setId(UUID.randomUUID().toString());
+        pipeHistory.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        pipeHistory.setType("3");
+        pipeHistory.setDisabled(false);
+        pipeHistory.setRes(JsonUtils.serialize(tmpReport));
+        pipeHistoryService.insert(pipeHistory);
+    }
+
+    /**
+     * 电子对抗武器测试-4
+     */
+    public void electronicCountermeasure(){
+        if(!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
+                .hasKey(Constant.EQUIPMENT_STATUS_HTTP_KEY))) {
+            log.error("从Redis中获取装备信息失败！-4");
+            return ;
+        }
+
+        Map<String, String> tmpEquipments = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
+                boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).entries();
+        assert tmpEquipments != null;
+        Map<String, EquipmentStatus> allEquipmentStatus = tmpEquipments.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                pair -> JsonUtils.deserialize(pair.getValue(), EquipmentStatus.class))
+        );
+
+        HistoryInfo.ElectronicWeaponTestReport tmpReport = new HistoryInfo.ElectronicWeaponTestReport();
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.ElectronicDetection.getValue());
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.ElectronicCountermeasure.getValue());
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.MultiUsageLaunch.getValue());
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.OutBoardElectronicCountermeasure.getValue());
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.InBoardElectronicCountermeasure.getValue());
+
+        tmpReport.setTime(System.currentTimeMillis());
+        tmpReport.setElectronicDetectorId(PipeWeaponIndices.ElectronicDetection.getValue());
+        tmpReport.setElectronicDetectorSelfCheck(
+                allEquipmentStatus.get(PipeWeaponIndices.ElectronicDetection.getValue()).getCheckStatus());
+        tmpReport.setFireControlId(PipeWeaponIndices.ElectronicCountermeasure.getValue());
+        tmpReport.setFireControlSelfCheck(
+                allEquipmentStatus.get(PipeWeaponIndices.ElectronicCountermeasure.getValue()).getCheckStatus());
+        tmpReport.setLauncherId(PipeWeaponIndices.MultiUsageLaunch.getValue());
+        tmpReport.setLauncherSelfCheck(
+                allEquipmentStatus.get(PipeWeaponIndices.MultiUsageLaunch.getValue()).getCheckStatus());
+        tmpReport.setOuterElectronicWeaponId(PipeWeaponIndices.OutBoardElectronicCountermeasure.getValue());
+        tmpReport.setOuterElectronicWeaponSelfCheck(
+                allEquipmentStatus.get(PipeWeaponIndices.OutBoardElectronicCountermeasure.getValue()).getCheckStatus());
+        tmpReport.setInnerElectronicWeaponId(PipeWeaponIndices.InBoardElectronicCountermeasure.getValue());
+        tmpReport.setInnerElectronicWeaponSelfCheck(
+                allEquipmentStatus.get(PipeWeaponIndices.InBoardElectronicCountermeasure.getValue()).getCheckStatus());
+        long[] timeVec = {
+                allEquipmentStatus.get(PipeWeaponIndices.ElectronicDetection.getValue()).getTime(),
+                allEquipmentStatus.get(PipeWeaponIndices.ElectronicCountermeasure.getValue()).getTime(),
+                allEquipmentStatus.get(PipeWeaponIndices.MultiUsageLaunch.getValue()).getTime(),
+                allEquipmentStatus.get(PipeWeaponIndices.OutBoardElectronicCountermeasure.getValue()).getTime(),
+                allEquipmentStatus.get(PipeWeaponIndices.InBoardElectronicCountermeasure.getValue()).getTime()
+        };
+        boolean pipeStatus = tmpReport.getElectronicDetectorSelfCheck() &&
+                tmpReport.getFireControlSelfCheck() &&
+                tmpReport.getLauncherSelfCheck() &&
+                tmpReport.getOuterElectronicWeaponSelfCheck() &&
+                tmpReport.getInnerElectronicWeaponSelfCheck() &&
+                meetTestCycleHelper(timeVec, PIPETEST_CYCLE_THRESHOLD);
+                tmpReport.setStatus(pipeStatus);
+
+        PipeHistory pipeHistory = new PipeHistory();
+        pipeHistory.setId(UUID.randomUUID().toString());
+        pipeHistory.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        pipeHistory.setType("4");
+        pipeHistory.setDisabled(false);
+        pipeHistory.setRes(JsonUtils.serialize(tmpReport));
+        pipeHistoryService.insert(pipeHistory);
+    }
+
+
+    /**
+     * 水声对抗武器测试 -5
+     */
+    public void underwaterAcousticCountermeasure(){
+        if(!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
+                .hasKey(Constant.EQUIPMENT_STATUS_HTTP_KEY))) {
+            log.error("从Redis中获取装备信息失败！-5");
+            return ;
+        }
+
+        Map<String, String> tmpEquipments = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
+                boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).entries();
+        assert tmpEquipments != null;
+        Map<String, EquipmentStatus> allEquipmentStatus = tmpEquipments.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                pair -> JsonUtils.deserialize(pair.getValue(), EquipmentStatus.class))
+        );
+
+        HistoryInfo.WaterWeaponTestReport tmpReport = new HistoryInfo.WaterWeaponTestReport();
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.UnderwaterAcousticCountermeasureControl.getValue());
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.UnderwaterAcousticCountermeasure.getValue());
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.MultiUsageLaunch.getValue());
+
+        tmpReport.setTime(System.currentTimeMillis());
+        tmpReport.setSonarId(PipeWeaponIndices.Sonar.getValue());
+        tmpReport.setSonarSelfCheck(
+                allEquipmentStatus.get(PipeWeaponIndices.Sonar.getValue()).getCheckStatus());
+        tmpReport.setFireControlId(PipeWeaponIndices.UnderwaterAcousticCountermeasureControl.getValue());
+        tmpReport.setFireControlSelfCheck(
+                allEquipmentStatus.get(PipeWeaponIndices.UnderwaterAcousticCountermeasureControl.getValue()).getCheckStatus());
+        tmpReport.setLauncherId(PipeWeaponIndices.MultiUsageLaunch.getValue());
+        tmpReport.setLauncherSelfCheck(
+                allEquipmentStatus.get(PipeWeaponIndices.MultiUsageLaunch.getValue()).getCheckStatus());
+        tmpReport.setWaterWeaponId(PipeWeaponIndices.UnderwaterAcousticCountermeasure.getValue());
+        tmpReport.setWaterWeaponSelfCheck(
+                allEquipmentStatus.get(PipeWeaponIndices.UnderwaterAcousticCountermeasure.getValue()).getCheckStatus());
+
+        long[] timeVec = {
+                allEquipmentStatus.get(PipeWeaponIndices.Sonar.getValue()).getTime(),
+                allEquipmentStatus.get(PipeWeaponIndices.UnderwaterAcousticCountermeasureControl.getValue()).getTime(),
+                allEquipmentStatus.get(PipeWeaponIndices.MultiUsageLaunch.getValue()).getTime(),
+                allEquipmentStatus.get(PipeWeaponIndices.UnderwaterAcousticCountermeasure.getValue()).getTime()
+        };
+        boolean pipeStatus = tmpReport.getSonarSelfCheck() &&
+                tmpReport.getFireControlSelfCheck() &&
+                tmpReport.getLauncherSelfCheck() &&
+                tmpReport.getWaterWeaponSelfCheck() &&
+                meetTestCycleHelper(timeVec, PIPETEST_CYCLE_THRESHOLD);
+        tmpReport.setStatus(pipeStatus);
+
+        PipeHistory pipeHistory = new PipeHistory();
+        pipeHistory.setId(UUID.randomUUID().toString());
+        pipeHistory.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        pipeHistory.setType("5");
+        pipeHistory.setDisabled(false);
+        pipeHistory.setRes(JsonUtils.serialize(tmpReport));
+        pipeHistoryService.insert(pipeHistory);
+    }
     /**
      * 信息流程测试-6
      */
