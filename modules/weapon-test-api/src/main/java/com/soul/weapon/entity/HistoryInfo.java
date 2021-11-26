@@ -40,11 +40,23 @@ public class HistoryInfo implements Serializable {
         @Display("舰空导弹发射系统自检")
         private Boolean launcherSelfCheck;
 
-        @Display("舰空导弹标识")
-        private String missileId;
+        @Display("舰空导弹近程标识")
+        private String missileShortId;
 
-        @Display("舰空导弹自检")
-        private Boolean missileSelfCheck;
+        @Display("舰空导弹近程自检")
+        private Boolean missileSelfShortCheck;
+
+        @Display("舰空导弹中程标识")
+        private String missileMediumId;
+
+        @Display("舰空导弹中程自检")
+        private Boolean missileSelfMediumCheck;
+
+        @Display("舰空导弹远程标识")
+        private String missileLongId;
+
+        @Display("舰空导弹远程自检")
+        private Boolean missileSelfLongCheck;
 
         @Display("舰空导弹武器通道状态")
         private Boolean status;

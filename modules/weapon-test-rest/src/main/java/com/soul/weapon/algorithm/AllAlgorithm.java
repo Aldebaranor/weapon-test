@@ -71,14 +71,74 @@ public class AllAlgorithm {
      * 航空导弹-1
      *
      */
-    public void ShipToAirMissile(){
+    public void shipToAirMissile(){
         if(!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
                 .hasKey(Constant.EQUIPMENT_STATUS_HTTP_KEY))) {
-            log.error("从Redis中获取装备信息失败！");
+            log.error("从Redis中获取装备信息失败！-1");
             return ;
         }
+            Map<String, String> tmpEquipments = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
+                    boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).entries();
+            assert tmpEquipments != null;
+            Map<String, EquipmentStatus> allEquipmentStatus = tmpEquipments.entrySet().stream().collect(Collectors.toMap(
+                    Map.Entry::getKey,
+                    pair -> JsonUtils.deserialize(pair.getValue(), EquipmentStatus.class))
+            );
 
-    }
+            HistoryInfo.ShipToAirMissileTestReport tmpReport = new HistoryInfo.ShipToAirMissileTestReport();
+
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.AirMissileRadar.getValue());
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.AirMissileFireControl.getValue());
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices. AirMissileLauncher.getValue());
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.AirMissileShortRange.getValue());
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.AirMissileMediumRange.getValue());
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.AirMissileLongRange.getValue());
+
+            tmpReport.setTime(System.currentTimeMillis());
+            tmpReport.setRadarSelfCheck(allEquipmentStatus.get(
+                PipeWeaponIndices.AirMissileRadar.getValue()).getCheckStatus());
+            tmpReport.setRadarId(PipeWeaponIndices.AirMissileRadar.getValue());
+            tmpReport.setFireControlId(PipeWeaponIndices.AirMissileFireControl.getValue());
+            tmpReport.setFireControlSelfCheck(allEquipmentStatus.get(
+                PipeWeaponIndices.AirMissileFireControl.getValue()).getCheckStatus());
+            tmpReport.setLauncherId(PipeWeaponIndices.AirMissileLauncher.getValue());
+            tmpReport.setLauncherSelfCheck(allEquipmentStatus.get(
+                PipeWeaponIndices.AirMissileLauncher.getValue()).getCheckStatus());
+            tmpReport.setMissileShortId(PipeWeaponIndices.AirMissileShortRange.getValue());
+            tmpReport.setMissileSelfShortCheck(allEquipmentStatus.get(
+                PipeWeaponIndices.AirMissileShortRange.getValue()).getCheckStatus());
+            tmpReport.setMissileMediumId(PipeWeaponIndices.AirMissileMediumRange.getValue());
+            tmpReport.setMissileSelfMediumCheck(allEquipmentStatus.get(
+                PipeWeaponIndices.AirMissileMediumRange.getValue()).getCheckStatus());
+            tmpReport.setMissileLongId(PipeWeaponIndices.AirMissileLongRange.getValue());
+            tmpReport.setMissileSelfLongCheck(allEquipmentStatus.get(
+                PipeWeaponIndices.AirMissileLongRange.getValue()).getCheckStatus());
+
+            long[] timeVec = {
+                    allEquipmentStatus.get(PipeWeaponIndices.AirMissileRadar.getValue()).getTime(),
+                    allEquipmentStatus.get(PipeWeaponIndices.AirMissileFireControl.getValue()).getTime(),
+                    allEquipmentStatus.get(PipeWeaponIndices.AirMissileLauncher.getValue()).getTime(),
+                    allEquipmentStatus.get(PipeWeaponIndices.AirMissileShortRange.getValue()).getTime(),
+                    allEquipmentStatus.get(PipeWeaponIndices.AirMissileMediumRange.getValue()).getTime(),
+                    allEquipmentStatus.get(PipeWeaponIndices.AirMissileLongRange.getValue()).getTime()
+            };
+            boolean pipeStatus = tmpReport.getRadarSelfCheck() &&
+                    tmpReport.getFireControlSelfCheck() &&
+                    tmpReport.getLauncherSelfCheck() &&
+                    tmpReport.getMissileSelfShortCheck() &&
+                    tmpReport.getMissileSelfMediumCheck() &&
+                    tmpReport.getMissileSelfLongCheck() &&
+                    meetTestCycleHelper(timeVec, PIPETEST_CYCLE_THRESHOLD);
+            tmpReport.setStatus(pipeStatus);
+
+            PipeHistory pipeHistory = new PipeHistory();
+            pipeHistory.setId(UUID.randomUUID().toString());
+            pipeHistory.setCreateTime(new Timestamp(System.currentTimeMillis()));
+            pipeHistory.setType("1");
+            pipeHistory.setDisabled(false);
+            pipeHistory.setRes(JsonUtils.serialize(tmpReport));
+            pipeHistoryService.insert(pipeHistory);
+        }
 
 
     /**
@@ -87,7 +147,7 @@ public class AllAlgorithm {
     public void antiMissileShipGun() {
         if(!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
                 .hasKey(Constant.EQUIPMENT_STATUS_HTTP_KEY))) {
-            log.error("从Redis中获取装备信息失败！");
+            log.error("从Redis中获取装备信息失败！-2");
             return ;
         }
 
