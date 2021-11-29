@@ -455,7 +455,7 @@ public class HistoryInfo implements Serializable {
         private Long time;
 
         @Display("目标拦截时间")
-        private Float interceptionTime;
+        private Long interceptionTime;
 
         @Display("目标拦截数量")
         private Integer interceptionAccount;

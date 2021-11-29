@@ -2,7 +2,6 @@ package com.soul.weapon.algorithm;
 
 import com.egova.json.utils.JsonUtils;
 import com.egova.redis.RedisUtils;
-import com.flagwind.commons.StringUtils;
 import com.soul.weapon.config.CommonRedisConfig;
 import com.soul.weapon.config.Constant;
 import com.soul.weapon.entity.HistoryInfo;
@@ -11,18 +10,13 @@ import com.soul.weapon.entity.enums.PipeWeaponIndices;
 import com.soul.weapon.model.dds.*;
 import com.soul.weapon.service.PipeHistoryService;
 import com.soul.weapon.utils.MathUtils;
-import com.squareup.moshi.Json;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.poi.ss.formula.functions.T;
-import org.checkerframework.checker.units.qual.C;
 import org.springframework.data.redis.core.StringRedisTemplate;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -63,6 +57,9 @@ public class AllAlgorithm {
 
     /** 发射架调转时间阈值 **/
     private Long LAUNCHER_ROTATION_TIME_THRESHOLD = 5L;
+
+    /** 多目标拦截中最小有效拦截距离 **/
+    private Long MIN_INTERCEPTION_DISTANCE = 50L;
 
     private final PipeHistoryService pipeHistoryService;
 
@@ -877,6 +874,82 @@ public class AllAlgorithm {
 
     }
 
+
+    /**
+     * 多目标拦截能力测试-15
+     */
+    public void multiTargetInterceptionTest(){
+
+        StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
+        if (Boolean.FALSE.equals(template.hasKey(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY))) {
+            log.error("从Redis中获取目标指示信息失败！");
+            return;
+        }
+
+        Map<String,String> tmpEquipmentLaunch = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+                Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY).entries();
+        assert tmpEquipmentLaunch !=null;
+
+        Map<String,EquipmentLaunchStatus> allEquipmentStatus = tmpEquipmentLaunch.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                pair -> JsonUtils.deserialize(pair.getValue(),EquipmentLaunchStatus.class)
+        ));
+
+
+        List<HistoryInfo.MultiTargetInterceptionReport> finalReport = new ArrayList<>();
+        Set<String> targetInstructionInfoIndices = Objects.requireNonNull(
+                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+                Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY).entries()).keySet();
+
+        for(String targetInstructionInfoId : targetInstructionInfoIndices) {
+            String targetInstructionInfoHistoryId = Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY + "_" + targetInstructionInfoId;
+            String targetType = "";
+
+            // 目标最后消失时间
+            Long maxDetectTargetTime = Long.MIN_VALUE;
+            // 目标最近探测距离
+            Float minInterceptionDistance = Float.MAX_VALUE;
+            TargetInstructionsInfo targetInstructionsInfo = new TargetInstructionsInfo();
+
+            Long targetInstructionInfoHistoryCnt = Objects.requireNonNull( RedisUtils.getService(
+                    commonRedisConfig.getHttpDataBaseIdx()).boundListOps(targetInstructionInfoHistoryId).size());
+            for(int i = 0; i < targetInstructionInfoHistoryCnt; ++i){
+                String tmpInstruction = template.boundListOps(targetInstructionInfoHistoryId).index(i);
+                TargetInstructionsInfo instruction = JsonUtils.deserialize(tmpInstruction,TargetInstructionsInfo.class);
+                maxDetectTargetTime = Math.max(maxDetectTargetTime, instruction.getTime());
+                minInterceptionDistance = Math.min(minInterceptionDistance, instruction.getDistance());
+                targetType = instruction.getTargetTypeId();
+            }
+
+            if(targetInstructionInfoHistoryCnt <= 0 ||
+                    maxDetectTargetTime == Long.MAX_VALUE ||
+                    minInterceptionDistance == Float.MAX_VALUE ||
+                    minInterceptionDistance <= MIN_INTERCEPTION_DISTANCE
+            ) {
+                continue;
+            }
+
+            HistoryInfo.MultiTargetInterceptionReport curReport = new HistoryInfo.MultiTargetInterceptionReport();
+            curReport.setTargetId(targetInstructionInfoId);
+            curReport.setTargetType(targetType);
+            curReport.setTime(maxDetectTargetTime);
+            curReport.setInterceptionTime(maxDetectTargetTime);
+            // 得所有目标的测试做完才知道拦截总目标个数
+            curReport.setInterceptionAccount(0);
+            finalReport.add(curReport);
+        }
+        for(HistoryInfo.MultiTargetInterceptionReport oneTargetReport: finalReport) {
+            oneTargetReport.setInterceptionAccount(finalReport.size());
+        }
+
+        PipeHistory reactionPipeHistory = new PipeHistory();
+        reactionPipeHistory.setId(UUID.randomUUID().toString());
+        reactionPipeHistory.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        reactionPipeHistory.setType("15");
+        reactionPipeHistory.setDisabled(false);
+        reactionPipeHistory.setRes(JsonUtils.serialize(finalReport));
+        pipeHistoryService.insert(reactionPipeHistory);
+    }
 
     /**
     *
