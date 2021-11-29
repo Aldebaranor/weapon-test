@@ -37,7 +37,8 @@ public class AlgorithmScheduleJob implements Job {
             allAlgorithm.torpedoDefense();
             allAlgorithm.electronicCountermeasure();
             allAlgorithm.underwaterAcousticCountermeasure();
-
+            allAlgorithm.executionStatusTest();
+            allAlgorithm.interceptDistanceTest();
         } catch (Exception e) {
             log.error("定时轮询所有算法失败！", e);
         }

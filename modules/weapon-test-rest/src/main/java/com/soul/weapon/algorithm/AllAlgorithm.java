@@ -2,6 +2,7 @@ package com.soul.weapon.algorithm;
 
 import com.egova.json.utils.JsonUtils;
 import com.egova.redis.RedisUtils;
+import com.flagwind.commons.StringUtils;
 import com.soul.weapon.config.CommonRedisConfig;
 import com.soul.weapon.config.Constant;
 import com.soul.weapon.entity.HistoryInfo;
@@ -417,7 +418,7 @@ public class AllAlgorithm {
 
                 assert targetInfo != null;
 
-                if (targetInfo.getTargetId().equals(targetInstructionsInfo.getTargetId())) {
+                if (StringUtils.equals(targetInfo.getTargetId(),targetInstructionsInfo.getTargetId())) {
 
                     if (!threatenState&&Math.abs(targetInfo.getTime() - targetInstructionsInfo.getTime()) < DETECTOR_TIME_THRESHOLD) {
 
@@ -556,8 +557,8 @@ public class AllAlgorithm {
                             Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + "_" + targetFireControlInfo.getTargetId()).index(j),
                     EquipmentLaunchStatus.class);
 
-                    if (targetFireControlInfo.getTargetId() == targetInstructionsInfo.getTargetId() &&
-                            targetFireControlInfo.getTargetId() == equipmentLaunchStatus.getTargetId()) {
+                    if (StringUtils.equals(targetFireControlInfo.getTargetId(),targetInstructionsInfo.getTargetId()) &&
+                        StringUtils.equals(targetFireControlInfo.getTargetId(),equipmentLaunchStatus.getTargetId())) {
 
                         HistoryInfo.ExecutionStatusReport executionStatusReport = new HistoryInfo.ExecutionStatusReport();
                         HistoryInfo.InfoProcessTestReport infoProcessTestReport = new HistoryInfo.InfoProcessTestReport();

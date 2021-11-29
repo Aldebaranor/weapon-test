@@ -63,22 +63,33 @@ public class PumpController {
                         Constant.ENVIRONMENT_INFO_HTTP_KEY, JsonUtils.serialize(msg));
             }break;
             case "EquipmentLaunchStatus": {
-                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().opsForValue().set(
-                        Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, JsonUtils.serialize(msg));
+                EquipmentLaunchStatus equipmentLaunchStatus = JsonUtils.deserialize(JsonUtils.serialize(msg), EquipmentLaunchStatus.class);
+                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().
+                        boundHashOps(Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY).put(
+                        equipmentLaunchStatus.getEquipmentId(), JsonUtils.serialize(equipmentLaunchStatus));
+
+                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().boundListOps(
+                        Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY+"_"+ equipmentLaunchStatus.getEquipmentId()).leftPush(JsonUtils.serialize(equipmentLaunchStatus));
+
+
             }break;
             case "EquipmentStatus": {
                 EquipmentStatus equipmentStatus = JsonUtils.deserialize(JsonUtils.serialize(msg), EquipmentStatus.class);
                 RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().
                         boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).put(
                                 equipmentStatus.getEquipmentId(), JsonUtils.serialize(equipmentStatus));
+
+                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().boundListOps(
+                        Constant.EQUIPMENT_STATUS_HTTP_KEY+"_"+ equipmentStatus.getEquipmentId()).leftPush(JsonUtils.serialize(equipmentStatus));
             }break;
             case "LauncherRotationInfo": {
                 RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().opsForValue().set(
                         Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY, JsonUtils.serialize(msg));
             }break;
             case "TargetFireControlInfo": {
-                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().opsForValue().set(
-                        Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, JsonUtils.serialize(msg));
+                TargetFireControlInfo tmpTargetFireControlInfo=JsonUtils.deserialize(JsonUtils.serialize(msg),TargetFireControlInfo.class);
+                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+                        Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY).put(tmpTargetFireControlInfo.getTargetId(),JsonUtils.serialize(tmpTargetFireControlInfo));
             }break;
             case "TargetInfo": {
                 TargetInfo tmpTargetInfo = JsonUtils.deserialize(JsonUtils.serialize(msg), TargetInfo.class);
@@ -149,7 +160,35 @@ public class PumpController {
                 return JsonUtils.serialize(new EnvironmentInfo());
             }
             case "EquipmentLaunchStatus": {
-                return JsonUtils.serialize(new EquipmentLaunchStatus());
+                EquipmentLaunchStatus equipmentLaunchStatus1=new EquipmentLaunchStatus();
+                equipmentLaunchStatus1.setSender("1");
+                equipmentLaunchStatus1.setMsgTime(System.currentTimeMillis());
+                equipmentLaunchStatus1.setEquipmentId("6");
+                equipmentLaunchStatus1.setEquipmentMode("6");
+                equipmentLaunchStatus1.setTime(System.currentTimeMillis());
+                equipmentLaunchStatus1.setTargetId("6");
+                equipmentLaunchStatus1.setTargetTypeId("6");
+                equipmentLaunchStatus1.setLaunchAzimuth(0.1f);
+                equipmentLaunchStatus1.setLaunchPitchAngle(0.1f);
+
+                EquipmentLaunchStatus equipmentLaunchStatus2=new EquipmentLaunchStatus();
+                equipmentLaunchStatus2.setSender("2");
+                equipmentLaunchStatus2.setMsgTime(System.currentTimeMillis());
+                equipmentLaunchStatus2.setEquipmentId("2");
+                equipmentLaunchStatus2.setEquipmentMode("2");
+                equipmentLaunchStatus2.setTime(111L);
+                equipmentLaunchStatus2.setTargetId("2");
+                equipmentLaunchStatus2.setTargetTypeId("6");
+                equipmentLaunchStatus2.setLaunchAzimuth(0.1f);
+                equipmentLaunchStatus2.setLaunchPitchAngle(0.1f);
+
+                HttpEntity<Object> request = new HttpEntity<>(equipmentLaunchStatus1, headers);
+                ResponseEntity<String> responseEntity = restTemplate.postForEntity(
+                        "http://127.0.0.1:8016/free/pump/" + structName, request, String.class);
+                HttpEntity<Object> request2 = new HttpEntity<>(equipmentLaunchStatus2, headers);
+                ResponseEntity<String> responseEntity2 = restTemplate.postForEntity(
+                        "http://127.0.0.1:8016/free/pump/" + structName, request2, String.class);
+                return responseEntity.toString();
             }
             case "EquipmentStatus": {
                 EquipmentStatus equipmentStatus1 = new EquipmentStatus();
@@ -169,8 +208,8 @@ public class PumpController {
                 EquipmentStatus equipmentStatus2 = new EquipmentStatus();
                 equipmentStatus2.setSender("2");
                 equipmentStatus2.setMsgTime(System.currentTimeMillis());
-                equipmentStatus2.setEquipmentId("7");
-                equipmentStatus2.setEquipmentTypeId("7");
+                equipmentStatus2.setEquipmentId("2");
+                equipmentStatus2.setEquipmentTypeId("2");
                 equipmentStatus2.setEquipmentMode("反导舰炮武器火控系统");
                 equipmentStatus2.setCheckStatus(true);
                 equipmentStatus2.setTime(System.currentTimeMillis());
@@ -239,9 +278,9 @@ public class PumpController {
                 TargetInfo tarInfo2 = new TargetInfo();
                 tarInfo2.setSender("xxx");
                 tarInfo2.setMsgTime(104L);
-                tarInfo2.setTime(104L);
-                tarInfo2.setTargetId("6");
-                tarInfo2.setTargetTypeId("6");
+                tarInfo2.setTime(111L);
+                tarInfo2.setTargetId("2");
+                tarInfo2.setTargetTypeId("2");
                 tarInfo2.setDistance(6.0F);
                 tarInfo2.setSpeed(6.0F);
                 tarInfo2.setAzimuth(6.0F);
@@ -302,8 +341,8 @@ public class PumpController {
                 targetInstructionsInfo3.setSender("xxx");
                 targetInstructionsInfo3.setMsgTime(104L);
                 targetInstructionsInfo3.setTime(111L);
-                targetInstructionsInfo3.setTargetId("6");
-                targetInstructionsInfo3.setTargetTypeId("6");
+                targetInstructionsInfo3.setTargetId("2");
+                targetInstructionsInfo3.setTargetTypeId("2");
                 targetInstructionsInfo3.setDistance(2.88F);
                 targetInstructionsInfo3.setSpeed(3.15F);
                 targetInstructionsInfo3.setAzimuth(3.22F);
