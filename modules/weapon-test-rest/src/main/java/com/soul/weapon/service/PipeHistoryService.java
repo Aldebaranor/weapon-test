@@ -47,6 +47,16 @@ public interface PipeHistoryService {
 
     /**
      * get by time && id
+     * @param time
+     * @param taskId
+     * @return
      */
     List<PipeHistory> getByTimeAndId(String time,String taskId);
+
+    /**
+     * get by Type
+     * @param type
+     * @return
+     */
+    List<PipeHistory> getByType(String type);
 }

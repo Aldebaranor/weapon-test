@@ -70,4 +70,16 @@ public class PipeHistoryServiceImpl extends TemplateService<PipeHistory,String> 
         return super.query(pipeHistoryCondition);
 
     }
+
+    /**
+     * 根据算法类型查询
+     * @param type
+     * @return
+     */
+    @Override
+    public List<PipeHistory> getByType(String type) {
+        PipeHistoryCondition pipeHistoryCondition = new PipeHistoryCondition();
+        pipeHistoryCondition.setType(type);
+        return super.query(pipeHistoryCondition);
+    }
 }

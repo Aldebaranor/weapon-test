@@ -21,6 +21,10 @@ public class PipeHistoryCondition {
     @ConditionOperator(name = "taskId",operator = ClauseOperator.Equal)
     private String taskId;
 
+    @Display("外键-测试项类型")
+    @ConditionOperator(name = "type",operator = ClauseOperator.Equal)
+    private String type;
+
     @Display("外键-测试项")
     @ConditionOperator(name = "pipeTestId",operator = ClauseOperator.Equal)
     private String pipeTestId;

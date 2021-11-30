@@ -61,4 +61,10 @@ public class FreePipeHistoryController {
         return pipeHistoryService.deleteById(id);
     }
 
+    @Api
+    @GetMapping(value = "/type/{type}")
+    public List<PipeHistory> getByType(@PathVariable String type)
+    {
+        return pipeHistoryService.getByType(type);
+    }
 }

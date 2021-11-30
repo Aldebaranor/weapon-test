@@ -249,8 +249,9 @@ public class PumpController {
             case "TargetFireControlInfo": {
                 TargetFireControlInfo targetFireControlInfo=new TargetFireControlInfo();
                 targetFireControlInfo.setTargetId("2");
-                targetFireControlInfo.setSender("1");
-                targetFireControlInfo.setTargetTypeId("1");
+                targetFireControlInfo.setSender("2");
+                targetFireControlInfo.setTime(111L);
+                targetFireControlInfo.setTargetTypeId("2");
                 targetFireControlInfo.setMsgTime(System.currentTimeMillis());
                 targetFireControlInfo.setDistance(1f);
                 targetFireControlInfo.setSpeed(2f);
