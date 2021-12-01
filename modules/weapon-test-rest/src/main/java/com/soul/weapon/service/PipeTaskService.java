@@ -4,6 +4,7 @@ import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
 import com.soul.weapon.condition.PipeTaskCondition;
 import com.soul.weapon.entity.PipeTask;
+import com.soul.weapon.entity.PipeTest;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,5 +56,12 @@ public interface PipeTaskService {
      * @return
      */
     PageResult<PipeTask> page(QueryModel<PipeTaskCondition> model);
-    // QueryModel<PipeTaskCondition> page(QueryModel<PipeTaskCondition> model);
+
+    /**
+     * 开始测试
+     * @param takeId
+     * @param pipeTests
+     */
+    void startTest(String takeId, List<PipeTest> pipeTests);
+
 }

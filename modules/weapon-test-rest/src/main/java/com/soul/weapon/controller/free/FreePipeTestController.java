@@ -54,7 +54,7 @@ public class FreePipeTestController {
 
     @Api
     @PostMapping
-    public String inset(@RequestBody PipeTest pipeTest)
+    public String insert(@RequestBody PipeTest pipeTest)
     {
         return pipeTestService.insert(pipeTest);
     }

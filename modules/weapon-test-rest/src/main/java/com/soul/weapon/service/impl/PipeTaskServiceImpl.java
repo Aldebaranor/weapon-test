@@ -11,6 +11,7 @@ import com.soul.weapon.condition.PipeTaskCondition;
 import com.soul.weapon.domain.PipeTaskRepository;
 import com.soul.weapon.entity.PipeTask;
 import com.soul.weapon.entity.PipeTest;
+import com.soul.weapon.entity.codes.PipeState;
 import com.soul.weapon.service.PipeTaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,7 @@ import java.util.*;
 public class PipeTaskServiceImpl extends TemplateService<PipeTask,String> implements PipeTaskService {
 
     private final PipeTaskRepository pipeTaskRepository;
-
+    private final PipeTestServiceImpl pipeTestServiceImpl;
     @Override
     protected AbstractRepositoryBase<PipeTask,String> getRepository(){
         return pipeTaskRepository;
@@ -61,6 +62,18 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask,String> implem
     @Transactional(rollbackFor = Exception.class)
     public PageResult<PipeTask> page(QueryModel<PipeTaskCondition> model) {
         return super.page(model.getCondition(), model.getPaging(), model.getSorts());
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void startTest(String takeId, List<PipeTest> pipeTests) {
+        PipeTask pipeTask = super.getById(takeId);
+        pipeTask.setStatus(new PipeState("1"));
+        super.update(pipeTask);
+        for (PipeTest pipeTest : pipeTests) {
+            pipeTestServiceImpl.insert(pipeTest);
+        }
+
     }
 }
 

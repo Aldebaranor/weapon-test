@@ -5,6 +5,7 @@ import com.egova.model.QueryModel;
 import com.egova.web.annotation.Api;
 import com.soul.weapon.condition.PipeTaskCondition;
 import com.soul.weapon.entity.PipeTask;
+import com.soul.weapon.entity.PipeTest;
 import com.soul.weapon.service.PipeTaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -71,4 +72,9 @@ public class FreePipeTaskController {
         return  pipeTaskService.page(con);
     }
 
+    @Api
+    @PostMapping(value = "/{takeId}")
+    public void startTest(@PathVariable String takeId,@RequestBody List<PipeTest> pipeTests){
+        pipeTaskService.startTest(takeId,pipeTests);
+    }
 }
