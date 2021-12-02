@@ -5,11 +5,15 @@ import com.egova.redis.RedisUtils;
 import com.flagwind.commons.StringUtils;
 import com.soul.weapon.config.CommonRedisConfig;
 import com.soul.weapon.config.Constant;
-import com.soul.weapon.entity.HistoryInfo;
-import com.soul.weapon.entity.PipeHistory;
+import com.soul.weapon.config.TaskTypeConstant;
+import com.soul.weapon.entity.*;
+import com.soul.weapon.entity.codes.PipeState;
 import com.soul.weapon.entity.enums.PipeWeaponIndices;
 import com.soul.weapon.model.dds.*;
+import com.soul.weapon.service.ComDictionaryItemService;
 import com.soul.weapon.service.PipeHistoryService;
+import com.soul.weapon.service.PipeTaskService;
+import com.soul.weapon.service.PipeTestService;
 import com.soul.weapon.utils.MathUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,10 +34,24 @@ import java.util.stream.Collectors;
 public class AllAlgorithm {
     private final CommonRedisConfig commonRedisConfig;
 
-    /** 通道测试的测试周期阈值 **/
+    private final PipeTaskService pipeTaskService;
+
+    private final PipeTestService pipeTestService;
+
+    private final ComDictionaryItemService comDictionaryItemService;
+
+    /**
+     * 不执行算法返回值
+     */
+    private final String NONE = "-1";
+    /**
+     * 通道测试的测试周期阈值
+     **/
     private Long PIPETEST_CYCLE_THRESHOLD = 3L;
 
-    /** 威胁判断-传感器探测时间阈值 **/
+    /**
+     * 威胁判断-传感器探测时间阈值
+     **/
     private Long DETECTOR_TIME_THRESHOLD = 2L;
 
     /**
@@ -47,19 +65,34 @@ public class AllAlgorithm {
     private Long RADARPATH_TIME_THRESHOLD = 2L;
     private String AIRTYPE = "对空目标";
 
-    /** 信息流程时间阈值 **/
+    /**
+     * 信息流程时间阈值
+     **/
     private Long PROGRESS_TIME_THRESHOLD = 60L;
 
-    /** 执行时间阈值 **/
+    /**
+     * 执行时间阈值
+     **/
     private Long EXECUTION_TIME_THRESHOLD = 60L;
 
-    /** 火控解算时间阈值 **/
+    /**
+     * 拦截距离测试阈值
+     */
+    private Long INTERCEPTION_DISTANCE = 50L;
+
+    /**
+     * 火控解算时间阈值
+     **/
     private Long FIRECONTROL_TIME_THRESHOLD = 5L;
 
-    /** 发射架调转时间阈值 **/
+    /**
+     * 发射架调转时间阈值
+     **/
     private Long LAUNCHER_ROTATION_TIME_THRESHOLD = 5L;
 
-    /** 多目标拦截中最小有效拦截距离 **/
+    /**
+     * 多目标拦截中最小有效拦截距离
+     **/
     private Long MIN_INTERCEPTION_DISTANCE = 50L;
 
     private final PipeHistoryService pipeHistoryService;
@@ -67,95 +100,108 @@ public class AllAlgorithm {
 
     /**
      * 航空导弹-1
-     *
      */
-    public void shipToAirMissile(){
-        if(!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
+    public void shipToAirMissile() {
+        String threshold = pipeTestSetThreshold(TaskTypeConstant.Ship_Air_Missile);
+        if (StringUtils.equals(threshold, NONE)) {
+            return;
+        }
+        //更新阈值
+        PIPETEST_CYCLE_THRESHOLD=Long.valueOf(threshold);
+
+        if (!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
                 .hasKey(Constant.EQUIPMENT_STATUS_HTTP_KEY))) {
             log.error("从Redis中获取装备信息失败！-1");
-            return ;
+            return;
         }
-            Map<String, String> tmpEquipments = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
-                    boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).entries();
-            assert tmpEquipments != null;
-            Map<String, EquipmentStatus> allEquipmentStatus = tmpEquipments.entrySet().stream().collect(Collectors.toMap(
-                    Map.Entry::getKey,
-                    pair -> JsonUtils.deserialize(pair.getValue(), EquipmentStatus.class))
-            );
+        Map<String, String> tmpEquipments = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
+                boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).entries();
+        assert tmpEquipments != null;
+        Map<String, EquipmentStatus> allEquipmentStatus = tmpEquipments.entrySet().stream().collect(Collectors.toMap(
+                Map.Entry::getKey,
+                pair -> JsonUtils.deserialize(pair.getValue(), EquipmentStatus.class))
+        );
 
-            HistoryInfo.ShipToAirMissileTestReport tmpReport = new HistoryInfo.ShipToAirMissileTestReport();
+        HistoryInfo.ShipToAirMissileTestReport tmpReport = new HistoryInfo.ShipToAirMissileTestReport();
 
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.AirMissileRadar.getValue());
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.AirMissileFireControl.getValue());
-        assert allEquipmentStatus.containsKey(PipeWeaponIndices. AirMissileLauncher.getValue());
+        assert allEquipmentStatus.containsKey(PipeWeaponIndices.AirMissileLauncher.getValue());
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.AirMissileShortRange.getValue());
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.AirMissileMediumRange.getValue());
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.AirMissileLongRange.getValue());
 
-            tmpReport.setTime(System.currentTimeMillis());
-            tmpReport.setRadarSelfCheck(allEquipmentStatus.get(
+        tmpReport.setTime(System.currentTimeMillis());
+        tmpReport.setRadarSelfCheck(allEquipmentStatus.get(
                 PipeWeaponIndices.AirMissileRadar.getValue()).getCheckStatus());
-            tmpReport.setRadarId(PipeWeaponIndices.AirMissileRadar.getValue());
-            tmpReport.setFireControlId(PipeWeaponIndices.AirMissileFireControl.getValue());
-            tmpReport.setFireControlSelfCheck(allEquipmentStatus.get(
+        tmpReport.setRadarId(PipeWeaponIndices.AirMissileRadar.getValue());
+        tmpReport.setFireControlId(PipeWeaponIndices.AirMissileFireControl.getValue());
+        tmpReport.setFireControlSelfCheck(allEquipmentStatus.get(
                 PipeWeaponIndices.AirMissileFireControl.getValue()).getCheckStatus());
-            tmpReport.setLauncherId(PipeWeaponIndices.AirMissileLauncher.getValue());
-            tmpReport.setLauncherSelfCheck(allEquipmentStatus.get(
+        tmpReport.setLauncherId(PipeWeaponIndices.AirMissileLauncher.getValue());
+        tmpReport.setLauncherSelfCheck(allEquipmentStatus.get(
                 PipeWeaponIndices.AirMissileLauncher.getValue()).getCheckStatus());
-            tmpReport.setMissileShortId(PipeWeaponIndices.AirMissileShortRange.getValue());
-            tmpReport.setMissileSelfShortCheck(allEquipmentStatus.get(
+        tmpReport.setMissileShortId(PipeWeaponIndices.AirMissileShortRange.getValue());
+        tmpReport.setMissileSelfShortCheck(allEquipmentStatus.get(
                 PipeWeaponIndices.AirMissileShortRange.getValue()).getCheckStatus());
-            tmpReport.setMissileMediumId(PipeWeaponIndices.AirMissileMediumRange.getValue());
-            tmpReport.setMissileSelfMediumCheck(allEquipmentStatus.get(
+        tmpReport.setMissileMediumId(PipeWeaponIndices.AirMissileMediumRange.getValue());
+        tmpReport.setMissileSelfMediumCheck(allEquipmentStatus.get(
                 PipeWeaponIndices.AirMissileMediumRange.getValue()).getCheckStatus());
-            tmpReport.setMissileLongId(PipeWeaponIndices.AirMissileLongRange.getValue());
-            tmpReport.setMissileSelfLongCheck(allEquipmentStatus.get(
+        tmpReport.setMissileLongId(PipeWeaponIndices.AirMissileLongRange.getValue());
+        tmpReport.setMissileSelfLongCheck(allEquipmentStatus.get(
                 PipeWeaponIndices.AirMissileLongRange.getValue()).getCheckStatus());
 
-            long[] timeVec = {
-                    allEquipmentStatus.get(PipeWeaponIndices.AirMissileRadar.getValue()).getTime(),
-                    allEquipmentStatus.get(PipeWeaponIndices.AirMissileFireControl.getValue()).getTime(),
-                    allEquipmentStatus.get(PipeWeaponIndices.AirMissileLauncher.getValue()).getTime(),
-                    allEquipmentStatus.get(PipeWeaponIndices.AirMissileShortRange.getValue()).getTime(),
-                    allEquipmentStatus.get(PipeWeaponIndices.AirMissileMediumRange.getValue()).getTime(),
-                    allEquipmentStatus.get(PipeWeaponIndices.AirMissileLongRange.getValue()).getTime()
-            };
-            boolean pipeStatus = tmpReport.getRadarSelfCheck() &&
-                    tmpReport.getFireControlSelfCheck() &&
-                    tmpReport.getLauncherSelfCheck() &&
-                    tmpReport.getMissileSelfShortCheck() &&
-                    tmpReport.getMissileSelfMediumCheck() &&
-                    tmpReport.getMissileSelfLongCheck() &&
-                    meetTestCycleHelper(timeVec, PIPETEST_CYCLE_THRESHOLD);
-            tmpReport.setStatus(pipeStatus);
+        long[] timeVec = {
+                allEquipmentStatus.get(PipeWeaponIndices.AirMissileRadar.getValue()).getTime(),
+                allEquipmentStatus.get(PipeWeaponIndices.AirMissileFireControl.getValue()).getTime(),
+                allEquipmentStatus.get(PipeWeaponIndices.AirMissileLauncher.getValue()).getTime(),
+                allEquipmentStatus.get(PipeWeaponIndices.AirMissileShortRange.getValue()).getTime(),
+                allEquipmentStatus.get(PipeWeaponIndices.AirMissileMediumRange.getValue()).getTime(),
+                allEquipmentStatus.get(PipeWeaponIndices.AirMissileLongRange.getValue()).getTime()
+        };
+        boolean pipeStatus = tmpReport.getRadarSelfCheck() &&
+                tmpReport.getFireControlSelfCheck() &&
+                tmpReport.getLauncherSelfCheck() &&
+                tmpReport.getMissileSelfShortCheck() &&
+                tmpReport.getMissileSelfMediumCheck() &&
+                tmpReport.getMissileSelfLongCheck() &&
+                meetTestCycleHelper(timeVec, PIPETEST_CYCLE_THRESHOLD);
+        tmpReport.setStatus(pipeStatus);
 
-            PipeHistory pipeHistory = new PipeHistory();
-            pipeHistory.setId(UUID.randomUUID().toString());
-            pipeHistory.setCreateTime(new Timestamp(System.currentTimeMillis()));
-            pipeHistory.setType("1");
-            pipeHistory.setDisabled(false);
-            pipeHistory.setRes(JsonUtils.serialize(tmpReport));
-            pipeHistoryService.insert(pipeHistory);
-        }
+        PipeHistory pipeHistory = new PipeHistory();
+        pipeHistory.setId(UUID.randomUUID().toString());
+        pipeHistory.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        pipeHistory.setType("1");
+        pipeHistory.setDisabled(false);
+        pipeHistory.setRes(JsonUtils.serialize(tmpReport));
+        pipeHistoryService.insert(pipeHistory);
+    }
 
 
     /**
      * 反导舰炮算法-2
      */
     public void antiMissileShipGun() {
-        if(!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
+        String threshold = pipeTestSetThreshold(TaskTypeConstant.Anti_missile_naval_gun);
+        if (StringUtils.equals(threshold, NONE)) {
+            return;
+        }
+        //更新阈值
+        PIPETEST_CYCLE_THRESHOLD=Long.valueOf(threshold);
+
+        if (!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
                 .hasKey(Constant.EQUIPMENT_STATUS_HTTP_KEY))) {
             log.error("从Redis中获取装备信息失败！-2");
-            return ;
+            return;
         }
 
         Map<String, String> tmpEquipments = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
                 boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).entries();
         assert tmpEquipments != null;
         Map<String, EquipmentStatus> allEquipmentStatus = tmpEquipments.entrySet().stream().collect(Collectors.toMap(
-                    Map.Entry::getKey,
-                    pair -> JsonUtils.deserialize(pair.getValue(), EquipmentStatus.class))
-                );
+                Map.Entry::getKey,
+                pair -> JsonUtils.deserialize(pair.getValue(), EquipmentStatus.class))
+        );
 
         HistoryInfo.AntiMissileShipGunTestReport tmpReport = new HistoryInfo.AntiMissileShipGunTestReport();
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.AntiMissileShipGun.getValue());
@@ -198,11 +244,18 @@ public class AllAlgorithm {
     /**
      * 鱼类防御武器测试-3
      */
-    public void torpedoDefense(){
-        if(!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
+    public void torpedoDefense() {
+        String threshold = pipeTestSetThreshold(TaskTypeConstant.Torpedo_defense);
+        if (StringUtils.equals(threshold, NONE)) {
+            return;
+        }
+        //更新阈值
+        PIPETEST_CYCLE_THRESHOLD=Long.valueOf(threshold);
+
+        if (!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
                 .hasKey(Constant.EQUIPMENT_STATUS_HTTP_KEY))) {
             log.error("从Redis中获取装备信息失败！-3");
-            return ;
+            return;
         }
 
         Map<String, String> tmpEquipments = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
@@ -257,11 +310,19 @@ public class AllAlgorithm {
     /**
      * 电子对抗武器测试-4
      */
-    public void electronicCountermeasure(){
-        if(!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
+    public void electronicCountermeasure() {
+        String threshold = pipeTestSetThreshold(TaskTypeConstant.electronic_countermeasure);
+        if (StringUtils.equals(threshold, NONE)) {
+            return;
+        }
+
+        //更新阈值
+        PIPETEST_CYCLE_THRESHOLD=Long.valueOf(threshold);
+
+        if (!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
                 .hasKey(Constant.EQUIPMENT_STATUS_HTTP_KEY))) {
             log.error("从Redis中获取装备信息失败！-4");
-            return ;
+            return;
         }
 
         Map<String, String> tmpEquipments = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
@@ -308,7 +369,7 @@ public class AllAlgorithm {
                 tmpReport.getOuterElectronicWeaponSelfCheck() &&
                 tmpReport.getInnerElectronicWeaponSelfCheck() &&
                 meetTestCycleHelper(timeVec, PIPETEST_CYCLE_THRESHOLD);
-                tmpReport.setStatus(pipeStatus);
+        tmpReport.setStatus(pipeStatus);
 
         PipeHistory pipeHistory = new PipeHistory();
         pipeHistory.setId(UUID.randomUUID().toString());
@@ -323,11 +384,18 @@ public class AllAlgorithm {
     /**
      * 水声对抗武器测试 -5
      */
-    public void underwaterAcousticCountermeasure(){
-        if(!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
+    public void underwaterAcousticCountermeasure() {
+        String threshold = pipeTestSetThreshold(TaskTypeConstant.Underwater_acoustic_countermeasure);
+        if (StringUtils.equals(threshold, NONE)) {
+            return;
+        }
+        //更新阈值
+        PIPETEST_CYCLE_THRESHOLD=Long.valueOf(threshold);
+
+        if (!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
                 .hasKey(Constant.EQUIPMENT_STATUS_HTTP_KEY))) {
             log.error("从Redis中获取装备信息失败！-5");
-            return ;
+            return;
         }
 
         Map<String, String> tmpEquipments = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
@@ -378,10 +446,11 @@ public class AllAlgorithm {
         pipeHistory.setRes(JsonUtils.serialize(tmpReport));
         pipeHistoryService.insert(pipeHistory);
     }
+
     /**
      * 信息流程测试-6
      */
-    public void infoProcessTest(){
+    public void infoProcessTest() {
 
     }
 
@@ -390,6 +459,23 @@ public class AllAlgorithm {
      * 威胁判断算法-7 指示处理精度测试-8 雷达航迹测试-10
      */
     public void threatenEstimation() {
+        String threshold1 = pipeTestSetThreshold(TaskTypeConstant.Threat_judgment);
+        String threshold2 = pipeTestSetThreshold(TaskTypeConstant.Indicates_the_processing_accuracy);
+        String threshold3 = pipeTestSetThreshold(TaskTypeConstant.Radar_track);
+        if (StringUtils.equals(threshold1, NONE)&&StringUtils.equals(threshold2, NONE) &&StringUtils.equals(threshold3, NONE)) {
+            return;
+        }
+        //更新阈值
+        if (!StringUtils.equals(threshold1, NONE)){
+            DETECTOR_TIME_THRESHOLD=Long.valueOf(threshold1);
+        }
+        if (!StringUtils.equals(threshold2, NONE)){
+            INSTRUCTION_TIME_THRESHOLD=Long.valueOf(threshold2);
+        }
+        if (!StringUtils.equals(threshold3, NONE)){
+            RADARPATH_TIME_THRESHOLD=Long.valueOf(threshold3);
+        }
+
         StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
         if (!template.hasKey(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY) || !template.hasKey(Constant.TARGET_INFO_HTTP_KEY)) {
             log.error("从Redis中获取目标指示信息或目标真值信息失败！");
@@ -410,7 +496,7 @@ public class AllAlgorithm {
 
             Long n = template.boundListOps(Constant.TARGET_INFO_HTTP_KEY + "_" + targetInstructionsInfo.getTargetId()).size();
 
-            boolean threatenState = false,instructionState = false,radarState = false;
+            boolean threatenState = false, instructionState = false, radarState = false;
 
             for (int i = 0; i < n; i++) {
                 TargetInfo targetInfo = JsonUtils.deserialize(template.boundListOps(
@@ -418,9 +504,9 @@ public class AllAlgorithm {
 
                 assert targetInfo != null;
 
-                if (StringUtils.equals(targetInfo.getTargetId(),targetInstructionsInfo.getTargetId())) {
+                if (StringUtils.equals(targetInfo.getTargetId(), targetInstructionsInfo.getTargetId())) {
 
-                    if (!threatenState&&Math.abs(targetInfo.getTime() - targetInstructionsInfo.getTime()) < DETECTOR_TIME_THRESHOLD) {
+                    if (!threatenState && Math.abs(targetInfo.getTime() - targetInstructionsInfo.getTime()) < DETECTOR_TIME_THRESHOLD) {
 
                         HistoryInfo.ThreatenReport threatenReport = new HistoryInfo.ThreatenReport();
                         threatenReport.setId(targetInfo.getTargetId());
@@ -446,8 +532,8 @@ public class AllAlgorithm {
                     }
 
                     // 指示处理精度测试
-                    if(!instructionState &&
-                            Math.abs(targetInfo.getTime() - targetInstructionsInfo.getTime()) < INSTRUCTION_TIME_THRESHOLD){
+                    if (!instructionState &&
+                            Math.abs(targetInfo.getTime() - targetInstructionsInfo.getTime()) < INSTRUCTION_TIME_THRESHOLD) {
 
                         HistoryInfo.InstructionAccuracyReport instructionAccuracyReport = new HistoryInfo.InstructionAccuracyReport();
                         instructionAccuracyReport.setTime(targetInstructionsInfo.getTime());
@@ -457,13 +543,13 @@ public class AllAlgorithm {
                         instructionAccuracyReport.setSensorType(targetInstructionsInfo.getEquipmentTypeId());
 
                         instructionAccuracyReport.setDistanceAccuracy(
-                                Math.abs(targetInstructionsInfo.getDistance()-targetInfo.getDistance()));
+                                Math.abs(targetInstructionsInfo.getDistance() - targetInfo.getDistance()));
                         instructionAccuracyReport.setAzimuthAccuracy(
-                                Math.abs(targetInstructionsInfo.getAzimuth()-targetInfo.getAzimuth()));
+                                Math.abs(targetInstructionsInfo.getAzimuth() - targetInfo.getAzimuth()));
                         instructionAccuracyReport.setDepthAccuracy(
-                                Math.abs(targetInstructionsInfo.getDepth()-targetInfo.getDepth()));
+                                Math.abs(targetInstructionsInfo.getDepth() - targetInfo.getDepth()));
                         instructionAccuracyReport.setPitchAccuracy(
-                                Math.abs(targetInstructionsInfo.getPitchAngle()-targetInfo.getPitchAngle()));
+                                Math.abs(targetInstructionsInfo.getPitchAngle() - targetInfo.getPitchAngle()));
 
                         PipeHistory accuracyPipeHistory = new PipeHistory();
                         accuracyPipeHistory.setId(UUID.randomUUID().toString());
@@ -478,10 +564,10 @@ public class AllAlgorithm {
                     }
 
                     // 雷达航迹测试
-                    if(!radarState && targetInfo.getTime() - targetInstructionsInfo.getTime()>0
-                            && targetInfo.getTime() - targetInstructionsInfo.getTime()<RADARPATH_TIME_THRESHOLD
+                    if (!radarState && targetInfo.getTime() - targetInstructionsInfo.getTime() > 0
+                            && targetInfo.getTime() - targetInstructionsInfo.getTime() < RADARPATH_TIME_THRESHOLD
                             && targetInfo.getTargetTypeId().equals(AIRTYPE)
-                            && targetInstructionsInfo.getTargetTypeId().equals(AIRTYPE)){
+                            && targetInstructionsInfo.getTargetTypeId().equals(AIRTYPE)) {
 
                         HistoryInfo.RadarPathReport radarPathReport = new HistoryInfo.RadarPathReport();
                         radarPathReport.setTime(targetInstructionsInfo.getTime());
@@ -501,12 +587,14 @@ public class AllAlgorithm {
                         radarPathPipeHistory.setDisabled(false);
                         radarPathPipeHistory.setRes(JsonUtils.serialize(radarPathReport));
                         pipeHistoryService.insert(radarPathPipeHistory);
-                        radarState =true;
+                        radarState = true;
                     }
 
                 }
 
-                if(threatenState && radarState && instructionState){break;}
+                if (threatenState && radarState && instructionState) {
+                    break;
+                }
 
             }
         }
@@ -517,6 +605,18 @@ public class AllAlgorithm {
      * 执行情况测试-9
      */
     public void executionStatusTest() {
+        String threshold1 = pipeTestSetThreshold(TaskTypeConstant.Information_flow);
+        String threshold2 = pipeTestSetThreshold(TaskTypeConstant.Implementation);
+        if (StringUtils.equals(threshold1, NONE)&&StringUtils.equals(threshold2, NONE)) {
+           return;
+        }
+        //更新阈值
+        if (!StringUtils.equals(threshold1, NONE)){
+            PROGRESS_TIME_THRESHOLD=Long.valueOf(threshold1);
+        }
+        if (!StringUtils.equals(threshold2, NONE)){
+            EXECUTION_TIME_THRESHOLD=Long.valueOf(threshold2);
+        }
 
         StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
         if (!template.hasKey(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY) ||
@@ -542,23 +642,23 @@ public class AllAlgorithm {
 
             Long n = template.boundListOps(Constant.TARGET_INFO_HTTP_KEY + "_" + targetFireControlInfo.getTargetId()).size();
 
-            for(int i =0;i<n;i++){
+            for (int i = 0; i < n; i++) {
 
                 TargetInstructionsInfo targetInstructionsInfo = JsonUtils.deserialize(template.boundListOps(
-                        Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY + "_" +targetFireControlInfo.getTargetId()).index(i),
+                        Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY + "_" + targetFireControlInfo.getTargetId()).index(i),
                         TargetInstructionsInfo.class);
 
                 Long m = template.boundListOps(Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + "_" +
                         targetFireControlInfo.getTargetId()).size();
 
-                for(int j =0;j<m;j++){
+                for (int j = 0; j < m; j++) {
 
                     EquipmentLaunchStatus equipmentLaunchStatus = JsonUtils.deserialize(template.boundListOps(
                             Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + "_" + targetFireControlInfo.getTargetId()).index(j),
-                    EquipmentLaunchStatus.class);
+                            EquipmentLaunchStatus.class);
 
-                    if (StringUtils.equals(targetFireControlInfo.getTargetId(),targetInstructionsInfo.getTargetId()) &&
-                        StringUtils.equals(targetFireControlInfo.getTargetId(),equipmentLaunchStatus.getTargetId())) {
+                    if (StringUtils.equals(targetFireControlInfo.getTargetId(), targetInstructionsInfo.getTargetId()) &&
+                            StringUtils.equals(targetFireControlInfo.getTargetId(), equipmentLaunchStatus.getTargetId())) {
 
                         HistoryInfo.ExecutionStatusReport executionStatusReport = new HistoryInfo.ExecutionStatusReport();
                         HistoryInfo.InfoProcessTestReport infoProcessTestReport = new HistoryInfo.InfoProcessTestReport();
@@ -582,9 +682,9 @@ public class AllAlgorithm {
                         infoProcessTestReport.setId(equipmentLaunchStatus.getTargetId());
                         infoProcessTestReport.setTime(equipmentLaunchStatus.getTime());
                         infoProcessTestReport.setType(equipmentLaunchStatus.getTargetTypeId());
-                        if( b && d){
+                        if (b && d) {
                             infoProcessTestReport.setStatus(true);
-                        }else{
+                        } else {
                             infoProcessTestReport.setStatus(false);
                         }
 
@@ -605,7 +705,9 @@ public class AllAlgorithm {
                         break;
                     }
                 }
-                if(state) {break;}
+                if (state) {
+                    break;
+                }
             }
         }
     }
@@ -614,22 +716,30 @@ public class AllAlgorithm {
      * 拦截距离测试-11
      */
     public void interceptDistanceTest() {
+
+        String threshold = pipeTestSetThreshold(TaskTypeConstant.Intercept_distance);
+        if (StringUtils.equals(threshold, NONE)) {
+            return;
+        }
+        //更新阈值
+        INTERCEPTION_DISTANCE=Long.valueOf(threshold);
+
         StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
         if (!template.hasKey(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY)) {
             log.error("从Redis中获取目标指示信息失败！");
             return;
         }
 
-        Map<String,String>  tempInstructions  = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+        Map<String, String> tempInstructions = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
                 Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY).entries();
 
         assert tempInstructions != null;
-        Map<String,TargetInstructionsInfo> allInstructions = tempInstructions.entrySet().stream().collect(Collectors.toMap(
+        Map<String, TargetInstructionsInfo> allInstructions = tempInstructions.entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
-                pair -> JsonUtils.deserialize(pair.getValue(),TargetInstructionsInfo.class)
+                pair -> JsonUtils.deserialize(pair.getValue(), TargetInstructionsInfo.class)
         ));
 
-        for(TargetInstructionsInfo targetInstructionsInfo:allInstructions.values()){
+        for (TargetInstructionsInfo targetInstructionsInfo : allInstructions.values()) {
 
             Long n = template.boundListOps(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY + "_" +
                     targetInstructionsInfo.getTargetId()).size();
@@ -637,15 +747,17 @@ public class AllAlgorithm {
             Long MaxTime = 0L;
             Float MinDistance = Float.MAX_VALUE;
 
-            for(int i =0;i<n;i++){
+            for (int i = 0; i < n; i++) {
 
-                String tmpInstruction =  template.boundListOps(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY + "_" +
+                String tmpInstruction = template.boundListOps(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY + "_" +
                         targetInstructionsInfo.getTargetId()).index(i);
 
                 TargetInstructionsInfo targetInstructionsInfo1 = JsonUtils.deserialize(
-                        tmpInstruction,TargetInstructionsInfo.class);
+                        tmpInstruction, TargetInstructionsInfo.class);
 
-                if(targetInstructionsInfo1.getDistance()<50) {continue;}
+                if (targetInstructionsInfo1.getDistance() < INTERCEPTION_DISTANCE) {
+                    continue;
+                }
 
                 MaxTime = targetInstructionsInfo1.getTime() > MaxTime ? targetInstructionsInfo1.getTime() : MaxTime;
 
@@ -655,7 +767,9 @@ public class AllAlgorithm {
 
             }
 
-            if(MinDistance==Float.MAX_VALUE) {continue;}
+            if (MinDistance == Float.MAX_VALUE) {
+                continue;
+            }
 
             HistoryInfo.InterceptDistanceReport interceptDistanceReport = new HistoryInfo.InterceptDistanceReport();
             interceptDistanceReport.setInterceptDistance(MinDistance);
@@ -678,6 +792,13 @@ public class AllAlgorithm {
      * 火控解算精度测试-12
      */
     public void fireControlTest() {
+        String threshold = pipeTestSetThreshold(TaskTypeConstant.Fire_control_calculation_accuracy);
+        if (StringUtils.equals(threshold, NONE)) {
+            return;
+        }
+        //更新阈值
+        FIRECONTROL_TIME_THRESHOLD=Long.valueOf(threshold);
+
         StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
         if (!template.hasKey(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY) ||
                 !template.hasKey(Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY)) {
@@ -745,8 +866,12 @@ public class AllAlgorithm {
     /**
      * 反应时间测试-13
      */
-    public void reactionTimeTest(){
+    public void reactionTimeTest() {
 
+        String threshold = pipeTestSetThreshold(TaskTypeConstant.reaction_time);
+        if (StringUtils.equals(threshold, NONE)) {
+            return;
+        }
         StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
         if (!template.hasKey(Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY) ||
                 !template.hasKey(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY)) {
@@ -754,16 +879,16 @@ public class AllAlgorithm {
             return;
         }
 
-        Map<String,String> tmpEqupimentLaunch = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+        Map<String, String> tmpEqupimentLaunch = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
                 Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY).entries();
-        assert tmpEqupimentLaunch!=null;
+        assert tmpEqupimentLaunch != null;
 
-        Map<String,EquipmentLaunchStatus> allEquipmentStatus = tmpEqupimentLaunch.entrySet().stream().collect(Collectors.toMap(
+        Map<String, EquipmentLaunchStatus> allEquipmentStatus = tmpEqupimentLaunch.entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
-                pair -> JsonUtils.deserialize(pair.getValue(),EquipmentLaunchStatus.class)
+                pair -> JsonUtils.deserialize(pair.getValue(), EquipmentLaunchStatus.class)
         ));
 
-        for(EquipmentLaunchStatus equipmentLaunchStatus:allEquipmentStatus.values()){
+        for (EquipmentLaunchStatus equipmentLaunchStatus : allEquipmentStatus.values()) {
 
             Long n = template.boundListOps(
                     Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY + "_" + equipmentLaunchStatus.getTargetId()).size();
@@ -772,20 +897,22 @@ public class AllAlgorithm {
 
             TargetInstructionsInfo targetInstructionsInfo = new TargetInstructionsInfo();
 
-            for(int i=0;i<n;i++){
+            for (int i = 0; i < n; i++) {
                 String tmpLaunch = template.boundListOps(
                         Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY + "_" + equipmentLaunchStatus.getTargetId()).index(i);
 
 
-                TargetInstructionsInfo tmpInstruction = JsonUtils.deserialize(tmpLaunch,TargetInstructionsInfo.class);
-                if(reactionTime>equipmentLaunchStatus.getTime()-tmpInstruction.getTime()){
-                    reactionTime = equipmentLaunchStatus.getTime()-tmpInstruction.getTime();
+                TargetInstructionsInfo tmpInstruction = JsonUtils.deserialize(tmpLaunch, TargetInstructionsInfo.class);
+                if (reactionTime > equipmentLaunchStatus.getTime() - tmpInstruction.getTime()) {
+                    reactionTime = equipmentLaunchStatus.getTime() - tmpInstruction.getTime();
                     targetInstructionsInfo = tmpInstruction;
                 }
 
             }
 
-            if(reactionTime == Long.MAX_VALUE) {continue;}
+            if (reactionTime == Long.MAX_VALUE) {
+                continue;
+            }
 
             HistoryInfo.ReactionReport reactionReport = new HistoryInfo.ReactionReport();
             reactionReport.setTime(equipmentLaunchStatus.getTime());
@@ -811,7 +938,13 @@ public class AllAlgorithm {
     /**
      * 发射架调转精度测试-14
      */
-    public void launcherRotationTest(){
+    public void launcherRotationTest() {
+        String threshold = pipeTestSetThreshold(TaskTypeConstant.Launcher_rotation_accuracy);
+        if (StringUtils.equals(threshold, NONE)) {
+            return;
+        }
+        //更新阈值
+        LAUNCHER_ROTATION_TIME_THRESHOLD=Long.valueOf(threshold);
 
         StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
         if (!template.hasKey(Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY) ||
@@ -855,7 +988,8 @@ public class AllAlgorithm {
                         launcherRotationReport.setTime(equipmentLaunchStatus.getTime());
 
                         launcherRotationReport.setLauncherPitchAccuracy(Math.abs(targetFireControlInfo.getPitchAngle() -
-                                equipmentLaunchStatus.getLaunchPitchAngle()));;
+                                equipmentLaunchStatus.getLaunchPitchAngle()));
+                        ;
                         launcherRotationReport.setLauncherAzimuthAccuracy(Math.abs(targetFireControlInfo.getAzimuth() -
                                 equipmentLaunchStatus.getLaunchAzimuth()));
 
@@ -879,7 +1013,14 @@ public class AllAlgorithm {
     /**
      * 多目标拦截能力测试-15
      */
-    public void multiTargetInterceptionTest(){
+    public void multiTargetInterceptionTest() {
+
+        String threshold = pipeTestSetThreshold(TaskTypeConstant.Multi_target_interception);
+        if (StringUtils.equals(threshold, NONE)) {
+            return;
+        }
+        //更新阈值
+        MIN_INTERCEPTION_DISTANCE=Long.valueOf(threshold);
 
         StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
         if (Boolean.FALSE.equals(template.hasKey(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY))) {
@@ -887,22 +1028,22 @@ public class AllAlgorithm {
             return;
         }
 
-        Map<String,String> tmpEquipmentLaunch = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+        Map<String, String> tmpEquipmentLaunch = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
                 Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY).entries();
-        assert tmpEquipmentLaunch !=null;
+        assert tmpEquipmentLaunch != null;
 
-        Map<String,EquipmentLaunchStatus> allEquipmentStatus = tmpEquipmentLaunch.entrySet().stream().collect(Collectors.toMap(
+        Map<String, EquipmentLaunchStatus> allEquipmentStatus = tmpEquipmentLaunch.entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
-                pair -> JsonUtils.deserialize(pair.getValue(),EquipmentLaunchStatus.class)
+                pair -> JsonUtils.deserialize(pair.getValue(), EquipmentLaunchStatus.class)
         ));
 
 
         List<HistoryInfo.MultiTargetInterceptionReport> finalReport = new ArrayList<>();
         Set<String> targetInstructionInfoIndices = Objects.requireNonNull(
                 RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
-                Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY).entries()).keySet();
+                        Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY).entries()).keySet();
 
-        for(String targetInstructionInfoId : targetInstructionInfoIndices) {
+        for (String targetInstructionInfoId : targetInstructionInfoIndices) {
             String targetInstructionInfoHistoryId = Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY + "_" + targetInstructionInfoId;
             String targetType = "";
 
@@ -912,17 +1053,17 @@ public class AllAlgorithm {
             Float minInterceptionDistance = Float.MAX_VALUE;
             TargetInstructionsInfo targetInstructionsInfo = new TargetInstructionsInfo();
 
-            Long targetInstructionInfoHistoryCnt = Objects.requireNonNull( RedisUtils.getService(
+            Long targetInstructionInfoHistoryCnt = Objects.requireNonNull(RedisUtils.getService(
                     commonRedisConfig.getHttpDataBaseIdx()).boundListOps(targetInstructionInfoHistoryId).size());
-            for(int i = 0; i < targetInstructionInfoHistoryCnt; ++i){
+            for (int i = 0; i < targetInstructionInfoHistoryCnt; ++i) {
                 String tmpInstruction = template.boundListOps(targetInstructionInfoHistoryId).index(i);
-                TargetInstructionsInfo instruction = JsonUtils.deserialize(tmpInstruction,TargetInstructionsInfo.class);
+                TargetInstructionsInfo instruction = JsonUtils.deserialize(tmpInstruction, TargetInstructionsInfo.class);
                 maxDetectTargetTime = Math.max(maxDetectTargetTime, instruction.getTime());
                 minInterceptionDistance = Math.min(minInterceptionDistance, instruction.getDistance());
                 targetType = instruction.getTargetTypeId();
             }
 
-            if(targetInstructionInfoHistoryCnt <= 0 ||
+            if (targetInstructionInfoHistoryCnt <= 0 ||
                     maxDetectTargetTime == Long.MAX_VALUE ||
                     minInterceptionDistance == Float.MAX_VALUE ||
                     minInterceptionDistance <= MIN_INTERCEPTION_DISTANCE
@@ -939,7 +1080,7 @@ public class AllAlgorithm {
             curReport.setInterceptionAccount(0);
             finalReport.add(curReport);
         }
-        for(HistoryInfo.MultiTargetInterceptionReport oneTargetReport: finalReport) {
+        for (HistoryInfo.MultiTargetInterceptionReport oneTargetReport : finalReport) {
             oneTargetReport.setInterceptionAccount(finalReport.size());
         }
 
@@ -953,14 +1094,13 @@ public class AllAlgorithm {
     }
 
     /**
-    *
-    * @param allEquipmentStatus 所有的装备状态
-    * @param indices 通道测试涉及的装备下标
-    * @return bool 通道测试是否成功
-    */
+     * @param allEquipmentStatus 所有的装备状态
+     * @param indices            通道测试涉及的装备下标
+     * @return bool 通道测试是否成功
+     */
     public boolean pipeTestHelper(Map<String, EquipmentStatus> allEquipmentStatus, Integer[] indices) {
         boolean res = true;
-        for(Integer idx : indices){
+        for (Integer idx : indices) {
             if (!allEquipmentStatus.containsKey(idx.toString())) {
                 return false;
             }
@@ -972,12 +1112,39 @@ public class AllAlgorithm {
 
     /**
      * 是否满足时间阈值
-     * @param timeVec 时间串
+     *
+     * @param timeVec                时间串
      * @param pipeTestCycleThreshold 通道测试周期阈值，单位s
      * @return 测试结果
      */
     public boolean meetTestCycleHelper(long[] timeVec, long pipeTestCycleThreshold) {
         return MathUtils.findMaxByCollections(timeVec) - MathUtils.findMinByCollections(timeVec) <
                 pipeTestCycleThreshold * 1000;
+    }
+
+    /**
+     * 是否执行算法并传递阈值
+     *
+     * @param Code
+     * @return
+     */
+    public String pipeTestSetThreshold(String Code) {
+        //1.找到taskId
+        PipeState status = new PipeState("1");
+        PipeTest pipeTest = pipeTaskService.getByState(status);
+        if (pipeTest == null) {
+            return NONE;
+        }
+        //2.根据taskId找到通道测试集合
+        List<PipeTest> pipeTestList = pipeTestService.getByTaskId(pipeTest.getId());
+        //3.TestCode--》value判断
+        for (PipeTest test : pipeTestList) {
+            List<ComDictionaryItem> comDictionaryItems = comDictionaryItemService.getByCode(test.getCode());
+            if (StringUtils.equals(comDictionaryItems.get(0).getText(), Code)) {
+                //返回阈值
+                return test.getThreshold();
+            }
+        }
+        return NONE;
     }
 }

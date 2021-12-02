@@ -46,4 +46,11 @@ public interface PipeTestService {
      */
     int deleteById(@PathVariable("id") String id);
 
+    /**
+     * query by taskId
+     * @param taskId
+     * @return
+     */
+    List<PipeTest> getByTaskId(String taskId);
+
 }

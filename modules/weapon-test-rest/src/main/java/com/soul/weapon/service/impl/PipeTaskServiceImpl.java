@@ -4,9 +4,6 @@ import com.egova.data.service.AbstractRepositoryBase;
 import com.egova.data.service.TemplateService;
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
-import com.flagwind.persistent.model.Paging;
-import com.flagwind.persistent.model.SingleClause;
-import com.flagwind.persistent.model.Sorting;
 import com.soul.weapon.condition.PipeTaskCondition;
 import com.soul.weapon.domain.PipeTaskRepository;
 import com.soul.weapon.entity.PipeTask;
@@ -15,8 +12,6 @@ import com.soul.weapon.entity.codes.PipeState;
 import com.soul.weapon.service.PipeTaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.jetbrains.annotations.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,6 +69,13 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask,String> implem
             pipeTestServiceImpl.insert(pipeTest);
         }
 
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public PipeTest getByState(PipeState status) {
+        List<PipeTest> PipeTestList = pipeTestServiceImpl.query(status);
+        return  PipeTestList.get(0);
     }
 }
 

@@ -3,6 +3,7 @@ package com.soul.weapon.service.impl;
 import com.egova.data.service.AbstractRepositoryBase;
 import com.egova.data.service.TemplateService;
 import com.flagwind.persistent.model.SingleClause;
+import com.soul.weapon.condition.PipeTestCondition;
 import com.soul.weapon.domain.PipeTestRepository;
 import com.soul.weapon.entity.PipeTest;
 import com.soul.weapon.service.PipeTestService;
@@ -29,6 +30,7 @@ import java.util.List;
 public class PipeTestServiceImpl extends TemplateService<PipeTest,String> implements PipeTestService {
 
     private final PipeTestRepository pipeTestRepository;
+    private final PipeTestCondition pipeTestCondition;
 
     @Override
     protected AbstractRepositoryBase<PipeTest,String> getRepository(){
@@ -48,5 +50,13 @@ public class PipeTestServiceImpl extends TemplateService<PipeTest,String> implem
         pipeTest.setModifyTime(new Timestamp(System.currentTimeMillis()));
         super.update(pipeTest);
     }
-    
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public List<PipeTest> getByTaskId(String taskId) {
+        pipeTestCondition.setTaskId(taskId);
+        return super.query(pipeTestCondition);
+    }
+
+
 }

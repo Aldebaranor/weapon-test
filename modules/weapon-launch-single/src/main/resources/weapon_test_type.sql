@@ -27,7 +27,7 @@ INSERT IGNORE  INTO `com_dictionary_item` VALUES ('00004', 'weapon-type4', '4', 
 INSERT IGNORE  INTO `com_dictionary_item` VALUES ('00005', 'weapon-type5', '5', '反导舰炮武器通道测试-2', NULL, 'weapon-test:pipe-test-type', NULL, NULL,'weapon-test', 0);
 INSERT IGNORE  INTO `com_dictionary_item` VALUES ('00006', 'weapon-type6', '6', '鱼雷防御武器通道测试-3', NULL, 'weapon-test:pipe-test-type', NULL, NULL,'weapon-test', 0);
 INSERT IGNORE  INTO `com_dictionary_item` VALUES ('00007', 'weapon-type7', '7', '电子对抗武器通道测试-4', NULL, 'weapon-test:pipe-test-type', NULL, NULL,'weapon-test', 0);
-INSERT IGNORE  INTO `com_dictionary_item` VALUES ('00008', 'weapon-type8', '8', '鱼雷防御武器通道测试-5', NULL, 'weapon-test:pipe-test-type', NULL, NULL,'weapon-test', 0);
+INSERT IGNORE  INTO `com_dictionary_item` VALUES ('00008', 'weapon-type8', '8', '水声对抗武器测试-5', NULL, 'weapon-test:pipe-test-type', NULL, NULL,'weapon-test', 0);
 INSERT IGNORE  INTO `com_dictionary_item` VALUES ('00009', 'weapon-type9', '9', '信息流程测试-6', NULL, 'weapon-test:pipe-test-type', NULL, NULL,'weapon-test', 0);
 INSERT IGNORE  INTO `com_dictionary_item` VALUES ('00010', 'weapon-type10', '10', '威胁判断测试-7', NULL, 'weapon-test:pipe-test-type', NULL, NULL,'weapon-test', 0);
 INSERT IGNORE  INTO `com_dictionary_item` VALUES ('00011', 'weapon-type11', '11', '指示处理精度测试-8', NULL, 'weapon-test:pipe-test-type', NULL, NULL,'weapon-test', 0);

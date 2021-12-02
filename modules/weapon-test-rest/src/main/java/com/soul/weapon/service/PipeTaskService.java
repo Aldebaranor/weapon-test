@@ -5,7 +5,7 @@ import com.egova.model.QueryModel;
 import com.soul.weapon.condition.PipeTaskCondition;
 import com.soul.weapon.entity.PipeTask;
 import com.soul.weapon.entity.PipeTest;
-import org.springframework.stereotype.Service;
+import com.soul.weapon.entity.codes.PipeState;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -63,5 +63,12 @@ public interface PipeTaskService {
      * @param pipeTests
      */
     void startTest(String takeId, List<PipeTest> pipeTests);
+
+    /**
+     * 获取正在运行的Task
+     * @param status
+     * @return
+     */
+    PipeTest getByState(PipeState status);
 
 }
