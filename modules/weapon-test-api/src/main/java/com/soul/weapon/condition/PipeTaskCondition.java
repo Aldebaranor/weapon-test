@@ -18,9 +18,6 @@ public class PipeTaskCondition {
     @ConditionOperator(name="id", operator = ClauseOperator.Equal)
     private String id;
 
-    @Display("运行状态, 0: 未执行, 1: 执行中, 2: 执行完")
-    @ConditionOperator(name = "status",operator = ClauseOperator.Equal)
-    private String state;
 
     @Display("任务名称")
     @ConditionOperator(name="name", operator = ClauseOperator.Equal)

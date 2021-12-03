@@ -1130,7 +1130,7 @@ public class AllAlgorithm {
      */
     public String pipeTestSetThreshold(String Code) {
         //1.找到taskId
-        int status=1;
+        String status="1";
         PipeTest pipeTest = pipeTaskService.getByState(status);
         if (pipeTest == null) {
             return NONE;

@@ -5,6 +5,7 @@ import com.egova.data.service.TemplateService;
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
 import com.soul.weapon.condition.PipeTaskCondition;
+import com.soul.weapon.condition.PipeTestCondition;
 import com.soul.weapon.domain.PipeTaskRepository;
 import com.soul.weapon.entity.PipeTask;
 import com.soul.weapon.entity.PipeTest;
@@ -74,9 +75,9 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask,String> implem
     @Override
     @Transactional(rollbackFor = Exception.class)
     public PipeTest getByState(String status) {
-        PipeTaskCondition condition = new PipeTaskCondition();
-        condition.setState(status);
-        return pipeTestServiceImpl.query(status).stream().findFirst().orElse(null);
+        PipeTestCondition condition = new PipeTestCondition();
+        condition.setStatus(status);
+        return pipeTestServiceImpl.query(condition).stream().findFirst().orElse(null);
         //return  PipeTestList.get(0);
     }
 
