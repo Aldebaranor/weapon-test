@@ -69,6 +69,6 @@ public interface PipeTaskService {
      * @param status
      * @return
      */
-    PipeTest getByState(PipeState status);
+    PipeTest getByState(String status);
 
 }

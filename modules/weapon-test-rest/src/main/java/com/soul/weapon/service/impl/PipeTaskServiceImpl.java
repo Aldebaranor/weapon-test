@@ -73,9 +73,11 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask,String> implem
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public PipeTest getByState(PipeState status) {
-        List<PipeTest> PipeTestList = pipeTestServiceImpl.query(status);
-        return  PipeTestList.get(0);
+    public PipeTest getByState(String status) {
+        PipeTaskCondition condition = new PipeTaskCondition();
+        condition.setState(status);
+        return pipeTestServiceImpl.query(status).stream().findFirst().orElse(null);
+        //return  PipeTestList.get(0);
     }
 }
 

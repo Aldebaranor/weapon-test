@@ -20,5 +20,5 @@ public class PipeTaskCondition {
 
     @Display("运行状态, 0: 未执行, 1: 执行中, 2: 执行完")
     @ConditionOperator(name = "status",operator = ClauseOperator.Equal)
-    private PipeState state;
+    private String state;
 }
