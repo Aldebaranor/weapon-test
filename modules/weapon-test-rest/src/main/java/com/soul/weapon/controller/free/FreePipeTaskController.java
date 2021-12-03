@@ -77,4 +77,11 @@ public class FreePipeTaskController {
     public void startTest(@PathVariable String takeId,@RequestBody List<PipeTest> pipeTests){
         pipeTaskService.startTest(takeId,pipeTests);
     }
+
+    @Api
+    @GetMapping(value = "/name/{name}")
+    public List<PipeTask> getByName(@PathVariable String name)
+    {
+        return pipeTaskService.getByName(name);
+    }
 }

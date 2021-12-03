@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Priority;
+import javax.annotation.Resource;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -30,7 +31,6 @@ import java.util.List;
 public class PipeTestServiceImpl extends TemplateService<PipeTest,String> implements PipeTestService {
 
     private final PipeTestRepository pipeTestRepository;
-    private final PipeTestCondition pipeTestCondition;
 
     @Override
     protected AbstractRepositoryBase<PipeTest,String> getRepository(){
@@ -54,6 +54,7 @@ public class PipeTestServiceImpl extends TemplateService<PipeTest,String> implem
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<PipeTest> getByTaskId(String taskId) {
+        PipeTestCondition pipeTestCondition=new PipeTestCondition();
         pipeTestCondition.setTaskId(taskId);
         return super.query(pipeTestCondition);
     }

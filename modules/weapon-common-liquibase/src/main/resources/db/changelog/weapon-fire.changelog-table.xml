@@ -193,7 +193,7 @@
     <changeSet id="1630288315483-9" author="nemo">
         <sqlFile path="fire_weapon.sql"/>
     </changeSet>
-    <changeSet id="1630288315483-10" author="dxq">
+    <changeSet id="1630288315484-10" author="dxq">
         <sqlFile path="weapon_test_type.sql"/>
     </changeSet>
 

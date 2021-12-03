@@ -5,6 +5,7 @@ import com.egova.data.service.TemplateService;
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
 import com.soul.weapon.condition.PipeTaskCondition;
+import com.soul.weapon.condition.PipeTestCondition;
 import com.soul.weapon.domain.PipeTaskRepository;
 import com.soul.weapon.entity.PipeTask;
 import com.soul.weapon.entity.PipeTest;
@@ -12,12 +13,14 @@ import com.soul.weapon.entity.codes.PipeState;
 import com.soul.weapon.service.PipeTaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Priority;
+import javax.annotation.Resource;
 import java.sql.Timestamp;
 import java.util.*;
 
@@ -72,10 +75,21 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask,String> implem
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public PipeTest getByState(PipeState status) {
-        List<PipeTest> PipeTestList = pipeTestServiceImpl.query(status);
+    public PipeTest getByState(int status) {
+        PipeTestCondition pipeTestCondition=new PipeTestCondition();
+        pipeTestCondition.setStatus(status);
+        List<PipeTest> PipeTestList = pipeTestServiceImpl.query(pipeTestCondition);
+        if (PipeTestList.size()==0||PipeTestList==null){
+            return null;
+        }
         return  PipeTestList.get(0);
+    }
+
+    @Override
+    public List<PipeTask> getByName(String name) {
+        PipeTaskCondition pipeTaskCondition=new PipeTaskCondition();
+        pipeTaskCondition.setName(name);
+        return super.query(pipeTaskCondition);
     }
 }
 

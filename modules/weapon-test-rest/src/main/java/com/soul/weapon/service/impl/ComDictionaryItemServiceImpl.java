@@ -28,11 +28,11 @@ import java.util.List;
 public class ComDictionaryItemServiceImpl extends TemplateService<ComDictionaryItem,String> implements ComDictionaryItemService  {
 
     public  final ComDictionaryItemRepository comDictionaryItemRepository;
-    private final ComDictionaryItemCondition comDictionaryItemCondition;
     @Override
     public List<ComDictionaryItem> getByCode(String code) {
-        comDictionaryItemCondition.setValue(code);
-        return super.query(comDictionaryItemCondition);
+        ComDictionaryItemCondition dictionaryItemCondition=new ComDictionaryItemCondition();
+        dictionaryItemCondition.setValue(code);
+        return super.query(dictionaryItemCondition);
     }
 
     @Override
