@@ -20,6 +20,6 @@ public class PipeTaskCondition {
 
 
     @Display("任务名称")
-    @ConditionOperator(name="name", operator = ClauseOperator.Equal)
+    @ConditionOperator(name="name", operator = ClauseOperator.Like)
     private String name;
 }
