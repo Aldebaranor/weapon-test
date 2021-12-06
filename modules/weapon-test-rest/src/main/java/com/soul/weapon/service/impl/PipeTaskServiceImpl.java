@@ -66,10 +66,7 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask,String> implem
         PipeTask pipeTask = super.getById(takeId);
         pipeTask.setStatus(new PipeState("1"));
         super.update(pipeTask);
-        for (PipeTest pipeTest : pipeTests) {
-            pipeTestServiceImpl.insert(pipeTest);
-        }
-
+        pipeTestServiceImpl.insertList(pipeTests);
     }
 
     @Override
@@ -78,7 +75,6 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask,String> implem
         PipeTestCondition condition = new PipeTestCondition();
         condition.setStatus(status);
         return pipeTestServiceImpl.query(condition).stream().findFirst().orElse(null);
-        //return  PipeTestList.get(0);
     }
 
     @Override

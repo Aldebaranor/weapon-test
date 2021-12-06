@@ -40,7 +40,7 @@ public class ConflictPredictJob implements Job {
             String combatScenariosInfoStr = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).extrasForValue().
                     get(Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY);
             if(StringUtils.isBlank(combatScenariosInfoStr)) {
-                log.error("从Redis中获取冲突预判信息失败！");
+                log.debug("从Redis中获取冲突预判信息失败！");
                 return ;
             }
             CombatScenariosInfo test = JsonUtils.deserialize(combatScenariosInfoStr, CombatScenariosInfo.class);

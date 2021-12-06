@@ -1,5 +1,6 @@
 package com.soul.weapon.algorithm;
 
+import com.egova.entity.DictionaryItem;
 import com.egova.json.utils.JsonUtils;
 import com.egova.redis.RedisUtils;
 import com.flagwind.commons.StringUtils;
@@ -10,7 +11,7 @@ import com.soul.weapon.entity.*;
 import com.soul.weapon.entity.codes.PipeState;
 import com.soul.weapon.entity.enums.PipeWeaponIndices;
 import com.soul.weapon.model.dds.*;
-import com.soul.weapon.service.ComDictionaryItemService;
+import com.soul.weapon.service.DictionaryItemService;
 import com.soul.weapon.service.PipeHistoryService;
 import com.soul.weapon.service.PipeTaskService;
 import com.soul.weapon.service.PipeTestService;
@@ -38,7 +39,7 @@ public class AllAlgorithm {
 
     private final PipeTestService pipeTestService;
 
-    private final ComDictionaryItemService comDictionaryItemService;
+    private final DictionaryItemService DictionaryItemService;
 
     /**
      * 不执行算法返回值
@@ -1139,8 +1140,8 @@ public class AllAlgorithm {
         List<PipeTest> pipeTestList = pipeTestService.getByTaskId(pipeTest.getId());
         //3.TestCode--》value判断
         for (PipeTest test : pipeTestList) {
-            List<ComDictionaryItem> comDictionaryItems = comDictionaryItemService.getByCode(test.getCode());
-            if (StringUtils.equals(comDictionaryItems.get(0).getText(), Code)) {
+            List<DictionaryItem> DictionaryItems = DictionaryItemService.getByCode(test.getCode());
+            if (StringUtils.equals(DictionaryItems.stream().findFirst().orElse(null).getText(), Code)) {
                 //返回阈值
                 return test.getThreshold();
             }

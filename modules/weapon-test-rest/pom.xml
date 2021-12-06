@@ -30,5 +30,9 @@
             <groupId>com.egova</groupId>
             <artifactId>egova-quartz-rest</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.egova</groupId>
+            <artifactId>egova-generic-rest</artifactId>
+        </dependency>
     </dependencies>
 </project>

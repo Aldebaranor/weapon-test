@@ -1,6 +1,8 @@
 package com.soul.weapon.service;
 
-import com.soul.weapon.entity.ComDictionaryItem;
+
+
+import com.egova.entity.DictionaryItem;
 
 import java.util.List;
 
@@ -8,11 +10,11 @@ import java.util.List;
  * @Author: dxq
  * @Date: 2021/12/2 15:35
  */
-public interface ComDictionaryItemService {
+public interface DictionaryItemService {
     /**
      * 根据code查询通道测试text
      * @param code
      * @return
      */
-    List<ComDictionaryItem> getByCode(String code);
+    List<DictionaryItem> getByCode(String code);
 }
