@@ -18,4 +18,9 @@ public interface FireConflictPredictService {
      */
     ConflictReport conflictPredict(ScenariosInfo scenariosA , ScenariosInfo scenariosB);
 
+    /**
+     * 从Redis中取出所有作战方案进行预判
+     */
+    void predictTest();
+
 }

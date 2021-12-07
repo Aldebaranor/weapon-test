@@ -22,4 +22,11 @@ public class Constant {
      * 目标信息(雷达探测到的目标信息)于influxdb中的表名
      */
     public static String TARGET_INFO_INFLUX_MEASURMENT_NAME = "target_info";
+
+    /**
+     * 火力兼容结果报文
+     */
+    public static String CONFLICT_PREDICT_REPORT = "fire:pump:conflict_predict_report";
+    public static String CONFLICT_CHARGE_REPORT = "fire:pump:conflict_charge_report";
+
 }

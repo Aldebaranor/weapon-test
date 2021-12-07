@@ -21,6 +21,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import com.soul.weapon.config.Constant;
 
 /**
@@ -56,7 +58,8 @@ public class PumpController {
                         combatScenariosInfo.getScenarios(), ScenariosInfo.class));
 
                 RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().opsForValue().set(
-                        Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY, JsonUtils.serialize(combatScenariosInfo));
+                        Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY, JsonUtils.serialize(combatScenariosInfo),2, TimeUnit.HOURS);
+
             }break;
             case "EnvironmentInfo": {
                 RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().opsForValue().set(

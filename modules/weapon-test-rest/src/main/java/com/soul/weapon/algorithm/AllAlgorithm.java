@@ -117,6 +117,7 @@ public class AllAlgorithm {
         }
         Map<String, String> tmpEquipments = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
                 boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).entries();
+
         assert tmpEquipments != null;
         Map<String, EquipmentStatus> allEquipmentStatus = tmpEquipments.entrySet().stream().collect(Collectors.toMap(
                 Map.Entry::getKey,
