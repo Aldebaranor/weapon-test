@@ -13,7 +13,7 @@ import java.util.Map;
  * @Date: 2021/9/12 15:10
  * 存放历史信息的类，每一种历史信息都可以用如下类存放
  */
-public class HistoryInfo implements Serializable {
+public class HistoryInfo1 implements Serializable {
 
     @Data
     @Display("舰空导弹武器通道测试-1")

@@ -33,6 +33,7 @@ import java.util.*;
 @CacheConfig(cacheNames = PipeTask.NAME)
 public class PipeTaskServiceImpl extends TemplateService<PipeTask,String> implements PipeTaskService {
 
+    public static List<String>  pipeTestRunningCodes;
     private final PipeTaskRepository pipeTaskRepository;
     private final PipeTestServiceImpl pipeTestServiceImpl;
     @Override
@@ -66,11 +67,13 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask,String> implem
         PipeTask pipeTask = super.getById(takeId);
         pipeTask.setStatus(new PipeState("1"));
         super.update(pipeTask);
+        for (PipeTest pipeTest : pipeTests) {
+            pipeTestRunningCodes.add(pipeTest.getCode());
+        }
         pipeTestServiceImpl.insertList(pipeTests);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public PipeTest getByState(String status) {
         PipeTestCondition condition = new PipeTestCondition();
         condition.setStatus(status);

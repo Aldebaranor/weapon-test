@@ -118,7 +118,7 @@
             <column name="pipeTestId" remarks="外键-测试项id" type="VARCHAR(50)"/>
         </createTable>
     </changeSet>
-    <changeSet author="nash5 (generated)" id="1630566618258-6">
+   <!-- <changeSet author="nash5 (generated)" id="1630566618258-6">
         <createIndex indexName="pipeTestId" tableName="pipe_history">
             <column name="pipeTestId"/>
         </createIndex>
@@ -138,7 +138,8 @@
             <column name="taskId"/>
         </createIndex>
     </changeSet>
-
+-->
+<!--
     <changeSet author="nash5 (generated)" id="1630566618258-11">
         <addForeignKeyConstraint baseColumnNames="taskId" baseTableName="pipe_history" constraintName="pipe_history_ibfk_1" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="pipe_task" validate="true"/>
     </changeSet>
@@ -151,9 +152,417 @@
     <changeSet author="nash5 (generated)" id="1630566618258-14">
         <addForeignKeyConstraint baseColumnNames="taskId" baseTableName="pipe_self_check" constraintName="pipe_self_check_ibfk_1" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="pipe_task" validate="true"/>
     </changeSet>
+-->
 
     <changeSet id="1630566618258-15" author="xinlai">
         <sqlFile path="pipe_advice.sql"/>
     </changeSet>
+
+    <changeSet author="dxq (generated)" id="1630566618259-1">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="his_sam_report"/>
+            </not>
+        </preConditions>
+        <createTable tableName="his_sam_report">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="time" remarks="测试时间" type="VARCHAR(50)"/>
+            <column name="radarId" remarks="舰空导弹跟踪雷达标识" type="VARCHAR(50)"/>
+            <column name="radarSelfCheck" remarks="舰空导弹跟踪雷达自检" type="TINYINT(3)"/>
+            <column name="fireControlId" remarks="舰空导弹火控系统标识" type="VARCHAR(50)"/>
+            <column name="fireControlSelfCheck" remarks="舰空导弹火控系统自检" type="TINYINT(3)"/>
+            <column name="launcherId" remarks="舰空导弹发射系统标识" type="VARCHAR(50)"/>
+            <column name="launcherSelfCheck" remarks="舰空导弹发射系统自检" type="TINYINT(3)"/>
+            <column name="missileShortId" remarks="舰空导弹近程标识" type="VARCHAR(50)"/>
+            <column name="missileSelfShortCheck" remarks="舰空导弹近程自检" type="TINYINT(3)"/>
+            <column name="missileMediumId" remarks="舰空导弹近程标识" type="VARCHAR(50)"/>
+            <column name="missileSelfMediumCheck" remarks="舰空导弹中程标识" type="TINYINT(3)"/>
+            <column name="missileLongId" remarks="舰空导弹远程标识" type="VARCHAR(50)"/>
+            <column name="missileSelfLongCheck" remarks="舰空导弹远程自检" type="TINYINT(3)"/>
+            <column name="status" remarks="舰空导弹武器通道状态" type="VARCHAR(2)"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="sortKey" remarks="排序字段" type="INT"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="taskId" remarks="关联任务id,外键" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dxq (generated)" id="1630566618259-2">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="his_amsg_report"/>
+            </not>
+        </preConditions>
+        <createTable tableName="his_amsg_report">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="time" remarks="测试时间" type="VARCHAR(50)"/>
+            <column name="radarId" remarks="舰空导弹跟踪雷达标识" type="VARCHAR(50)"/>
+            <column name="radarSelfCheck" remarks="舰空导弹跟踪雷达自检" type="TINYINT(3)"/>
+            <column name="fireControlId" remarks="舰空导弹火控系统标识" type="VARCHAR(50)"/>
+            <column name="fireControlSelfCheck" remarks="舰空导弹火控系统自检" type="TINYINT(3)"/>
+            <column name="shipGunId" remarks="反导舰炮标识" type="VARCHAR(50)"/>
+            <column name="shipGunSelfCheck" remarks="反导舰炮自检" type="TINYINT(3)"/>
+            <column name="status" remarks="反导舰炮武器通道状态" type="VARCHAR(2)"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="sortKey" remarks="排序字段" type="INT"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="taskId" remarks="关联任务id,外键" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dxq (generated)" id="1630566618259-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="his_electronic_weapon_report"/>
+            </not>
+        </preConditions>
+        <createTable tableName="his_electronic_weapon_report">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="time" remarks="测试时间" type="VARCHAR(50)"/>
+            <column name="electronicDetectorId" remarks="电子侦察设备标识" type="VARCHAR(50)"/>
+            <column name="electronicDetectorSelfCheck" remarks="电子侦察设备自检" type="TINYINT(3)"/>
+            <column name="fireControlId" remarks="电子对抗武器火控系统标识" type="VARCHAR(50)"/>
+            <column name="fireControlSelfCheck" remarks="电子对抗武器火控系统自检" type="TINYINT(3)"/>
+            <column name="launcherId" remarks="多功能发射系统标识" type="VARCHAR(50)"/>
+            <column name="launcherSelfCheck" remarks="多功能发射系统自检" type="TINYINT(3)"/>
+            <column name="outerElectronicWeaponId" remarks="舷外电子对抗武器标识" type="VARCHAR(50)"/>
+            <column name="outerElectronicWeaponSelfCheck" remarks="舷外电子对抗武器自检" type="TINYINT(3)"/>
+            <column name="innerElectronicWeaponId" remarks="舷内电子对抗武器标识" type="VARCHAR(50)"/>
+            <column name="innerElectronicWeaponSelfCheck" remarks="舷内电子对抗武器自检" type="TINYINT(3)"/>
+            <column name="status" remarks="电子对抗武器通道状态" type="VARCHAR(2)"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="sortKey" remarks="排序字段" type="INT"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="taskId" remarks="关联任务id,外键" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dxq (generated)" id="1630566618259-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="his_execution_status_report"/>
+            </not>
+        </preConditions>
+        <createTable tableName="his_execution_status_report">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="time" remarks="测试时间" type="VARCHAR(50)"/>
+            <column name="targetId" remarks="目标标识" type="VARCHAR(50)"/>
+            <column name="targetType" remarks="目标类型" type="VARCHAR(2)"/>
+            <column name="status" remarks="执行情况状态" type="VARCHAR(2)"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="sortKey" remarks="排序字段" type="INT"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="taskId" remarks="关联任务id,外键" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dxq (generated)" id="1630566618259-5">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="his_fire_control_report"/>
+            </not>
+        </preConditions>
+        <createTable tableName="his_fire_control_report">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="time" remarks="测试时间" type="BIGINT"/>
+            <column name="targetId" remarks="目标标识" type="VARCHAR(50)"/>
+            <column name="targetType" remarks="目标类型" type="VARCHAR(2)"/>
+            <column name="fireControlId" remarks="火控系统标识" type="VARCHAR(50)"/>
+            <column name="fireControlType" remarks="火控系统类型" type="TINYINT(3)"/>
+            <column name="targetDistance" remarks="目标距离火控解算精度" type="FLOAT"/>
+            <column name="targetPitch" remarks="目标方位角火控解算精度" type="FLOAT"/>
+            <column name="targetAzimuth" remarks="目标俯仰角火控解算精度" type="FLOAT"/>
+            <column name="targetDepth" remarks="目标深度火控解算精度" type="FLOAT"/>
+            <column name="status" remarks="执行情况状态" type="VARCHAR(2)"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="sortKey" remarks="排序字段" type="INT"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="taskId" remarks="关联任务id,外键" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dxq (generated)" id="1630566618259-6">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="his_info_process_report"/>
+            </not>
+        </preConditions>
+        <createTable tableName="his_info_process_report">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="time" remarks="测试时间" type="VARCHAR(50)"/>
+            <column name="targetId" remarks="目标标识" type="VARCHAR(50)"/>
+            <column name="targetType" remarks="目标类型" type="VARCHAR(2)"/>
+            <column name="status" remarks="信息流程状态" type="VARCHAR(2)"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="sortKey" remarks="排序字段" type="INT"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="taskId" remarks="关联任务id,外键" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dxq (generated)" id="1630566618259-7">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="his_instruction_accuracy_report"/>
+            </not>
+        </preConditions>
+        <createTable tableName="his_instruction_accuracy_report">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="time" remarks="测试时间" type="VARCHAR(50)"/>
+
+            <column name="targetId" remarks="目标标识" type="VARCHAR(50)"/>
+            <column name="targetType" remarks="目标类型" type="VARCHAR(2)"/>
+            <column name="sensorId" remarks="传感器标识" type="VARCHAR(50)"/>
+            <column name="sensorType" remarks="传感器类型" type="VARCHAR(2)"/>
+            <column name="distanceAccuracy" remarks="目标距离指示处理精度" type="FLOAT"/>
+            <column name="pitchAccuracy" remarks="目标方位角指示处理精度" type="FLOAT"/>
+            <column name="azimuthAccuracy" remarks="目标俯仰角指示处理精度" type="FLOAT"/>
+            <column name="depthAccuracy" remarks="目标深度指示处理精度" type="FLOAT"/>
+            <column name="status" remarks="信息流程状态" type="VARCHAR(2)"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="sortKey" remarks="排序字段" type="INT"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="taskId" remarks="关联任务id,外键" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dxq (generated)" id="1630566618259-8">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="his_intercept_distance_report"/>
+            </not>
+        </preConditions>
+        <createTable tableName="his_intercept_distance_report">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="time" remarks="测试时间" type="VARCHAR(50)"/>
+            <column name="targetId" remarks="目标标识" type="VARCHAR(50)"/>
+            <column name="targetType" remarks="目标类型" type="VARCHAR(2)"/>
+            <column name="interceptDistance" remarks="目标拦截距离" type="FLOAT"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="sortKey" remarks="排序字段" type="INT"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="taskId" remarks="关联任务id,外键" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dxq (generated)" id="1630566618259-9">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="his_launcher_rotation_report"/>
+            </not>
+        </preConditions>
+        <createTable tableName="his_launcher_rotation_report">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="time" remarks="测试时间" type="VARCHAR(50)"/>
+            <column name="targetId" remarks="目标标识" type="VARCHAR(50)"/>
+            <column name="targetType" remarks="目标类型" type="VARCHAR(2)"/>
+            <column name="weaponId" remarks="武器标识" type="VARCHAR(50)"/>
+            <column name="weaponType" remarks="武器类型" type="VARCHAR(2)"/>
+            <column name="launcherPitchAccuracy" remarks="发射架方位角调转精度" type="FLOAT"/>
+            <column name="launcherAzimuthAccuracy" remarks="发射架俯仰角调转精度" type="FLOAT"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="sortKey" remarks="排序字段" type="INT"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="taskId" remarks="关联任务id,外键" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dxq (generated)" id="1630566618259-10">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="his_mti_report"/>
+            </not>
+        </preConditions>
+        <createTable tableName="his_mti_report">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="time" remarks="测试时间" type="VARCHAR(50)"/>
+            <column name="targetId" remarks="目标标识" type="VARCHAR(50)"/>
+            <column name="targetType" remarks="目标类型" type="VARCHAR(2)"/>
+            <column name="sensorId" remarks="传感器标识" type="VARCHAR(50)"/>
+            <column name="sensorType" remarks="传感器类型" type="VARCHAR(2)"/>
+            <column name="showedTargetDistance" remarks="雷达显示目标距离" type="FLOAT"/>
+            <column name="actualTargetDistance" remarks="目标距离真值" type="FLOAT"/>
+            <column name="showedTargetPitch" remarks="雷达显示目标方位角" type="FLOAT"/>
+            <column name="actualTargetPitch" remarks="目标方位角真值" type="FLOAT"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="sortKey" remarks="排序字段" type="INT"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="taskId" remarks="关联任务id,外键" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dxq (generated)" id="1630566618259-11">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="his_radar_path_report"/>
+            </not>
+        </preConditions>
+        <createTable tableName="his_radar_path_report">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="time" remarks="测试时间" type="VARCHAR(50)"/>
+            <column name="targetId" remarks="目标标识" type="VARCHAR(50)"/>
+            <column name="targetType" remarks="目标类型" type="VARCHAR(2)"/>
+            <column name="interceptionTime" remarks="目标拦截时间" type="BIGINT"/>
+            <column name="interceptionAccount" remarks="目标拦截数量" type="INT"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="sortKey" remarks="排序字段" type="INT"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="taskId" remarks="关联任务id,外键" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dxq (generated)" id="1630566618259-12">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="his_reaction_report"/>
+            </not>
+        </preConditions>
+        <createTable tableName="his_reaction_report">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="time" remarks="测试时间" type="VARCHAR(50)"/>
+            <column name="targetId" remarks="目标标识" type="VARCHAR(50)"/>
+            <column name="targetType" remarks="目标类型" type="VARCHAR(2)"/>
+            <column name="sensorId" remarks="传感器标识" type="VARCHAR(50)"/>
+            <column name="sensorType" remarks="传感器类型" type="VARCHAR(2)"/>
+            <column name="weaponId" remarks="武器标识" type="VARCHAR(50)"/>
+            <column name="weaponType" remarks="武器类型" type="VARCHAR(2)"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="sortKey" remarks="排序字段" type="INT"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="taskId" remarks="关联任务id,外键" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dxq (generated)" id="1630566618259-13">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="his_threaten_report"/>
+            </not>
+        </preConditions>
+        <createTable tableName="his_threaten_report">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="time" remarks="测试时间" type="VARCHAR(50)"/>
+            <column name="targetId" remarks="目标标识" type="VARCHAR(50)"/>
+            <column name="targetType" remarks="目标类型" type="VARCHAR(2)"/>
+            <column name="distanceOffset" remarks="目标距离判断偏差" type="FLOAT"/>
+            <column name="speedOffset" remarks="目标速率判断偏差" type="FLOAT"/>
+            <column name="pitchOffset" remarks="目标方位角判断偏差" type="FLOAT"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="sortKey" remarks="排序字段" type="INT"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="taskId" remarks="关联任务id,外键" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dxq (generated)" id="1630566618259-14">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="his_torpedo_report"/>
+            </not>
+        </preConditions>
+        <createTable tableName="his_torpedo_report">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="time" remarks="测试时间" type="VARCHAR(50)"/>
+            <column name="sonarId" remarks="声呐标识" type="VARCHAR(50)"/>
+            <column name="sonarSelfCheck" remarks="声呐自检" type="TINYINT(3)"/>
+            <column name="fireControlId" remarks="鱼雷防御武器火控系统标识" type="VARCHAR(50)"/>
+            <column name="fireControlSelfCheck" remarks="鱼雷防御武器火控系统自检" type="TINYINT(3)"/>
+            <column name="launcherId" remarks="鱼雷防御武器发射系统标识" type="VARCHAR(50)"/>
+            <column name="launcherSelfCheck" remarks="鱼雷防御武器发射系统自检" type="TINYINT(3)"/>
+            <column name="torpedoId" remarks="鱼雷防御武器标识" type="VARCHAR(50)"/>
+            <column name="torpedoSelfCheck" remarks="鱼雷防御武器自检" type="TINYINT(3)"/>
+            <column name="status" remarks="鱼雷防御武器通道状态" type="VARCHAR(2)"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="sortKey" remarks="排序字段" type="INT"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="taskId" remarks="关联任务id,外键" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="dxq (generated)" id="1630566618259-15">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="his_water_weapon_report"/>
+            </not>
+        </preConditions>
+        <createTable tableName="his_water_weapon_report">
+            <column name="id" remarks="主键" type="VARCHAR(50)">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="time" remarks="测试时间" type="VARCHAR(50)"/>
+            <column name="sonarId" remarks="声呐标识" type="VARCHAR(50)"/>
+            <column name="sonarSelfCheck" remarks="声呐自检" type="TINYINT(3)"/>
+            <column name="fireControlId" remarks="水声对抗武器火控系统标识" type="VARCHAR(50)"/>
+            <column name="fireControlSelfCheck" remarks="水声对抗武器火控系统自检" type="TINYINT(3)"/>
+            <column name="launcherId" remarks="多功能发射系统标识" type="VARCHAR(50)"/>
+            <column name="launcherSelfCheck" remarks="多功能发射系统自检" type="TINYINT(3)"/>
+            <column name="waterWeaponId" remarks="水声对抗武器标识" type="VARCHAR(50)"/>
+            <column name="waterWeaponSelfCheck" remarks="水声对抗武器自检" type="TINYINT(3)"/>
+            <column name="status" remarks="水声对抗武器通道状态" type="VARCHAR(2)"/>
+            <column name="createTime" remarks="创建时间" type="datetime"/>
+            <column name="modifyTime" remarks="修改时间" type="datetime"/>
+            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
+            <column name="sortKey" remarks="排序字段" type="INT"/>
+            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
+            <column name="taskId" remarks="关联任务id,外键" type="VARCHAR(50)"/>
+        </createTable>
+    </changeSet>
+
 
 </databaseChangeLog>

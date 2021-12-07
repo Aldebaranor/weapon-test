@@ -8,7 +8,7 @@ import com.soul.weapon.config.CommonRedisConfig;
 import com.soul.weapon.config.Constant;
 import com.soul.weapon.config.TaskTypeConstant;
 import com.soul.weapon.entity.*;
-import com.soul.weapon.entity.codes.PipeState;
+import com.soul.weapon.entity.HistoryInfo.ShipToAirMissileTestReport;
 import com.soul.weapon.entity.enums.PipeWeaponIndices;
 import com.soul.weapon.model.dds.*;
 import com.soul.weapon.service.DictionaryItemService;
@@ -123,7 +123,7 @@ public class AllAlgorithm {
                 pair -> JsonUtils.deserialize(pair.getValue(), EquipmentStatus.class))
         );
 
-        HistoryInfo.ShipToAirMissileTestReport tmpReport = new HistoryInfo.ShipToAirMissileTestReport();
+        ShipToAirMissileTestReport tmpReport = new ShipToAirMissileTestReport();
 
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.AirMissileRadar.getValue());
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.AirMissileFireControl.getValue());
@@ -204,7 +204,7 @@ public class AllAlgorithm {
                 pair -> JsonUtils.deserialize(pair.getValue(), EquipmentStatus.class))
         );
 
-        HistoryInfo.AntiMissileShipGunTestReport tmpReport = new HistoryInfo.AntiMissileShipGunTestReport();
+        HistoryInfo1.AntiMissileShipGunTestReport tmpReport = new HistoryInfo1.AntiMissileShipGunTestReport();
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.AntiMissileShipGun.getValue());
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.AntiMissileShipGunRadar.getValue());
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.AntiMissileShipGunControl.getValue());
@@ -267,7 +267,7 @@ public class AllAlgorithm {
                 pair -> JsonUtils.deserialize(pair.getValue(), EquipmentStatus.class))
         );
 
-        HistoryInfo.TorpedoTestReport tmpReport = new HistoryInfo.TorpedoTestReport();
+        HistoryInfo1.TorpedoTestReport tmpReport = new HistoryInfo1.TorpedoTestReport();
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.Sonar.getValue());
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.TorpedoFireControl.getValue());
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.TorpedoLauncher.getValue());
@@ -334,7 +334,7 @@ public class AllAlgorithm {
                 pair -> JsonUtils.deserialize(pair.getValue(), EquipmentStatus.class))
         );
 
-        HistoryInfo.ElectronicWeaponTestReport tmpReport = new HistoryInfo.ElectronicWeaponTestReport();
+        HistoryInfo1.ElectronicWeaponTestReport tmpReport = new HistoryInfo1.ElectronicWeaponTestReport();
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.ElectronicDetection.getValue());
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.ElectronicCountermeasure.getValue());
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.MultiUsageLaunch.getValue());
@@ -407,7 +407,7 @@ public class AllAlgorithm {
                 pair -> JsonUtils.deserialize(pair.getValue(), EquipmentStatus.class))
         );
 
-        HistoryInfo.WaterWeaponTestReport tmpReport = new HistoryInfo.WaterWeaponTestReport();
+        HistoryInfo1.WaterWeaponTestReport tmpReport = new HistoryInfo1.WaterWeaponTestReport();
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.UnderwaterAcousticCountermeasureControl.getValue());
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.UnderwaterAcousticCountermeasure.getValue());
         assert allEquipmentStatus.containsKey(PipeWeaponIndices.MultiUsageLaunch.getValue());
@@ -509,7 +509,7 @@ public class AllAlgorithm {
 
                     if (!threatenState && Math.abs(targetInfo.getTime() - targetInstructionsInfo.getTime()) < DETECTOR_TIME_THRESHOLD) {
 
-                        HistoryInfo.ThreatenReport threatenReport = new HistoryInfo.ThreatenReport();
+                        HistoryInfo1.ThreatenReport threatenReport = new HistoryInfo1.ThreatenReport();
                         threatenReport.setId(targetInfo.getTargetId());
                         threatenReport.setType(targetInfo.getTargetTypeId());
                         threatenReport.setDistanceOffset(
@@ -536,7 +536,7 @@ public class AllAlgorithm {
                     if (!instructionState &&
                             Math.abs(targetInfo.getTime() - targetInstructionsInfo.getTime()) < INSTRUCTION_TIME_THRESHOLD) {
 
-                        HistoryInfo.InstructionAccuracyReport instructionAccuracyReport = new HistoryInfo.InstructionAccuracyReport();
+                        HistoryInfo1.InstructionAccuracyReport instructionAccuracyReport = new HistoryInfo1.InstructionAccuracyReport();
                         instructionAccuracyReport.setTime(targetInstructionsInfo.getTime());
                         instructionAccuracyReport.setTargetId(targetInstructionsInfo.getTargetId());
                         instructionAccuracyReport.setTargetType(targetInstructionsInfo.getTargetTypeId());
@@ -570,7 +570,7 @@ public class AllAlgorithm {
                             && targetInfo.getTargetTypeId().equals(AIRTYPE)
                             && targetInstructionsInfo.getTargetTypeId().equals(AIRTYPE)) {
 
-                        HistoryInfo.RadarPathReport radarPathReport = new HistoryInfo.RadarPathReport();
+                        HistoryInfo1.RadarPathReport radarPathReport = new HistoryInfo1.RadarPathReport();
                         radarPathReport.setTime(targetInstructionsInfo.getTime());
                         radarPathReport.setTargetId(targetInstructionsInfo.getTargetId());
                         radarPathReport.setTargetType(targetInstructionsInfo.getTargetTypeId());
@@ -661,8 +661,8 @@ public class AllAlgorithm {
                     if (StringUtils.equals(targetFireControlInfo.getTargetId(), targetInstructionsInfo.getTargetId()) &&
                             StringUtils.equals(targetFireControlInfo.getTargetId(), equipmentLaunchStatus.getTargetId())) {
 
-                        HistoryInfo.ExecutionStatusReport executionStatusReport = new HistoryInfo.ExecutionStatusReport();
-                        HistoryInfo.InfoProcessTestReport infoProcessTestReport = new HistoryInfo.InfoProcessTestReport();
+                        HistoryInfo1.ExecutionStatusReport executionStatusReport = new HistoryInfo1.ExecutionStatusReport();
+                        HistoryInfo1.InfoProcessTestReport infoProcessTestReport = new HistoryInfo1.InfoProcessTestReport();
 
                         boolean b = equipmentLaunchStatus.getTime() > targetFireControlInfo.getTime() &&
                                 targetFireControlInfo.getTime() > targetInstructionsInfo.getTime();
@@ -772,7 +772,7 @@ public class AllAlgorithm {
                 continue;
             }
 
-            HistoryInfo.InterceptDistanceReport interceptDistanceReport = new HistoryInfo.InterceptDistanceReport();
+            HistoryInfo1.InterceptDistanceReport interceptDistanceReport = new HistoryInfo1.InterceptDistanceReport();
             interceptDistanceReport.setInterceptDistance(MinDistance);
             interceptDistanceReport.setTime(MaxTime);
             interceptDistanceReport.setTargetType(targetInstructionsInfo.getTargetTypeId());
@@ -832,7 +832,7 @@ public class AllAlgorithm {
 
                     if (Math.abs(targetFireControlInfo.getTime() - targetInstructionsInfo.getTime()) < FIRECONTROL_TIME_THRESHOLD) {
 
-                        HistoryInfo.FireControlReport fireControlReport = new HistoryInfo.FireControlReport();
+                        HistoryInfo1.FireControlReport fireControlReport = new HistoryInfo1.FireControlReport();
                         fireControlReport.setTargetId(targetInstructionsInfo.getTargetId());
                         fireControlReport.setTargetType(targetInstructionsInfo.getTargetTypeId());
                         fireControlReport.setFireControlId(targetFireControlInfo.getFireControlSystemId());
@@ -915,7 +915,7 @@ public class AllAlgorithm {
                 continue;
             }
 
-            HistoryInfo.ReactionReport reactionReport = new HistoryInfo.ReactionReport();
+            HistoryInfo1.ReactionReport reactionReport = new HistoryInfo1.ReactionReport();
             reactionReport.setTime(equipmentLaunchStatus.getTime());
             reactionReport.setReactionTime(reactionTime);
             reactionReport.setTargetId(targetInstructionsInfo.getTargetId());
@@ -981,7 +981,7 @@ public class AllAlgorithm {
                     if (equipmentLaunchStatus.getTime() - targetFireControlInfo.getTime() < LAUNCHER_ROTATION_TIME_THRESHOLD
                             && 0 < equipmentLaunchStatus.getTime() - targetFireControlInfo.getTime()) {
 
-                        HistoryInfo.LauncherRotationReport launcherRotationReport = new HistoryInfo.LauncherRotationReport();
+                        HistoryInfo1.LauncherRotationReport launcherRotationReport = new HistoryInfo1.LauncherRotationReport();
                         launcherRotationReport.setTargetId(equipmentLaunchStatus.getTargetId());
                         launcherRotationReport.setTargetType(equipmentLaunchStatus.getTargetTypeId());
                         launcherRotationReport.setWeaponId(equipmentLaunchStatus.getEquipmentId());
@@ -1039,7 +1039,7 @@ public class AllAlgorithm {
         ));
 
 
-        List<HistoryInfo.MultiTargetInterceptionReport> finalReport = new ArrayList<>();
+        List<HistoryInfo1.MultiTargetInterceptionReport> finalReport = new ArrayList<>();
         Set<String> targetInstructionInfoIndices = Objects.requireNonNull(
                 RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
                         Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY).entries()).keySet();
@@ -1072,7 +1072,7 @@ public class AllAlgorithm {
                 continue;
             }
 
-            HistoryInfo.MultiTargetInterceptionReport curReport = new HistoryInfo.MultiTargetInterceptionReport();
+            HistoryInfo1.MultiTargetInterceptionReport curReport = new HistoryInfo1.MultiTargetInterceptionReport();
             curReport.setTargetId(targetInstructionInfoId);
             curReport.setTargetType(targetType);
             curReport.setTime(maxDetectTargetTime);
@@ -1081,7 +1081,7 @@ public class AllAlgorithm {
             curReport.setInterceptionAccount(0);
             finalReport.add(curReport);
         }
-        for (HistoryInfo.MultiTargetInterceptionReport oneTargetReport : finalReport) {
+        for (HistoryInfo1.MultiTargetInterceptionReport oneTargetReport : finalReport) {
             oneTargetReport.setInterceptionAccount(finalReport.size());
         }
 

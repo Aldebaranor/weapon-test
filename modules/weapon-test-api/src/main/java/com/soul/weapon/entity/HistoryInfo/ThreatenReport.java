@@ -1,4 +1,4 @@
-package com.soul.weapon.entity;
+package com.soul.weapon.entity.HistoryInfo;
 
 import com.egova.model.BaseEntity;
 import com.egova.model.annotation.Display;
@@ -14,38 +14,46 @@ import javax.persistence.Table;
 import java.sql.Timestamp;
 
 /**
- * @Author: nash5
- * @Date: 2021/9/10 15:35
+ * @author dxq
+ * @Date 2021/12/7 11:17
  */
 @Data
 @Entity
-@Table(name = "pipe_advice")
-@Display("建议表")
+@Table(name = "his_threaten_report")
+@Display("威胁判断测试-7")
 @EqualsAndHashCode(callSuper = true)
-public class PipeAdvice extends BaseEntity {
+public class ThreatenReport extends BaseEntity {
 
-    public static final String NAME="weapon-test:advice";
+    public static final String NAME="weapon-test:ThreatenReport";
 
     @Id
     @Display("主键")
     @Column(name = "id")
     private String id;
 
-    @Display("测试项(1级)名称")
-    @Column(name = "l1Name")
-    private String l1Name;
+    @Display("目标标识")
+    @Column(name = "TargetId")
+    private String TargetId;
 
-    @Display("测试项子项(2级)名称")
-    @Column(name = "l2Name")
-    private String l2Name;
+    @Display("目标类型")
+    @Column(name = "TargetType")
+    private String TargetType;
 
-    @Display("l2是否有Err")
-    @Column(name = "l2HasErr")
-    private boolean l2HasErr;
+    @Display("测试时间")
+    @Column(name = "time")
+    private Long time;
 
-    @Display("对策建议")
-    @Column(name = "advice")
-    private String advice;
+    @Display("目标距离判断偏差")
+    @Column(name = "distanceOffset")
+    private Float distanceOffset;
+
+    @Display("目标速率判断偏差")
+    @Column(name = "speedOffset")
+    private Float speedOffset;
+
+    @Display("目标方位角判断偏差")
+    @Column(name = "pitchOffset")
+    private Float pitchOffset;
 
     @Display("创建时间")
     @Column(name = "createTime")
@@ -70,5 +78,9 @@ public class PipeAdvice extends BaseEntity {
     @Display("废弃标志")
     @Column(name = "disabled")
     private boolean disabled;
+
+    @Display("关联任务id,外键")
+    @Column(name = "taskId")
+    private String taskId;
 
 }
