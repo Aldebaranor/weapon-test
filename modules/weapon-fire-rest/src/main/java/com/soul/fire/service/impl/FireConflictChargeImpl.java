@@ -1,15 +1,22 @@
 package com.soul.fire.service.impl;
 
+import com.egova.json.utils.JsonUtils;
+import com.egova.redis.RedisUtils;
+import com.soul.fire.config.ChargeConfig;
 import com.soul.fire.entity.FirePriority;
 import com.soul.fire.service.FireConflictCharge;
 import com.soul.fire.controller.unity.FireThresholdController;
 import com.soul.fire.controller.unity.FireWeaponController;
 import com.soul.fire.entity.FireThreshold;
 import com.soul.fire.service.FirePriorityService;
+import com.soul.fire.service.FireThresholdService;
 import com.soul.fire.service.FireWeaponService;
+import com.soul.weapon.config.CommonRedisConfig;
+import com.soul.weapon.config.Constant;
 import com.soul.weapon.model.ChargeReport;
 import com.soul.weapon.model.dds.EquipmentStatus;
 import com.soul.weapon.model.ReportDetail;
+import com.squareup.moshi.Json;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +25,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Priority;
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 /**
  * @Author: XinLai
@@ -32,6 +42,8 @@ public class FireConflictChargeImpl implements FireConflictCharge {
 
     private final FirePriorityService firePriorityService;
     private final FireWeaponService fireWeaponService;
+    private final FireThresholdService fireThresholdService;
+    private final CommonRedisConfig commonRedisConfig;
 
     private final String TIME_ID = "1";
     private final String PITCH_ID = "2";
@@ -42,9 +54,6 @@ public class FireConflictChargeImpl implements FireConflictCharge {
     ReportDetail chargeReportDetailA = new ReportDetail();
     ReportDetail chargeReportDetailB = new ReportDetail();
     ChargeReport chargeReport = new ChargeReport();
-
-    public FireThresholdController fireThresholdController;
-    public FireWeaponController fireWeaponController;
 
     // 从阈值表项中获取阈值
     private Long  fireChargeTimeThreshold = 3L;
@@ -75,7 +84,6 @@ public class FireConflictChargeImpl implements FireConflictCharge {
 
         // 设置管控时间
         chargeReport.setTime(Math.min(timeA,timeB));
-        chargeReport.setId(String.valueOf(random.nextLong()));
         // 此处设置管控装备和自由装备id（应该根据管控措施具体实现）
         // 是否都处于工作状态
         boolean beWork = equipmentStatusA.getBeWork()&&equipmentStatusB.getBeWork();
@@ -95,11 +103,11 @@ public class FireConflictChargeImpl implements FireConflictCharge {
                 if(firePriority.isABetterThanB()){
                     chargeReport.setFreeEquipId(equipmentStatusA.getEquipmentId());
                     chargeReport.setChargeEquipId(equipmentStatusB.getEquipmentId());
-                    chargeReport.setChargeMethod(fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getName()+"禁射3分钟");
+                    chargeReport.setChargeMethod(fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getName()+"禁用3分钟");
                 }else{
                     chargeReport.setFreeEquipId(equipmentStatusB.getEquipmentId());
                     chargeReport.setChargeEquipId(equipmentStatusA.getEquipmentId());
-                    chargeReport.setChargeMethod(fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getName()+"禁射3分钟");
+                    chargeReport.setChargeMethod(fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getName()+"禁用3分钟");
                 }
                 /*
                      根据装备A和装备B去管控措施表中查询相关信息
@@ -130,6 +138,7 @@ public class FireConflictChargeImpl implements FireConflictCharge {
                     chargeReport.setChargeEquipId(equipmentStatusA.getEquipmentId());
                     chargeReport.setChargeMethod(fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getName()+"禁用3分钟");
                 }
+
                 return chargeReport;
             }else{
                 return null;
@@ -166,6 +175,38 @@ public class FireConflictChargeImpl implements FireConflictCharge {
         return null;
     }
 
+    @Override
+    public void chargeTest() {
+
+        if(!RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().hasKey(
+                Constant.EQUIPMENT_STATUS_HTTP_KEY)){
+            log.debug("从"+Constant.EQUIPMENT_STATUS_HTTP_KEY+"中获取装备状态信息失败！");
+        }
+
+        Map<String,String> equipmentStatus = RedisUtils.getService(commonRedisConfig.
+                getHttpDataBaseIdx()).boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).entries();
+        if(equipmentStatus==null) return;
+
+        Map<String,EquipmentStatus> equipmentStatusMap = equipmentStatus.entrySet().stream().collect(
+                Collectors.toMap(
+                        Map.Entry::getKey,
+                        pair -> JsonUtils.deserialize(pair.getValue(), EquipmentStatus.class)
+                )
+        );
+
+        for(EquipmentStatus statusA:equipmentStatusMap.values()){
+            for(EquipmentStatus statusB:equipmentStatusMap.values()){
+                if(!statusA.getEquipmentId().equals(statusB.getEquipmentId())){
+                    ChargeReport chargeReport = chargeReport(statusA,statusB);
+                    if(chargeReport!=null) {
+                        RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).boundHashOps(ChargeConfig.CHARGE_KEY).put(
+                                chargeReport.getId(),JsonUtils.serialize(chargeReport));
+                    }
+                }
+            }
+        }
+    }
+
 
     /**
      * 生成冲突实体详细内容
@@ -199,19 +240,20 @@ public class FireConflictChargeImpl implements FireConflictCharge {
      * 从数据库中读取阈值
      */
     private void ReadThreshold(EquipmentStatus equipmentStatusA,EquipmentStatus equipmentStatusB){
+
         FireThreshold fireThreshold;
-        fireChargeTimeThreshold = ((fireThreshold=fireThresholdController.getById(TIME_ID))!=null)?Long.valueOf(fireThreshold.getThresholdValue()):3L;
+        fireChargeTimeThreshold = ((fireThreshold=fireThresholdService.getById(TIME_ID))!=null)?Long.valueOf(fireThreshold.getThresholdValue()):3L;
 
-        fireChargePitchAngleThreshold = ((fireThreshold=fireThresholdController.getById(PITCH_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):0.05F;
-        fireChargeAzimuthThreshold = ((fireThreshold=fireThresholdController.getById(AZIMUTH_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):0.05F;
+        fireChargePitchAngleThreshold = ((fireThreshold=fireThresholdService.getById(PITCH_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):0.05F;
+        fireChargeAzimuthThreshold = ((fireThreshold=fireThresholdService.getById(AZIMUTH_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):0.05F;
 
-        posAx = fireWeaponController.getById(equipmentStatusA.getEquipmentId()).getX();
-        posAy = fireWeaponController.getById(equipmentStatusA.getEquipmentId()).getY();
-        posBx = fireWeaponController.getById(equipmentStatusB.getEquipmentId()).getX();
-        posBy = fireWeaponController.getById(equipmentStatusB.getEquipmentId()).getY();
+        posAx = fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getX();
+        posAy = fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getY();
+        posBx = fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getX();
+        posBy = fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getY();
 
-        electFrequencyThreshold = ((fireThreshold=fireThresholdController.getById(ELECTFREQUENCY_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):10.0F;
-        waterFrequencyThreshold = ((fireThreshold=fireThresholdController.getById(WATERFREQUENCY_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):5.0F;
+        electFrequencyThreshold = ((fireThreshold=fireThresholdService.getById(ELECTFREQUENCY_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):10.0F;
+        waterFrequencyThreshold = ((fireThreshold=fireThresholdService.getById(WATERFREQUENCY_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):5.0F;
 
     }
 

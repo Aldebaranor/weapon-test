@@ -8,14 +8,17 @@ import com.soul.fire.entity.FireThreshold;
 import com.soul.fire.service.FireThresholdService;
 import com.soul.fire.service.FireWeaponService;
 import com.soul.weapon.config.CommonRedisConfig;
+import com.soul.weapon.config.Constant;
 import com.soul.weapon.model.ConflictReport;
 import com.soul.weapon.model.ReportDetail;
 import com.soul.weapon.model.ScenariosInfo;
+import com.soul.weapon.model.dds.CombatScenariosInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Priority;
+import java.util.List;
 
 /**
  * @Author: XinLai
@@ -75,10 +78,16 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
             if(timeState && pitchState && azimuthState ){
                 conflictReport.setConflictType(0);
                 GenerateDetail(scenariosA,scenariosB);
-                RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).opsForHash().put(PredictConfig.PREDICT_KEY,conflictReport.getId(), JsonUtils.serialize(conflictReport));
-                RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,conflictReportDetailA.getId(), JsonUtils.serialize(conflictReportDetailA));
-                RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,conflictReportDetailB.getId(), JsonUtils.serialize(conflictReportDetailB));
+                RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).opsForHash().put(PredictConfig.PREDICT_KEY,
+                        conflictReport.getId(), JsonUtils.serialize(conflictReport));
+
+                RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,
+                        conflictReportDetailA.getId(), JsonUtils.serialize(conflictReportDetailA));
+
+                RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,
+                        conflictReportDetailB.getId(), JsonUtils.serialize(conflictReportDetailB));
                 return conflictReport;
+
             }else {
                 return null;
             }
@@ -90,9 +99,12 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
             if(timeState && frequencyState){
                 conflictReport.setConflictType(1);
                 GenerateDetail(scenariosA,scenariosB);
-                RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).opsForHash().put(PredictConfig.PREDICT_KEY,conflictReport.getId(), JsonUtils.serialize(conflictReport));
-                RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,conflictReportDetailA.getId(), JsonUtils.serialize(conflictReportDetailA));
-                RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,conflictReportDetailB.getId(), JsonUtils.serialize(conflictReportDetailB));
+                RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).opsForHash().put(PredictConfig.PREDICT_KEY,
+                        conflictReport.getId(), JsonUtils.serialize(conflictReport));
+                RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,
+                        conflictReportDetailA.getId(), JsonUtils.serialize(conflictReportDetailA));
+                RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,
+                        conflictReportDetailB.getId(), JsonUtils.serialize(conflictReportDetailB));
                 return conflictReport;
             }else{
                 return null;
@@ -111,15 +123,41 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
             if(timeState && frequencyState){
                 conflictReport.setConflictType(2);
                 GenerateDetail(scenariosA,scenariosB);
-                RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).opsForHash().put(PredictConfig.PREDICT_KEY,conflictReport.getId(), JsonUtils.serialize(conflictReport));
-                RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,conflictReportDetailA.getId(), JsonUtils.serialize(conflictReportDetailA));
-                RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,conflictReportDetailB.getId(), JsonUtils.serialize(conflictReportDetailB));
+                RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).opsForHash().put(PredictConfig.PREDICT_KEY,
+                        conflictReport.getId(), JsonUtils.serialize(conflictReport));
+                RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,
+                        conflictReportDetailA.getId(), JsonUtils.serialize(conflictReportDetailA));
+                RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,
+                        conflictReportDetailB.getId(), JsonUtils.serialize(conflictReportDetailB));
                 return conflictReport;
             }else{
                 return null;
             }
         }
         return null;
+    }
+
+    @Override
+    public void predictTest() {
+        if (!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
+                .hasKey(Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY))) {
+            log.debug("从"+Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY+"中获取作战方案信息失败！");
+            return;
+        }
+
+        CombatScenariosInfo combatScenariosInfo = JsonUtils.deserialize(RedisUtils.getService(
+                commonRedisConfig.getHttpDataBaseIdx()).getTemplate().boundValueOps(
+                Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY).get(),CombatScenariosInfo.class);
+
+        List<ScenariosInfo> scenariosInfos = combatScenariosInfo.getScenariosList();
+        int n = scenariosInfos.size();
+
+        for(int i=0;i<n;i++){
+            for(int j =i+1;j<n;j++){
+                conflictPredict(scenariosInfos.get(i),scenariosInfos.get(j));
+            }
+        }
+
     }
 
     /**

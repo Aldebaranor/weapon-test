@@ -12,10 +12,15 @@ import com.soul.weapon.model.ScenariosInfo;
 public interface FireConflictCharge {
 
     /**
-     * 预判作战方案之间是否存在火力冲突
-     * @param equipmentStatusA 作战方案A
-     * @param equipmentStatusB 作战方案B
+     * 预判装备之间是否存在火力冲突
+     * @param equipmentStatusA 装备状态A
+     * @param equipmentStatusB 装备状态B
      * @return 冲突报告
      */
     ChargeReport chargeReport(EquipmentStatus equipmentStatusA , EquipmentStatus equipmentStatusB);
+
+    /**
+     * 从Redis中取出所有装备状态进行预判
+     */
+    void chargeTest();
 }

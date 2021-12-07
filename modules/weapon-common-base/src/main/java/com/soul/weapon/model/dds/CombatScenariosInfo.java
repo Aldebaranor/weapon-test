@@ -26,6 +26,7 @@ public class CombatScenariosInfo {
     @Display("作战方案信息实体")
     private String scenarios;
 
+    @Display("作战方案信息实体列表")
     private List<ScenariosInfo> scenariosList;
 
 }

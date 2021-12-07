@@ -14,5 +14,9 @@ import org.springframework.stereotype.Component;
 @Configuration
 @ConfigurationProperties(prefix = "fire.charge")
 public class ChargeConfig {
+
     public int database;
+
+    public static String CHARGE_KEY = "fire:charge";
+
 }

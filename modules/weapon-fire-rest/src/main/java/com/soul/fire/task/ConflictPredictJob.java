@@ -3,6 +3,7 @@ package com.soul.fire.task;
 import com.egova.json.utils.JsonUtils;
 import com.egova.redis.RedisUtils;
 import com.flagwind.commons.StringUtils;
+import com.soul.fire.service.FireConflictCharge;
 import com.soul.fire.service.FireConflictPredictService;
 import com.soul.weapon.config.CommonRedisConfig;
 import com.soul.weapon.config.Constant;
@@ -29,6 +30,8 @@ public class ConflictPredictJob implements Job {
 
     @Autowired
     public FireConflictPredictService fireConflictPredictService;
+    @Autowired
+    public FireConflictCharge fireConflictCharge;
 
     @Autowired
     public CommonRedisConfig commonRedisConfig;
@@ -37,19 +40,10 @@ public class ConflictPredictJob implements Job {
     @Override
     public void execute(JobExecutionContext context) throws JobExecutionException{
         try {
-            String combatScenariosInfoStr = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).extrasForValue().
-                    get(Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY);
-            if(StringUtils.isBlank(combatScenariosInfoStr)) {
-                log.debug("从Redis中获取冲突预判信息失败！");
-                return ;
-            }
-            CombatScenariosInfo test = JsonUtils.deserialize(combatScenariosInfoStr, CombatScenariosInfo.class);
-            ScenariosInfo scenariosInfoA = test.getScenariosList().get(0);
-            ScenariosInfo scenariosInfoB = test.getScenariosList().get(0);
-
-            fireConflictPredictService.conflictPredict(scenariosInfoA, scenariosInfoB);
+            fireConflictPredictService.predictTest();
+            fireConflictCharge.chargeTest();
         } catch (Exception e) {
-            log.error("定时计算预判火力兼容预判任务失败！", e);
+            log.error("定时轮询火力兼容预判算法失败！", e);
         }
     }
 }
