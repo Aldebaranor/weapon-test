@@ -1,9 +1,13 @@
 package com.soul.weapon.controller.free;
 
+import com.egova.json.utils.JsonUtils;
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
+import com.egova.redis.RedisUtils;
 import com.egova.web.annotation.Api;
 import com.soul.weapon.condition.PipeTaskCondition;
+import com.soul.weapon.config.CommonRedisConfig;
+import com.soul.weapon.config.Constant;
 import com.soul.weapon.entity.PipeTask;
 import com.soul.weapon.entity.PipeTest;
 import com.soul.weapon.service.PipeTaskService;
@@ -25,6 +29,7 @@ import java.util.List;
 public class FreePipeTaskController {
 
     private final PipeTaskService pipeTaskService;
+    private final CommonRedisConfig commonRedisConfig;
 
     @Api
     @GetMapping(value = "/{id}")
@@ -73,9 +78,15 @@ public class FreePipeTaskController {
     }
 
     @Api
-    @PostMapping(value = "/{takeId}")
+    @PostMapping(value = "/start/{takeId}")
     public void startTest(@PathVariable String takeId,@RequestBody List<PipeTest> pipeTests){
+        //TODO:
         pipeTaskService.startTest(takeId,pipeTests);
+        RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).extrasForValue().set(Constant.WEAPON_CURRENT_TASK,takeId);
+        for(PipeTest pipeTest : pipeTests){
+            RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).opsForHash().put(Constant.WEAPON_CURRENT_PIPETEST,pipeTest.getCode(), JsonUtils.serialize(pipeTest));
+        }
+
     }
 
     @Api

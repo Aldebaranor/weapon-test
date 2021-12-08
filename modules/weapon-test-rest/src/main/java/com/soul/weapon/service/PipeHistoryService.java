@@ -30,20 +30,20 @@ public interface PipeHistoryService {
      * @param pipeHistory
      * @return
      */
-    String insert(@RequestBody PipeHistory pipeHistory);
+    String insert(PipeHistory pipeHistory);
 
     /**
      * update one item
      * @param pipeHistory
      */
-    void update(@RequestBody PipeHistory pipeHistory);
+    void update(PipeHistory pipeHistory);
 
     /**
      * delete by id
      * @param id
      * @return
      */
-    int deleteById(@PathVariable("id") String id);
+    int deleteById(String id);
 
     /**
      * get by time && id

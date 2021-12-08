@@ -29,4 +29,10 @@ public class Constant {
     public static String CONFLICT_PREDICT_REPORT = "fire:pump:conflict_predict_report";
     public static String CONFLICT_CHARGE_REPORT = "fire:pump:conflict_charge_report";
 
+
+    public static String WEAPON_CURRENT_TASK = "weapon:current:task";
+    public static String WEAPON_CURRENT_PIPETEST = "weapon:current:pipeTest";
+
+
+
 }

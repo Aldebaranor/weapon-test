@@ -42,15 +42,13 @@ public class PipeHistoryServiceImpl extends TemplateService<PipeHistory,String> 
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public String insert(@RequestBody PipeHistory pipeHistory){
+    public String insert(PipeHistory pipeHistory){
         pipeHistory.setCreateTime(new Timestamp(System.currentTimeMillis()));
         return super.insert(pipeHistory);
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void update(@RequestBody PipeHistory pipeHistory){
+    public void update(PipeHistory pipeHistory){
         pipeHistory.setModifyTime(new Timestamp(System.currentTimeMillis()));
        super.update(pipeHistory);
     }

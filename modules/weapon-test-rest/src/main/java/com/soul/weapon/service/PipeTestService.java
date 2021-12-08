@@ -31,20 +31,20 @@ public interface PipeTestService {
      * @param pipeTest
      * @return
      */
-    String insert(@RequestBody PipeTest pipeTest);
+    String insert(PipeTest pipeTest);
 
     /**
      * update a test
      * @param pipeTest
      */
-    void update(@RequestBody PipeTest pipeTest);
+    void update(PipeTest pipeTest);
 
     /**
      * del by id
      * @param id
      * @return
      */
-    int deleteById(@PathVariable("id") String id);
+    int deleteById(String id);
 
     /**
      * query by taskId

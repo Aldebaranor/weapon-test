@@ -35,20 +35,20 @@ public interface PipeTaskService {
      * @param pipeTask
      * @return
      */
-    String insert(@RequestBody PipeTask pipeTask);
+    String insert(PipeTask pipeTask);
 
     /**
      * update a task
      * @param pipeTask
      */
-    void update(@RequestBody PipeTask pipeTask);
+    void update(PipeTask pipeTask);
 
     /**
      * del by id
      * @param id
      * @return
      */
-    int deleteById(@PathVariable("id") String id);
+    int deleteById( String id);
 
     /**
      * page query by model

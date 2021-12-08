@@ -38,8 +38,7 @@ public class PipeTestServiceImpl extends TemplateService<PipeTest,String> implem
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public String insert(@RequestBody PipeTest pipeTest){
+    public String insert(PipeTest pipeTest){
         pipeTest.setCreateTime(new Timestamp(System.currentTimeMillis()));
         return super.insert(pipeTest);
     }

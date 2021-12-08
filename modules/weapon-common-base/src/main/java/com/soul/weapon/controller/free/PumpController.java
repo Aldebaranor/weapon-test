@@ -1,4 +1,6 @@
 package com.soul.weapon.controller.free;
+import com.egova.utils.TimeUtils;
+import com.flagwind.commons.Monment;
 import com.google.common.collect.Lists;
 import com.egova.exception.ExceptionUtils;
 import com.egova.json.utils.JsonUtils;
@@ -11,6 +13,7 @@ import com.soul.weapon.model.ScenariosInfo;
 import com.soul.weapon.model.dds.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +22,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -39,6 +44,7 @@ public class PumpController {
     private final InfluxdbTemplate influxdbTemplate;
     private final RestTemplate restTemplate;
     private final CommonRedisConfig commonRedisConfig;
+    private final int ONE_DAY=24*3600;
 
     @Api
     @PostMapping(value = "/{structName}")
@@ -57,59 +63,144 @@ public class PumpController {
                 combatScenariosInfo.setScenariosList(JsonUtils.deserializeList(
                         combatScenariosInfo.getScenarios(), ScenariosInfo.class));
 
-                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().opsForValue().set(
-                        Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY, JsonUtils.serialize(combatScenariosInfo),2, TimeUnit.HOURS);
+                String key=String.format("%s:%s",Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY,getTime());
+                if(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).exists(key)){
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).extrasForValue().set(
+                            key, JsonUtils.serialize(combatScenariosInfo));
+                }else{
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).extrasForValue().set(
+                            key, JsonUtils.serialize(combatScenariosInfo));
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).expire(key,ONE_DAY);
+                }
 
             }break;
             case "EnvironmentInfo": {
-                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().opsForValue().set(
-                        Constant.ENVIRONMENT_INFO_HTTP_KEY, JsonUtils.serialize(msg));
+
+                String key=String.format("%s:%s", Constant.ENVIRONMENT_INFO_HTTP_KEY,getTime());
+                if (RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).exists(key)){
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).extrasForValue().set(
+                            key, JsonUtils.serialize(msg));
+                }else{
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).extrasForValue().set(
+                            key, JsonUtils.serialize(msg));
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).expire(key,ONE_DAY);
+                }
             }break;
             case "EquipmentLaunchStatus": {
                 EquipmentLaunchStatus equipmentLaunchStatus = JsonUtils.deserialize(JsonUtils.serialize(msg), EquipmentLaunchStatus.class);
-                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().
-                        boundHashOps(Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY).put(
-                        equipmentLaunchStatus.getEquipmentId(), JsonUtils.serialize(equipmentLaunchStatus));
 
-                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().boundListOps(
-                        Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY+"_"+ equipmentLaunchStatus.getEquipmentId()).leftPush(JsonUtils.serialize(equipmentLaunchStatus));
+                String keyAll = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY,getTime());
+                if (RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).exists(keyAll)){
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
+                            boundHashOps(keyAll).put(
+                            equipmentLaunchStatus.getEquipmentId(), JsonUtils.serialize(equipmentLaunchStatus));
+                }else{
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
+                            boundHashOps(keyAll).put(
+                            equipmentLaunchStatus.getEquipmentId(), JsonUtils.serialize(equipmentLaunchStatus));
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).expire(keyAll,ONE_DAY);
+                }
 
-
+                String key = String.format("%s_%s:%s",Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY,equipmentLaunchStatus.getEquipmentId(),getTime());
+                if ( RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).exists(key)){
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundListOps(key).
+                            leftPush(JsonUtils.serialize(equipmentLaunchStatus));
+                }else {
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundListOps(key).
+                            leftPush(JsonUtils.serialize(equipmentLaunchStatus));
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).expire(key,ONE_DAY);
+                }
             }break;
             case "EquipmentStatus": {
                 EquipmentStatus equipmentStatus = JsonUtils.deserialize(JsonUtils.serialize(msg), EquipmentStatus.class);
-                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().
+
+                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
                         boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).put(
                                 equipmentStatus.getEquipmentId(), JsonUtils.serialize(equipmentStatus));
 
-                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().boundListOps(
+                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundListOps(
                         Constant.EQUIPMENT_STATUS_HTTP_KEY+"_"+ equipmentStatus.getEquipmentId()).leftPush(JsonUtils.serialize(equipmentStatus));
+
+                String keyAll = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY,getTime());
+                if (RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).exists(keyAll)){
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
+                            boundHashOps(keyAll).put(
+                            equipmentStatus.getEquipmentId(), JsonUtils.serialize(equipmentStatus));
+                } else {
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
+                            boundHashOps(keyAll).put(
+                            equipmentStatus.getEquipmentId(), JsonUtils.serialize(equipmentStatus));
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).expire(keyAll,ONE_DAY);
+                }
+
+                String key = String.format("%s_%s:%s",Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY,equipmentStatus.getEquipmentId(),getTime());
+                if (RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).exists(key)){
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundListOps(key).
+                            leftPush(JsonUtils.serialize(equipmentStatus));
+                }else {
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundListOps(key).
+                            leftPush(JsonUtils.serialize(equipmentStatus));
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).expire(key,ONE_DAY);
+                }
             }break;
             case "LauncherRotationInfo": {
-                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().opsForValue().set(
-                        Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY, JsonUtils.serialize(msg));
+
+                String key=String.format("%s:%s",Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY,getTime());
+                if(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).exists(key)){
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).extrasForValue().set(
+                            key, JsonUtils.serialize(msg));
+                }else{
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).extrasForValue().set(
+                            key, JsonUtils.serialize(msg));
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).expire(key,ONE_DAY);
+                }
+
             }break;
             case "TargetFireControlInfo": {
                 TargetFireControlInfo tmpTargetFireControlInfo=JsonUtils.deserialize(JsonUtils.serialize(msg),TargetFireControlInfo.class);
                 RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
                         Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY).put(tmpTargetFireControlInfo.getTargetId(),JsonUtils.serialize(tmpTargetFireControlInfo));
+
+                String key=String.format("%s:%s",Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY,getTime());
+                if(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).exists(key)){
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(key).
+                            put(tmpTargetFireControlInfo.getTargetId(),JsonUtils.serialize(tmpTargetFireControlInfo));
+
+                }else{
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(key).
+                            put(tmpTargetFireControlInfo.getTargetId(),JsonUtils.serialize(tmpTargetFireControlInfo));
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).expire(key,ONE_DAY);
+                }
+
             }break;
             case "TargetInfo": {
                 TargetInfo tmpTargetInfo = JsonUtils.deserialize(JsonUtils.serialize(msg), TargetInfo.class);
 
                 // 目标真值历史报文
-                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().boundHashOps(
-                        Constant.TARGET_INFO_HTTP_KEY).put(tmpTargetInfo.getTargetId(), JsonUtils.serialize(tmpTargetInfo));
+                String keyAll = String.format("%s:%s", Constant.TARGET_INFO_HTTP_KEY,getTime());
+                if (RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).exists(keyAll)){
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(keyAll).
+                            put(tmpTargetInfo.getTargetId(), JsonUtils.serialize(tmpTargetInfo));
+                }else{
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(keyAll).
+                            put(tmpTargetInfo.getTargetId(), JsonUtils.serialize(tmpTargetInfo));
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).expire(keyAll,ONE_DAY);
+                }
 
                 // 根据每个目标id存的目标真值历史报文
-                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().boundListOps(
-                        Constant.TARGET_INFO_HTTP_KEY+"_"+tmpTargetInfo.getTargetId()).leftPush(JsonUtils.serialize(tmpTargetInfo));
-
+                String key = String.format("%s_%s:%s",Constant.TARGET_INFO_HTTP_KEY,tmpTargetInfo.getTargetId(),getTime());
+                if ( RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).exists(key)){
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundListOps(key).
+                            leftPush(JsonUtils.serialize(tmpTargetInfo));
+                }else {
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundListOps(key).
+                            leftPush(JsonUtils.serialize(tmpTargetInfo));
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).expire(key,ONE_DAY);
+                }
 
                 // 添加一个field字段使得能够成功插入influxdb
                 msg.put("_uselessFiled", "useless");
                 influxdbTemplate.insert(Constant.TARGET_INFO_INFLUX_MEASURMENT_NAME, msg);
-
             }break;
             case "TargetInstructionsInfo": {
                 TargetInstructionsInfo targetInstructionsInfo = JsonUtils.deserialize(JsonUtils.serialize(msg),
@@ -121,8 +212,34 @@ public class PumpController {
 
                 // 根据每个目标id存的目标指示历史报文
                 RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().boundListOps(
-                        Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY+"_"+targetInstructionsInfo.getTargetId()).leftPush(
-                                JsonUtils.serialize(targetInstructionsInfo));
+                        Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY+"_"+targetInstructionsInfo.getTargetId()).
+                        leftPush(JsonUtils.serialize(targetInstructionsInfo));
+
+                // 目标真值历史报文
+                String keyAll = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY,getTime());
+                if (RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).exists(keyAll)){
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(keyAll).
+                            put(targetInstructionsInfo.getTargetId(),
+                            JsonUtils.serialize(targetInstructionsInfo));
+                }else{
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(keyAll).
+                            put(targetInstructionsInfo.getTargetId(),
+                            JsonUtils.serialize(targetInstructionsInfo));
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).expire(keyAll,ONE_DAY);
+                }
+
+                // 根据每个目标id存的目标真值历史报文
+                String key = String.format("%s_%s:%s",Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY,
+                        targetInstructionsInfo.getTargetId(),getTime());
+                if ( RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).exists(key)){
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().boundListOps(key).
+                            leftPush(JsonUtils.serialize(targetInstructionsInfo));
+                }else {
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().boundListOps(key).
+                            leftPush(JsonUtils.serialize(targetInstructionsInfo));
+                    RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).expire(key,ONE_DAY);
+                }
+
             }break;
             default: {
                 log.error("unrecognized struct name for http telegram to redis");
@@ -384,6 +501,11 @@ public class PumpController {
         ) {
             log.info(s);
         }
+    }
+
+    private String getTime(){
+        DateFormat df = new SimpleDateFormat("yyyyMMdd");
+        return df.format(System.currentTimeMillis());
     }
 }
 
