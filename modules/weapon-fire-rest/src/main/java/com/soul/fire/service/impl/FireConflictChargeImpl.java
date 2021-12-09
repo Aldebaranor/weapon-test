@@ -4,6 +4,7 @@ import com.egova.json.utils.JsonUtils;
 import com.egova.redis.RedisUtils;
 import com.soul.fire.config.ChargeConfig;
 import com.soul.fire.entity.FirePriority;
+import com.soul.fire.entity.FireWeapon;
 import com.soul.fire.service.FireConflictCharge;
 import com.soul.fire.controller.unity.FireThresholdController;
 import com.soul.fire.controller.unity.FireWeaponController;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Priority;
+import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -100,6 +102,10 @@ public class FireConflictChargeImpl implements FireConflictCharge {
                 chargeReport.setChargeType(0);
                 GenerateDetail(equipmentStatusA,equipmentStatusB);
                 FirePriority firePriority = firePriorityService.getPriorityByIds(equipmentStatusA.getEquipmentTypeId(),equipmentStatusB.getEquipmentTypeId());
+                if(firePriority==null)
+                {
+                    return null;
+                }
                 if(firePriority.isABetterThanB()){
                     chargeReport.setFreeEquipId(equipmentStatusA.getEquipmentId());
                     chargeReport.setChargeEquipId(equipmentStatusB.getEquipmentId());
@@ -185,7 +191,9 @@ public class FireConflictChargeImpl implements FireConflictCharge {
 
         Map<String,String> equipmentStatus = RedisUtils.getService(commonRedisConfig.
                 getHttpDataBaseIdx()).boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).entries();
-        if(equipmentStatus==null) return;
+        if(equipmentStatus==null) {
+            return;
+        }
 
         Map<String,EquipmentStatus> equipmentStatusMap = equipmentStatus.entrySet().stream().collect(
                 Collectors.toMap(
@@ -239,7 +247,7 @@ public class FireConflictChargeImpl implements FireConflictCharge {
     /**
      * 从数据库中读取阈值
      */
-    private void ReadThreshold(EquipmentStatus equipmentStatusA,EquipmentStatus equipmentStatusB){
+    private void ReadThreshold( EquipmentStatus equipmentStatusA, EquipmentStatus equipmentStatusB){
 
         FireThreshold fireThreshold;
         fireChargeTimeThreshold = ((fireThreshold=fireThresholdService.getById(TIME_ID))!=null)?Long.valueOf(fireThreshold.getThresholdValue()):3L;
@@ -247,10 +255,13 @@ public class FireConflictChargeImpl implements FireConflictCharge {
         fireChargePitchAngleThreshold = ((fireThreshold=fireThresholdService.getById(PITCH_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):0.05F;
         fireChargeAzimuthThreshold = ((fireThreshold=fireThresholdService.getById(AZIMUTH_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):0.05F;
 
-        posAx = fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getX();
-        posAy = fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getY();
-        posBx = fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getX();
-        posBy = fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getY();
+        FireWeapon fireWeapon = new FireWeapon();
+        fireWeapon = fireWeaponService.getById(equipmentStatusA.getEquipmentId());
+        posAx = fireWeapon!=null?fireWeapon.getX():0.0f;
+        posAy = fireWeapon!=null?fireWeapon.getY():0.0f;
+        fireWeapon = fireWeaponService.getById(equipmentStatusB.getEquipmentId());
+        posBx =fireWeapon!=null?fireWeapon.getX():0.0f;
+        posBy =fireWeapon!=null?fireWeapon.getY():0.0f;
 
         electFrequencyThreshold = ((fireThreshold=fireThresholdService.getById(ELECTFREQUENCY_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):10.0F;
         waterFrequencyThreshold = ((fireThreshold=fireThresholdService.getById(WATERFREQUENCY_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):5.0F;

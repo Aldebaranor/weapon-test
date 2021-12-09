@@ -33,37 +33,38 @@ import java.util.*;
 @RequiredArgsConstructor
 @Priority(5)
 @CacheConfig(cacheNames = PipeTask.NAME)
-public class PipeTaskServiceImpl extends TemplateService<PipeTask,String> implements PipeTaskService {
+public class PipeTaskServiceImpl extends TemplateService<PipeTask, String> implements PipeTaskService {
 
-    public static List<String>  pipeTestRunningCodes;
+    public static List<String> pipeTestRunningCodes;
     private final PipeTaskRepository pipeTaskRepository;
     private final PipeTestServiceImpl pipeTestServiceImpl;
+
     @Override
-    protected AbstractRepositoryBase<PipeTask,String> getRepository(){
+    protected AbstractRepositoryBase<PipeTask, String> getRepository() {
         return pipeTaskRepository;
     }
 
     @Override
-    public String insert( PipeTask pipeTask){
+    public String insert(PipeTask pipeTask) {
         pipeTask.setCreateTime(new Timestamp(System.currentTimeMillis()));
         return super.insert(pipeTask);
     }
 
     @Override
-    public void update( PipeTask pipeTask){
+    public void update(PipeTask pipeTask) {
         pipeTask.setModifyTime(new Timestamp(System.currentTimeMillis()));
         super.update(pipeTask);
     }
 
     @Override
     public String save(PipeTask pipeTask) {
-        if(pipeTask == null){
+        if (pipeTask == null) {
             throw ExceptionUtils.api("传参不能为空", new Object[0]);
         }
 
-        if(StringUtils.isBlank(pipeTask.getId())){
+        if (StringUtils.isBlank(pipeTask.getId())) {
             return insert(pipeTask);
-        }else{
+        } else {
             update(pipeTask);
             return pipeTask.getId();
         }
@@ -75,17 +76,17 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask,String> implem
         return super.page(model.getCondition(), model.getPaging(), model.getSorts());
     }
 
-//    @Override
-//    @Transactional(rollbackFor = Exception.class)
-//    public void startTest(String takeId, List<PipeTest> pipeTests) {
-//        PipeTask pipeTask = super.getById(takeId);
-//        pipeTask.setStatus(new PipeState("1"));
-//        super.update(pipeTask);
-//        for (PipeTest pipeTest : pipeTests) {
-//            pipeTestRunningCodes.add(pipeTest.getCode());
-//        }
-//        pipeTestServiceImpl.insertList(pipeTests);
-//    }
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public void startTest(String takeId, List<PipeTest> pipeTests) {
+        PipeTask pipeTask = super.getById(takeId);
+        pipeTask.setStatus(new PipeState("1"));
+        super.update(pipeTask);
+        for (PipeTest pipeTest : pipeTests) {
+            pipeTestRunningCodes.add(pipeTest.getCode());
+        }
+        pipeTestServiceImpl.insertList(pipeTests);
+    }
 
     @Override
     public PipeTest getByState(String status) {
@@ -96,7 +97,7 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask,String> implem
 
     @Override
     public List<PipeTask> getByName(String name) {
-        PipeTaskCondition pipeTaskCondition=new PipeTaskCondition();
+        PipeTaskCondition pipeTaskCondition = new PipeTaskCondition();
         pipeTaskCondition.setName(name);
         return super.query(pipeTaskCondition);
     }

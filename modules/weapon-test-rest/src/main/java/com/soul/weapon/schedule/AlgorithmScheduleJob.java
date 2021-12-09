@@ -47,16 +47,11 @@ public class AlgorithmScheduleJob implements Job {
             allAlgorithm.torpedoDefense(currentTask,getPipeTestByCode(currentPipeTest, TaskTypeConstant.TORPEDO_DEFENSE));
             allAlgorithm.electronicCountermeasure(currentTask,getPipeTestByCode(currentPipeTest, TaskTypeConstant.ELECTRONIC_COUNTERMEASURE));
             allAlgorithm.underwaterAcousticCountermeasure(currentTask,getPipeTestByCode(currentPipeTest, TaskTypeConstant.UNDERWATER_ACOUSTIC_COUNTERMEASURE));
-
-            allAlgorithm.executionStatusTest(currentTask,getPipeTestByCode(currentPipeTest, TaskTypeConstant.INFORMATION_FLOW));
-
-            allAlgorithm.threatenEstimation(currentTask,getPipeTestByCode(currentPipeTest, TaskTypeConstant.THREAT_JUDGMENT));
-            allAlgorithm.threatenEstimation(currentTask,getPipeTestByCode(currentPipeTest, TaskTypeConstant.INDICATES_THE_PROCESSING_ACCURACY));
-
+            allAlgorithm.infoProcessTest(currentTask,getPipeTestByCode(currentPipeTest, TaskTypeConstant.INFORMATION_FLOW));
+            allAlgorithm.threatJudgment(currentTask,getPipeTestByCode(currentPipeTest, TaskTypeConstant.THREAT_JUDGMENT));
+            allAlgorithm.indicationAccuracyTest(currentTask,getPipeTestByCode(currentPipeTest, TaskTypeConstant.INDICATES_THE_PROCESSING_ACCURACY));
             allAlgorithm.executionStatusTest(currentTask,getPipeTestByCode(currentPipeTest, TaskTypeConstant.IMPLEMENTATION));
-
-            allAlgorithm.threatenEstimation(currentTask,getPipeTestByCode(currentPipeTest, TaskTypeConstant.RADAR_TRACK));
-
+            allAlgorithm.radarTrackTest(currentTask,getPipeTestByCode(currentPipeTest, TaskTypeConstant.RADAR_TRACK));
             allAlgorithm.interceptDistanceTest(currentTask,getPipeTestByCode(currentPipeTest, TaskTypeConstant.INTERCEPT_DISTANCE));
             allAlgorithm.fireControlTest(currentTask,getPipeTestByCode(currentPipeTest, TaskTypeConstant.FIRE_CONTROL_CALCULATION_ACCURACY));
             allAlgorithm.reactionTimeTest(currentTask,getPipeTestByCode(currentPipeTest, TaskTypeConstant.REACTION_TIME));
