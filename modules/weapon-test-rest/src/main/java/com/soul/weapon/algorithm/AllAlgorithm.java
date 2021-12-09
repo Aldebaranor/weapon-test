@@ -1301,31 +1301,11 @@ public class AllAlgorithm {
     }
 
     /**
-     * 是否执行算法并传递阈值
-     *
-     * @param Code
+     * 是否开始执行
+     * @param taskId
+     * @param pipeTest
      * @return
      */
-    public String pipeTestSetThreshold(String Code) {
-        //1.找到taskId
-        String status = "1";
-        PipeTest pipeTest = pipeTaskService.getByState(status);
-        if (pipeTest == null) {
-            return NONE;
-        }
-        //2.根据taskId找到通道测试集合
-        List<PipeTest> pipeTestList = pipeTestService.getByTaskId(pipeTest.getId());
-        //3.TestCode--》value判断
-        for (PipeTest test : pipeTestList) {
-            List<DictionaryItem> DictionaryItems = DictionaryItemService.getByCode(test.getCode());
-            if (StringUtils.equals(DictionaryItems.stream().findFirst().orElse(null).getText(), Code)) {
-                //返回阈值
-                return test.getThreshold();
-            }
-        }
-        return NONE;
-    }
-
     public Boolean IsStart(String taskId, PipeTest pipeTest) {
         return StringUtils.isEmpty(taskId) || pipeTest == null;
     }

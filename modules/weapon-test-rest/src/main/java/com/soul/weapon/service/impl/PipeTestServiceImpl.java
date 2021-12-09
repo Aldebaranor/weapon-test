@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import javax.annotation.Priority;
 import javax.annotation.Resource;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -56,6 +57,25 @@ public class PipeTestServiceImpl extends TemplateService<PipeTest,String> implem
         PipeTestCondition pipeTestCondition=new PipeTestCondition();
         pipeTestCondition.setTaskId(taskId);
         return super.query(pipeTestCondition);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public int deleteByTaskId(String taskId) {
+        List<PipeTest> pipeTests = getByTaskId(taskId);
+        List<String> ids=new ArrayList<>();
+        for (PipeTest pipeTest : pipeTests) {
+            ids.add(pipeTest.getId());
+        }
+        return super.deleteByIds(ids);
+    }
+
+    @Override
+    public void saveByTaskId(String taskId, List<PipeTest> list) {
+        deleteByTaskId(taskId);
+
+
+        super.insertList(list);
     }
 
 

@@ -88,12 +88,7 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask, String> imple
         pipeTestServiceImpl.insertList(pipeTests);
     }
 
-    @Override
-    public PipeTest getByState(String status) {
-        PipeTestCondition condition = new PipeTestCondition();
-        condition.setStatus(status);
-        return pipeTestServiceImpl.query(condition).stream().findFirst().orElse(null);
-    }
+
 
     @Override
     public List<PipeTask> getByName(String name) {

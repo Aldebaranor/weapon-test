@@ -90,6 +90,18 @@ public class FreePipeTaskController {
     }
 
     @Api
+    @PostMapping(value = "/save/{takeId}")
+    public void saveTest(@PathVariable String takeId,@RequestBody List<PipeTest> pipeTests){
+
+        pipeTaskService.startTest(takeId,pipeTests);
+        RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).extrasForValue().set(Constant.WEAPON_CURRENT_TASK,takeId);
+        for(PipeTest pipeTest : pipeTests){
+            RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).opsForHash().put(Constant.WEAPON_CURRENT_PIPETEST,pipeTest.getCode(), JsonUtils.serialize(pipeTest));
+        }
+
+    }
+
+    @Api
     @GetMapping(value = "/name/{name}")
     public List<PipeTask> getByName(@PathVariable String name)
     {
