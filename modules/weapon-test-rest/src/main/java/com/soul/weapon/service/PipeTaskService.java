@@ -43,6 +43,8 @@ public interface PipeTaskService {
      */
     void update(PipeTask pipeTask);
 
+    String save(PipeTask pipeTask);
+
     /**
      * del by id
      * @param id
@@ -57,12 +59,12 @@ public interface PipeTaskService {
      */
     PageResult<PipeTask> page(QueryModel<PipeTaskCondition> model);
 
-    /**
-     * 开始测试
-     * @param takeId
-     * @param pipeTests
-     */
-    void startTest(String takeId, List<PipeTest> pipeTests);
+//    /**
+//     * 开始测试
+//     * @param takeId
+//     * @param pipeTests
+//     */
+//    void startTest(String takeId, List<PipeTest> pipeTests);
 
     /**
      * 获取正在运行的Task

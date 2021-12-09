@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "common.redis")
 public class CommonRedisConfig {
     /** 火力和通道项目公用的http报文存储数据库配置 **/
+    //TODO:不要用一些看不懂的简写
     private int httpDataBaseIdx;
 
     /** 火力兼容项目redis数据库配置 **/

@@ -53,4 +53,8 @@ public interface PipeTestService {
      */
     List<PipeTest> getByTaskId(String taskId);
 
+    int deleteByTaskId(String id);
+
+    int saveByTaskId(String taskId,List<PipeTest> list);
+
 }
