@@ -6,28 +6,21 @@ import com.soul.fire.config.ChargeConfig;
 import com.soul.fire.entity.FirePriority;
 import com.soul.fire.entity.FireWeapon;
 import com.soul.fire.service.FireConflictCharge;
-import com.soul.fire.controller.unity.FireThresholdController;
-import com.soul.fire.controller.unity.FireWeaponController;
+
 import com.soul.fire.entity.FireThreshold;
 import com.soul.fire.service.FirePriorityService;
 import com.soul.fire.service.FireThresholdService;
 import com.soul.fire.service.FireWeaponService;
-import com.soul.weapon.config.CommonRedisConfig;
+import com.soul.weapon.config.CommonConfig;
 import com.soul.weapon.config.Constant;
 import com.soul.weapon.model.ChargeReport;
 import com.soul.weapon.model.dds.EquipmentStatus;
 import com.soul.weapon.model.ReportDetail;
-import com.squareup.moshi.Json;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Priority;
-import javax.validation.constraints.NotNull;
-import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -45,7 +38,7 @@ public class FireConflictChargeImpl implements FireConflictCharge {
     private final FirePriorityService firePriorityService;
     private final FireWeaponService fireWeaponService;
     private final FireThresholdService fireThresholdService;
-    private final CommonRedisConfig commonRedisConfig;
+    private final CommonConfig config;
 
     private final String TIME_ID = "1";
     private final String PITCH_ID = "2";
@@ -184,13 +177,13 @@ public class FireConflictChargeImpl implements FireConflictCharge {
     @Override
     public void chargeTest() {
 
-        if(!RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate().hasKey(
+        if(!RedisUtils.getService(config.getPumpDataBase()).getTemplate().hasKey(
                 Constant.EQUIPMENT_STATUS_HTTP_KEY)){
             log.debug("从"+Constant.EQUIPMENT_STATUS_HTTP_KEY+"中获取装备状态信息失败！");
         }
 
-        Map<String,String> equipmentStatus = RedisUtils.getService(commonRedisConfig.
-                getHttpDataBaseIdx()).boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).entries();
+        Map<String,String> equipmentStatus = RedisUtils.getService(config.
+                getPumpDataBase()).boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).entries();
         if(equipmentStatus==null) {
             return;
         }
@@ -207,7 +200,7 @@ public class FireConflictChargeImpl implements FireConflictCharge {
                 if(!statusA.getEquipmentId().equals(statusB.getEquipmentId())){
                     ChargeReport chargeReport = chargeReport(statusA,statusB);
                     if(chargeReport!=null) {
-                        RedisUtils.getService(commonRedisConfig.getFireDataBaseIdx()).boundHashOps(ChargeConfig.CHARGE_KEY).put(
+                        RedisUtils.getService(config.getFireDataBase()).boundHashOps(ChargeConfig.CHARGE_KEY).put(
                                 chargeReport.getId(),JsonUtils.serialize(chargeReport));
                     }
                 }

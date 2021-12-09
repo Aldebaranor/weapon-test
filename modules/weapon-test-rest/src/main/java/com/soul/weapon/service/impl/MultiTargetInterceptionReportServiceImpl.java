@@ -41,7 +41,7 @@ public class MultiTargetInterceptionReportServiceImpl extends TemplateService<Mu
 
     @Override
     public List<MultiTargetInterceptionReport> list(MultiTargetInterceptionReportCondition condition) {
-        //TODO:
+        //TODO:1209
         return super.query(condition,null);
     }
 }

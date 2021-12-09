@@ -46,6 +46,7 @@ public class PipeSelfCheckServiceImpl extends TemplateService<PipeSelfCheck,Stri
         return super.query(pipeSelfCheckCondition).stream().findFirst().orElse(null);
     }
 
+    //TODO:1209
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String insert(@RequestBody PipeSelfCheck pipeSelfCheck){
@@ -53,6 +54,7 @@ public class PipeSelfCheckServiceImpl extends TemplateService<PipeSelfCheck,Stri
         return super.insert(pipeSelfCheck);
     }
 
+    //TODO:1209
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(@RequestBody PipeSelfCheck pipeSelfCheck){

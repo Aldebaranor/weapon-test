@@ -5,7 +5,7 @@ import com.egova.redis.RedisUtils;
 import com.flagwind.commons.StringUtils;
 import com.soul.fire.service.FireConflictCharge;
 import com.soul.fire.service.FireConflictPredictService;
-import com.soul.weapon.config.CommonRedisConfig;
+import com.soul.weapon.config.CommonConfig;
 import com.soul.weapon.config.Constant;
 import com.soul.weapon.model.ScenariosInfo;
 import com.soul.weapon.model.dds.CombatScenariosInfo;
@@ -15,6 +15,7 @@ import org.quartz.Job;
 import org.quartz.JobExecutionContext;
 import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,10 +24,11 @@ import org.springframework.stereotype.Component;
  */
 
 @Slf4j
-@Component("ConflictPredictJob")
-@com.egova.quartz.annotation.Job(name="ConflictPredictJob",group = "weapon",cron = "1000")
-@DisallowConcurrentExecution
-public class ConflictPredictJob implements Job {
+@Component
+//@Component("ConflictPredictJob")
+//@com.egova.quartz.annotation.Job(name="ConflictPredictJob",group = "weapon",cron = "1000")
+//@DisallowConcurrentExecution
+public class ConflictPredictJob  {
 
     @Autowired
     public FireConflictPredictService fireConflictPredictService;
@@ -34,10 +36,10 @@ public class ConflictPredictJob implements Job {
     public FireConflictCharge fireConflictCharge;
 
     @Autowired
-    public CommonRedisConfig commonRedisConfig;
+    public CommonConfig config;
 
 
-    @Override
+    @Scheduled(fixedDelay = 1000)
     public void execute(JobExecutionContext context) throws JobExecutionException{
         try {
             fireConflictPredictService.predictTest();

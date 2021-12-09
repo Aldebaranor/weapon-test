@@ -28,6 +28,7 @@ public class PipeAdviceController {
         return pipeAdviceService.getById(id);
     }
 
+
     @Api
     @GetMapping(value = "/list-all")
     public List<PipeAdvice> getAll()

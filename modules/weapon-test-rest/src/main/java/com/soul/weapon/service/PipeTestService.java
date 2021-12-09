@@ -71,6 +71,6 @@ public interface PipeTestService {
      * 批量添加
      * @param entities
      */
-    public void insertList(List<PipeTest> entities);
+    void insertList(List<PipeTest> entities);
 
 }

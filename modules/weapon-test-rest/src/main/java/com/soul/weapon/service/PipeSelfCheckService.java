@@ -37,12 +37,14 @@ public interface PipeSelfCheckService {
      * @param pipeSelfCheck
      * @return
      */
+    //TODO:1209
     String insert(@RequestBody PipeSelfCheck pipeSelfCheck);
 
     /**
      * update one item
      * @param pipeSelfCheck
      */
+    //TODO:1209
     void update(@RequestBody PipeSelfCheck pipeSelfCheck);
 
     /**
@@ -50,5 +52,6 @@ public interface PipeSelfCheckService {
      * @param id
      * @return
      */
+    //TODO:1209
     int deleteById(@PathVariable("id") String id);
 }

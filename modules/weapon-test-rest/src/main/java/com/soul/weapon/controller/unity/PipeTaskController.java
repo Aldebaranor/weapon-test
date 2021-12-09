@@ -65,8 +65,6 @@ public class PipeTaskController {
     @Api
     @PostMapping(value = "/page")
     public PageResult<PipeTask> page(@RequestBody QueryModel<PipeTaskCondition> con) {
-    // public QueryModel<PipeTaskCondition> page() {
-        // QueryModel<PipeTaskCondition> con = new QueryModel<PipeTaskCondition>();
         return  pipeTaskService.page(con);
     }
 

@@ -10,7 +10,7 @@ import com.egova.redis.RedisUtils;
 import com.flagwind.commons.StringUtils;
 import com.soul.weapon.condition.PipeTaskCondition;
 import com.soul.weapon.condition.PipeTestCondition;
-import com.soul.weapon.config.CommonRedisConfig;
+import com.soul.weapon.config.CommonConfig;
 import com.soul.weapon.config.Constant;
 import com.soul.weapon.domain.PipeTaskRepository;
 import com.soul.weapon.entity.PipeTask;
@@ -40,10 +40,11 @@ import java.util.*;
 @CacheConfig(cacheNames = PipeTask.NAME)
 public class PipeTaskServiceImpl extends TemplateService<PipeTask, String> implements PipeTaskService {
 
+    //TODO:1209 没用到的变量删掉
     public static List<String> pipeTestRunningCodes;
     private final PipeTaskRepository pipeTaskRepository;
     private final PipeTestServiceImpl pipeTestServiceImpl;
-    private final CommonRedisConfig commonRedisConfig;
+    private final CommonConfig config;
 
     @Override
     protected AbstractRepositoryBase<PipeTask, String> getRepository() {
@@ -84,16 +85,16 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask, String> imple
     @Override
     public Boolean startTest(String takeId, List<PipeTest> pipeTests) {
 
-        String currentTaskId = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).extrasForValue().get(Constant.WEAPON_CURRENT_TASK);
+        String currentTaskId = RedisUtils.getService(config.getPumpDataBase()).extrasForValue().get(Constant.WEAPON_CURRENT_TASK);
         if (!StringUtils.isEmpty(currentTaskId)) {
             throw ExceptionUtils.api("已有任务正在运行，请关闭当前运行任务再开启本任务", new Object[0]);
         }
         if(CollectionUtils.isEmpty(pipeTests)){
             throw ExceptionUtils.api("当前任务没有测试项", new Object[0]);
         }
-        RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).extrasForValue().set(Constant.WEAPON_CURRENT_TASK, takeId);
+        RedisUtils.getService(config.getPumpDataBase()).extrasForValue().set(Constant.WEAPON_CURRENT_TASK, takeId);
         for (PipeTest pipeTest : pipeTests) {
-            RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).opsForHash().put(Constant.WEAPON_CURRENT_PIPETEST, pipeTest.getCode(), JsonUtils.serialize(pipeTest));
+            RedisUtils.getService(config.getPumpDataBase()).opsForHash().put(Constant.WEAPON_CURRENT_PIPETEST, pipeTest.getCode(), JsonUtils.serialize(pipeTest));
         }
         PipeTask pipeTask = super.getById(takeId);
         pipeTask.setStatus(new PipeState("1"));
@@ -110,12 +111,12 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask, String> imple
         pipeTask.setId(takeId);
         pipeTask.setStatus(new PipeState("2"));
         super.update(pipeTask);
-        RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).delete(Constant.WEAPON_CURRENT_TASK);
-        RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).delete(Constant.WEAPON_CURRENT_PIPETEST);
+        RedisUtils.getService(config.getPumpDataBase()).delete(Constant.WEAPON_CURRENT_TASK);
+        RedisUtils.getService(config.getPumpDataBase()).delete(Constant.WEAPON_CURRENT_PIPETEST);
         return true;
     }
 
-
+//TODO:1209 对齐
 
         @Override
         public List<PipeTask> getByName (String name){

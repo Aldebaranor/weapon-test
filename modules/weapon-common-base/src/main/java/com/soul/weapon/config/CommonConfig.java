@@ -12,12 +12,13 @@ import org.springframework.stereotype.Component;
 @Data
 @Component
 @Configuration
-@ConfigurationProperties(prefix = "common.redis")
-public class CommonRedisConfig {
+@ConfigurationProperties(prefix = "weapon.common")
+public class CommonConfig {
     /** 火力和通道项目公用的http报文存储数据库配置 **/
-    //TODO:不要用一些看不懂的简写
-    private int httpDataBaseIdx;
+    private int pumpDataBase;
 
     /** 火力兼容项目redis数据库配置 **/
-    private int fireDataBaseIdx;
+    private int fireDataBase;
+
+    //TODO :同步膝盖所有的配置文件
 }

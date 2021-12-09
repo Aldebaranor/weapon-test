@@ -41,7 +41,7 @@ public class ElectronicWeaponTestReportServiceImpl extends TemplateService<Elect
 
     @Override
     public List<ElectronicWeaponTestReport> list(ElectronicWeaponTestReportCondition condition) {
-        //TODO:
+        //TODO:1209
         return super.query(condition,null);
     }
 }

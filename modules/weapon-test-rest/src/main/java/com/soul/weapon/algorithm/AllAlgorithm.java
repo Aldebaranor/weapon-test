@@ -4,7 +4,7 @@ import com.egova.entity.DictionaryItem;
 import com.egova.json.utils.JsonUtils;
 import com.egova.redis.RedisUtils;
 import com.flagwind.commons.StringUtils;
-import com.soul.weapon.config.CommonRedisConfig;
+import com.soul.weapon.config.CommonConfig;
 import com.soul.weapon.config.Constant;
 import com.soul.weapon.entity.*;
 import com.soul.weapon.entity.historyInfo.*;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class AllAlgorithm {
-    private final CommonRedisConfig commonRedisConfig;
+    private final CommonConfig config;
 
     private final PipeTaskService pipeTaskService;
 
@@ -125,12 +125,12 @@ public class AllAlgorithm {
         }
 
         String key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
-        if (!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
+        if (!Boolean.TRUE.equals(RedisUtils.getService(config.getPumpDataBase()).getTemplate()
                 .hasKey(key))) {
             log.error("从Redis中获取装备信息失败！-1");
             return;
         }
-        Map<String, String> tmpEquipments = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
+        Map<String, String> tmpEquipments = RedisUtils.getService(config.getPumpDataBase()).
                 boundHashOps(key).entries();
 
         assert tmpEquipments != null;
@@ -209,13 +209,13 @@ public class AllAlgorithm {
 
         String key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
 
-        if (!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
+        if (!Boolean.TRUE.equals(RedisUtils.getService(config.getPumpDataBase()).getTemplate()
                 .hasKey(key))) {
             log.error("从Redis中获取装备信息失败！-2");
             return;
         }
 
-        Map<String, String> tmpEquipments = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
+        Map<String, String> tmpEquipments = RedisUtils.getService(config.getPumpDataBase()).
                 boundHashOps(key).entries();
         assert tmpEquipments != null;
         Map<String, EquipmentStatus> allEquipmentStatus = tmpEquipments.entrySet().stream().collect(Collectors.toMap(
@@ -274,13 +274,13 @@ public class AllAlgorithm {
 
         String key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
 
-        if (!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
+        if (!Boolean.TRUE.equals(RedisUtils.getService(config.getPumpDataBase()).getTemplate()
                 .hasKey(Constant.EQUIPMENT_STATUS_HTTP_KEY))) {
             log.error("从Redis中获取装备信息失败！-3");
             return;
         }
 
-        Map<String, String> tmpEquipments = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
+        Map<String, String> tmpEquipments = RedisUtils.getService(config.getPumpDataBase()).
                 boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).entries();
         assert tmpEquipments != null;
         Map<String, EquipmentStatus> allEquipmentStatus = tmpEquipments.entrySet().stream().collect(Collectors.toMap(
@@ -343,12 +343,12 @@ public class AllAlgorithm {
         String key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
 
 
-        if (!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).exists(Constant.EQUIPMENT_STATUS_HTTP_KEY))) {
+        if (!Boolean.TRUE.equals(RedisUtils.getService(config.getPumpDataBase()).exists(Constant.EQUIPMENT_STATUS_HTTP_KEY))) {
             log.error("从Redis中获取装备信息失败！-4");
             return;
         }
 
-        Map<String, String> tmpEquipments = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
+        Map<String, String> tmpEquipments = RedisUtils.getService(config.getPumpDataBase()).
                 boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).entries();
         assert tmpEquipments != null;
         Map<String, EquipmentStatus> allEquipmentStatus = tmpEquipments.entrySet().stream().collect(Collectors.toMap(
@@ -419,13 +419,13 @@ public class AllAlgorithm {
         String key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
 
 
-        if (!Boolean.TRUE.equals(RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate()
+        if (!Boolean.TRUE.equals(RedisUtils.getService(config.getPumpDataBase()).getTemplate()
                 .hasKey(Constant.EQUIPMENT_STATUS_HTTP_KEY))) {
             log.error("从Redis中获取装备信息失败！-5");
             return;
         }
 
-        Map<String, String> tmpEquipments = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
+        Map<String, String> tmpEquipments = RedisUtils.getService(config.getPumpDataBase()).
                 boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).entries();
         assert tmpEquipments != null;
         Map<String, EquipmentStatus> allEquipmentStatus = tmpEquipments.entrySet().stream().collect(Collectors.toMap(
@@ -488,14 +488,14 @@ public class AllAlgorithm {
         String equipment_key = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, getTime());
 
 
-        StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
+        StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
         if (!template.hasKey(instructions_key) ||
                 !template.hasKey(target_key)
                 || !template.hasKey(equipment_key)) {
             log.error("从Redis中获取信息失败！");
             return;
         }
-        Map<String, String> tmpFireControlInfos = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+        Map<String, String> tmpFireControlInfos = RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
                 target_key).entries();
 
         assert tmpFireControlInfos != null;
@@ -575,13 +575,13 @@ public class AllAlgorithm {
             DETECTOR_TIME_THRESHOLD = Long.parseLong(pipeTest.getThreshold());
         }
 
-        StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
+        StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
         if (!template.hasKey(instructions_key) || !template.hasKey(target_key)) {
             log.error("从Redis中获取目标指示信息或目标真值信息失败！");
             return;
         }
 
-        Map<String, String> tmpInstructionInfos = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+        Map<String, String> tmpInstructionInfos = RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
                 instructions_key).entries();
         assert tmpInstructionInfos != null;
         Map<String, TargetInstructionsInfo> allInstructionInfos = tmpInstructionInfos.entrySet().stream().collect(Collectors.toMap(
@@ -647,13 +647,13 @@ public class AllAlgorithm {
             DETECTOR_TIME_THRESHOLD = Long.parseLong(pipeTest.getThreshold());
         }
 
-        StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
+        StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
         if (!template.hasKey(instructions_key) || !template.hasKey(target_key)) {
             log.error("从Redis中获取目标指示信息或目标真值信息失败！");
             return;
         }
 
-        Map<String, String> tmpInstructionInfos = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+        Map<String, String> tmpInstructionInfos = RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
                 instructions_key).entries();
         assert tmpInstructionInfos != null;
         Map<String, TargetInstructionsInfo> allInstructionInfos = tmpInstructionInfos.entrySet().stream().collect(Collectors.toMap(
@@ -720,14 +720,14 @@ public class AllAlgorithm {
         String equipment_key = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, getTime());
 
 
-        StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
+        StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
         if (!template.hasKey(instructions_key) ||
                 !template.hasKey(target_key)
                 || !template.hasKey(equipment_key)) {
             log.error("从Redis中获取信息失败！");
             return;
         }
-        Map<String, String> tmpFireControlInfos = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+        Map<String, String> tmpFireControlInfos = RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
                 target_key).entries();
 
         assert tmpFireControlInfos != null;
@@ -808,13 +808,13 @@ public class AllAlgorithm {
             RADARPATH_TIME_THRESHOLD = Long.parseLong(pipeTest.getThreshold());
         }
 
-        StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
+        StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
         if (!template.hasKey(instructions_key) || !template.hasKey(target_key)) {
             log.error("从Redis中获取目标指示信息或目标真值信息失败！");
             return;
         }
 
-        Map<String, String> tmpInstructionInfos = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+        Map<String, String> tmpInstructionInfos = RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
                 instructions_key).entries();
         assert tmpInstructionInfos != null;
         Map<String, TargetInstructionsInfo> allInstructionInfos = tmpInstructionInfos.entrySet().stream().collect(Collectors.toMap(
@@ -879,7 +879,7 @@ public class AllAlgorithm {
             INTERCEPTION_DISTANCE = Long.parseLong(pipeTest.getThreshold());
         }
 
-        StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
+        StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
         if (!template.hasKey(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY)) {
             log.error("从Redis中获取目标指示信息失败！");
             return;
@@ -887,7 +887,7 @@ public class AllAlgorithm {
 
         String key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, getTime());
 
-        Map<String, String> tempInstructions = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).
+        Map<String, String> tempInstructions = RedisUtils.getService(config.getPumpDataBase()).
                 boundHashOps(key).entries();
 
         assert tempInstructions != null;
@@ -956,7 +956,7 @@ public class AllAlgorithm {
             FIRECONTROL_TIME_THRESHOLD = Long.parseLong(pipeTest.getThreshold());
         }
 
-        StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
+        StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
         if (!template.hasKey(Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY) ||
                 !template.hasKey(Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY)) {
             log.error("从Redis中获取目标指示信息或目标火控信息失败！");
@@ -964,7 +964,7 @@ public class AllAlgorithm {
         }
         String target_key = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, getTime());
 
-        Map<String, String> tmpFireControls = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+        Map<String, String> tmpFireControls = RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
                 target_key).entries();
         assert tmpFireControls != null;
         Map<String, TargetFireControlInfo> allFireControlInfos = tmpFireControls.entrySet().stream().collect(Collectors.toMap(
@@ -1033,14 +1033,14 @@ public class AllAlgorithm {
         String target_key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, getTime());
 
 
-        StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
+        StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
         if (!template.hasKey(equipment_key) ||
                 !template.hasKey(target_key)) {
             log.error("从Redis中获取武器发射或目标指示信息失败！");
             return;
         }
 
-        Map<String, String> tmpEqupimentLaunch = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+        Map<String, String> tmpEqupimentLaunch = RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
                 equipment_key).entries();
         assert tmpEqupimentLaunch != null;
 
@@ -1112,14 +1112,14 @@ public class AllAlgorithm {
         String target_key = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, getTime());
 
 
-        StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
+        StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
         if (!template.hasKey(equipment_key) ||
                 !template.hasKey(target_key)) {
             log.error("从Redis中获取武器发射或目标火控信息失败！");
             return;
         }
 
-        Map<String, String> tmpFireControls = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+        Map<String, String> tmpFireControls = RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
                 target_key).entries();
         assert tmpFireControls != null;
         Map<String, TargetFireControlInfo> allFireControlInfos = tmpFireControls.entrySet().stream().collect(Collectors.toMap(
@@ -1192,13 +1192,13 @@ public class AllAlgorithm {
         String target_key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, getTime());
 
 
-        StringRedisTemplate template = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).getTemplate();
+        StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
         if (Boolean.FALSE.equals(template.hasKey(target_key))) {
             log.error("从Redis中获取目标指示信息失败！");
             return;
         }
 
-        Map<String, String> tmpEquipmentLaunch = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+        Map<String, String> tmpEquipmentLaunch = RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
                 target_key).entries();
         assert tmpEquipmentLaunch != null;
 
@@ -1210,7 +1210,7 @@ public class AllAlgorithm {
 
         List<MultiTargetInterceptionReport> finalReport = new ArrayList<>();
         Set<String> targetInstructionInfoIndices = Objects.requireNonNull(
-                RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).boundHashOps(
+                RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
                         target_key).entries()).keySet();
 
         for (String targetInstructionInfoId : targetInstructionInfoIndices) {
@@ -1225,7 +1225,7 @@ public class AllAlgorithm {
             TargetInstructionsInfo targetInstructionsInfo = new TargetInstructionsInfo();
 
             Long targetInstructionInfoHistoryCnt = Objects.requireNonNull(RedisUtils.getService(
-                    commonRedisConfig.getHttpDataBaseIdx()).boundListOps(targetInstructionInfoHistoryId).size());
+                    config.getPumpDataBase()).boundListOps(targetInstructionInfoHistoryId).size());
             for (int i = 0; i < targetInstructionInfoHistoryCnt; ++i) {
                 String tmpInstruction = template.boundListOps(targetInstructionInfoHistoryId).index(i);
                 TargetInstructionsInfo instruction = JsonUtils.deserialize(tmpInstruction, TargetInstructionsInfo.class);

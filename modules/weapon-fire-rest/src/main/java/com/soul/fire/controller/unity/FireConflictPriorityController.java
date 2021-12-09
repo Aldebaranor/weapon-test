@@ -24,7 +24,7 @@ public class FireConflictPriorityController {
 
     @Api
     @PutMapping()
-    public void update(@RequestBody List<FireConflictPriority> list) {
+    public void updateList(@RequestBody List<FireConflictPriority> list) {
         if(CollectionUtils.isEmpty(list)){
             throw  ExceptionUtils.api("list must not be empty");
         }

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "fire.predict")
 public class PredictConfig {
 
+    //TODO:静态变量定义到Constant文件。这个database还要吗？？？
     public int database;
 
     public static String PREDICT_KEY = "fire:predict";

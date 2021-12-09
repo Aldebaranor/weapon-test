@@ -19,6 +19,7 @@ import javax.annotation.Resource;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @Author: nash5
@@ -44,6 +45,7 @@ public class PipeTestServiceImpl extends TemplateService<PipeTest,String> implem
         return super.insert(pipeTest);
     }
 
+    //TODO:1209
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void update(@RequestBody PipeTest pipeTest){
@@ -51,6 +53,7 @@ public class PipeTestServiceImpl extends TemplateService<PipeTest,String> implem
         super.update(pipeTest);
     }
 
+    //TODO:1209
     @Override
     @Transactional(rollbackFor = Exception.class)
     public List<PipeTest> getByTaskId(String taskId) {
@@ -59,17 +62,21 @@ public class PipeTestServiceImpl extends TemplateService<PipeTest,String> implem
         return super.query(pipeTestCondition);
     }
 
+
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public int deleteByTaskId(String taskId) {
         List<PipeTest> pipeTests = getByTaskId(taskId);
-        List<String> ids=new ArrayList<>();
-        for (PipeTest pipeTest : pipeTests) {
-            ids.add(pipeTest.getId());
-        }
+
+        List<String> ids = pipeTests.stream().map(PipeTest::getId).collect(Collectors.toList());
+        //TODO:1209 可以用Lamda表达式，这样更优雅
+//        List<String> ids=new ArrayList<>();
+//        for (PipeTest pipeTest : pipeTests) {
+//            ids.add(pipeTest.getId());
+//        }
         return super.deleteByIds(ids);
     }
 
+    //TODO:1209 两个事物需要加回滚，需要先判断第一步删除是否成功，否则无法进行第二步！！！
     @Override
     public void saveByTaskId(String taskId, List<PipeTest> list) {
         deleteByTaskId(taskId);

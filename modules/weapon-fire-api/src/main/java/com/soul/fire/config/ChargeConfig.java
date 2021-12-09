@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "fire.charge")
 public class ChargeConfig {
 
+    //TODO:静态变量定义到Constant文件。这个database还要吗？？？
     public int database;
 
     public static String CHARGE_KEY = "fire:charge";

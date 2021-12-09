@@ -26,15 +26,17 @@ import java.util.List;
 public class DictionaryItemServiceImpl extends TemplateService<DictionaryItem, String> implements DictionaryItemService {
 
     public  final com.egova.generic.domain.DictionaryItemRepository DictionaryItemRepository;
+
+
+    @Override
+    protected AbstractRepositoryBase<DictionaryItem, String> getRepository() {
+        return DictionaryItemRepository;
+    }
+
     @Override
     public List<DictionaryItem> getByCode(String code) {
         DictionaryItemCondition dictionaryItemCondition=new DictionaryItemCondition();
         dictionaryItemCondition.setValue(code);
         return super.query(dictionaryItemCondition);
-    }
-
-    @Override
-    protected AbstractRepositoryBase<DictionaryItem, String> getRepository() {
-        return DictionaryItemRepository;
     }
 }
