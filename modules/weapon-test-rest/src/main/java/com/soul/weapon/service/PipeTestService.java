@@ -67,4 +67,10 @@ public interface PipeTestService {
      */
     void saveByTaskId(String taskId,List<PipeTest> list);
 
+    /**
+     * 批量添加
+     * @param entities
+     */
+    public void insertList(List<PipeTest> entities);
+
 }

@@ -73,10 +73,10 @@ public class PipeTestServiceImpl extends TemplateService<PipeTest,String> implem
     @Override
     public void saveByTaskId(String taskId, List<PipeTest> list) {
         deleteByTaskId(taskId);
-
-
         super.insertList(list);
     }
+
+
 
 
 }

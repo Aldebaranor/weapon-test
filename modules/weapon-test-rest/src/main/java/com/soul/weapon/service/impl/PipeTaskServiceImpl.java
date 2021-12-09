@@ -3,11 +3,15 @@ package com.soul.weapon.service.impl;
 import com.egova.data.service.AbstractRepositoryBase;
 import com.egova.data.service.TemplateService;
 import com.egova.exception.ExceptionUtils;
+import com.egova.json.utils.JsonUtils;
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
+import com.egova.redis.RedisUtils;
 import com.flagwind.commons.StringUtils;
 import com.soul.weapon.condition.PipeTaskCondition;
 import com.soul.weapon.condition.PipeTestCondition;
+import com.soul.weapon.config.CommonRedisConfig;
+import com.soul.weapon.config.Constant;
 import com.soul.weapon.domain.PipeTaskRepository;
 import com.soul.weapon.entity.PipeTask;
 import com.soul.weapon.entity.PipeTest;
@@ -18,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Priority;
@@ -38,6 +43,7 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask, String> imple
     public static List<String> pipeTestRunningCodes;
     private final PipeTaskRepository pipeTaskRepository;
     private final PipeTestServiceImpl pipeTestServiceImpl;
+    private final CommonRedisConfig commonRedisConfig;
 
     @Override
     protected AbstractRepositoryBase<PipeTask, String> getRepository() {
@@ -71,30 +77,52 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask, String> imple
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public PageResult<PipeTask> page(QueryModel<PipeTaskCondition> model) {
         return super.page(model.getCondition(), model.getPaging(), model.getSorts());
     }
 
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void startTest(String takeId, List<PipeTest> pipeTests) {
+    public Boolean startTest(String takeId, List<PipeTest> pipeTests) {
+
+        String currentTaskId = RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).extrasForValue().get(Constant.WEAPON_CURRENT_TASK);
+        if (!StringUtils.isEmpty(currentTaskId)) {
+            throw ExceptionUtils.api("已有任务正在运行，请关闭当前运行任务再开启本任务", new Object[0]);
+        }
+        if(CollectionUtils.isEmpty(pipeTests)){
+            throw ExceptionUtils.api("当前任务没有测试项", new Object[0]);
+        }
+        RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).extrasForValue().set(Constant.WEAPON_CURRENT_TASK, takeId);
+        for (PipeTest pipeTest : pipeTests) {
+            RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).opsForHash().put(Constant.WEAPON_CURRENT_PIPETEST, pipeTest.getCode(), JsonUtils.serialize(pipeTest));
+        }
         PipeTask pipeTask = super.getById(takeId);
         pipeTask.setStatus(new PipeState("1"));
         super.update(pipeTask);
-        for (PipeTest pipeTest : pipeTests) {
-            pipeTestRunningCodes.add(pipeTest.getCode());
-        }
-        pipeTestServiceImpl.insertList(pipeTests);
+        return true;
     }
-
-
 
     @Override
-    public List<PipeTask> getByName(String name) {
-        PipeTaskCondition pipeTaskCondition = new PipeTaskCondition();
-        pipeTaskCondition.setName(name);
-        return super.query(pipeTaskCondition);
+    public Boolean stopTest(String takeId){
+        if (!StringUtils.isEmpty(takeId)) {
+            throw ExceptionUtils.api("任务Id为空", new Object[0]);
+        }
+        PipeTask pipeTask = new PipeTask();
+        pipeTask.setId(takeId);
+        pipeTask.setStatus(new PipeState("2"));
+        super.update(pipeTask);
+        RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).delete(Constant.WEAPON_CURRENT_TASK);
+        RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).delete(Constant.WEAPON_CURRENT_PIPETEST);
+        return true;
     }
-}
+
+
+
+        @Override
+        public List<PipeTask> getByName (String name){
+            PipeTaskCondition pipeTaskCondition = new PipeTaskCondition();
+            pipeTaskCondition.setName(name);
+            return super.query(pipeTaskCondition);
+        }
+    }
+
 

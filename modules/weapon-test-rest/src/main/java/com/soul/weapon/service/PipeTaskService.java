@@ -59,12 +59,13 @@ public interface PipeTaskService {
      */
     PageResult<PipeTask> page(QueryModel<PipeTaskCondition> model);
 
-   /**
+    /**
      * 开始测试
      * @param takeId
      * @param pipeTests
+     * @return
      */
-    void startTest(String takeId, List<PipeTest> pipeTests);
+    Boolean startTest(String takeId, List<PipeTest> pipeTests);
 
 
     /**
@@ -73,5 +74,12 @@ public interface PipeTaskService {
      * @return
      */
     List<PipeTask> getByName(String name);
+
+    /**
+     * 停止测试
+     * @param takeId
+     * @return
+     */
+    public Boolean stopTest(String takeId);
 
 }

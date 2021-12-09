@@ -1,16 +1,19 @@
 package com.soul.weapon.controller.free;
 
+import com.egova.exception.ExceptionUtils;
 import com.egova.json.utils.JsonUtils;
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
 import com.egova.redis.RedisUtils;
 import com.egova.web.annotation.Api;
+import com.flagwind.commons.StringUtils;
 import com.soul.weapon.condition.PipeTaskCondition;
 import com.soul.weapon.config.CommonRedisConfig;
 import com.soul.weapon.config.Constant;
 import com.soul.weapon.entity.PipeTask;
 import com.soul.weapon.entity.PipeTest;
 import com.soul.weapon.service.PipeTaskService;
+import com.soul.weapon.service.PipeTestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,9 @@ import java.util.List;
 public class FreePipeTaskController {
 
     private final PipeTaskService pipeTaskService;
+
+    private final PipeTestService pipeTestService;
+
     private final CommonRedisConfig commonRedisConfig;
 
     @Api
@@ -72,32 +78,32 @@ public class FreePipeTaskController {
     @Api
     @PostMapping(value = "/page")
     public PageResult<PipeTask> page(@RequestBody QueryModel<PipeTaskCondition> con) {
-    // public QueryModel<PipeTaskCondition> page() {
-        // QueryModel<PipeTaskCondition> con = new QueryModel<PipeTaskCondition>();
+
         return  pipeTaskService.page(con);
     }
 
     @Api
-    @PostMapping(value = "/start/{takeId}")
-    public void startTest(@PathVariable String takeId,@RequestBody List<PipeTest> pipeTests){
+    @GetMapping(value = "/start/{takeId}")
+    public void startTest(@PathVariable String takeId){
         //TODO:
-        pipeTaskService.startTest(takeId,pipeTests);
-        RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).extrasForValue().set(Constant.WEAPON_CURRENT_TASK,takeId);
-        for(PipeTest pipeTest : pipeTests){
-            RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).opsForHash().put(Constant.WEAPON_CURRENT_PIPETEST,pipeTest.getCode(), JsonUtils.serialize(pipeTest));
-        }
+        List<PipeTest> list = pipeTestService.getByTaskId(takeId);
+        pipeTaskService.startTest(takeId,list);
+    }
+
+    @Api
+    @PostMapping(value = "/save/{taskId}")
+    public void safeTest(@PathVariable String taskId,@RequestBody List<PipeTest> pipeTests){
+      if (pipeTaskService.getById(taskId)==null){
+          throw ExceptionUtils.api("没有找到该任务", new Object[0]);
+      }
+      pipeTestService.insertList(pipeTests);
 
     }
 
     @Api
-    @PostMapping(value = "/save/{takeId}")
-    public void saveTest(@PathVariable String takeId,@RequestBody List<PipeTest> pipeTests){
-
-        pipeTaskService.startTest(takeId,pipeTests);
-        RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).extrasForValue().set(Constant.WEAPON_CURRENT_TASK,takeId);
-        for(PipeTest pipeTest : pipeTests){
-            RedisUtils.getService(commonRedisConfig.getHttpDataBaseIdx()).opsForHash().put(Constant.WEAPON_CURRENT_PIPETEST,pipeTest.getCode(), JsonUtils.serialize(pipeTest));
-        }
+    @DeleteMapping(value = "/stop/{takeId}")
+    public void safeTest(@PathVariable String takeId){
+        pipeTaskService.stopTest(takeId);
 
     }
 
