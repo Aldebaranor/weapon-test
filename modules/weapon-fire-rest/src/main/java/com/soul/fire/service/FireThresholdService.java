@@ -33,14 +33,14 @@ public interface FireThresholdService {
      * @param fireThreshold 阈值表
      * @return 主键
      */
-    String insert(@RequestBody FireThreshold fireThreshold);
+    String insert(FireThreshold fireThreshold);
 
     /**
      * 更新
      *
      * @param fireThreshold 阈值表
      */
-    void update(@RequestBody FireThreshold fireThreshold);
+    void update(FireThreshold fireThreshold);
 
     /**
      * 删除
@@ -48,7 +48,7 @@ public interface FireThresholdService {
      * @param id 主键
      * @return 影响记录行数
      */
-    int deleteById(@PathVariable("id") String id);
+    int deleteById(String id);
 
     /**
      * 列表查询

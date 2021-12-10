@@ -22,14 +22,14 @@ public interface FireWeaponService {
      * @param fireWeapon 武器表
      * @return 主键
      */
-    String insert(@RequestBody FireWeapon fireWeapon);
+    String insert(FireWeapon fireWeapon);
 
     /**
      * 更新
      *
      * @param fireWeapon 武器表
      */
-    void update(@RequestBody FireWeapon fireWeapon);
+    void update(FireWeapon fireWeapon);
 
     /**
      * 删除
@@ -37,7 +37,7 @@ public interface FireWeaponService {
      * @param id 主键
      * @return 影响记录行数
      */
-    int deleteById(@PathVariable("id") String id);
+    int deleteById(String id);
 
     /**
      * 列表查询
@@ -45,6 +45,6 @@ public interface FireWeaponService {
      * @param condition SourceCondition
      * @return 列表数据
      */
-    List<FireWeapon> list(@RequestBody FireWeaponCondition condition);
+    List<FireWeapon> list(FireWeaponCondition condition);
 
 }

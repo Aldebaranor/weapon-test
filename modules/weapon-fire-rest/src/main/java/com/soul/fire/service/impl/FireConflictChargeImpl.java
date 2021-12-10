@@ -2,7 +2,6 @@ package com.soul.fire.service.impl;
 
 import com.egova.json.utils.JsonUtils;
 import com.egova.redis.RedisUtils;
-import com.soul.fire.config.ChargeConfig;
 import com.soul.fire.entity.FirePriority;
 import com.soul.fire.entity.FireWeapon;
 import com.soul.fire.service.FireConflictCharge;
@@ -200,7 +199,7 @@ public class FireConflictChargeImpl implements FireConflictCharge {
                 if(!statusA.getEquipmentId().equals(statusB.getEquipmentId())){
                     ChargeReport chargeReport = chargeReport(statusA,statusB);
                     if(chargeReport!=null) {
-                        RedisUtils.getService(config.getFireDataBase()).boundHashOps(ChargeConfig.CHARGE_KEY).put(
+                        RedisUtils.getService(config.getFireDataBase()).boundHashOps(Constant.CHARGE_KEY).put(
                                 chargeReport.getId(),JsonUtils.serialize(chargeReport));
                     }
                 }

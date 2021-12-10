@@ -3,7 +3,6 @@ package com.soul.fire.service.impl;
 import com.egova.json.utils.JsonUtils;
 import com.egova.redis.RedisUtils;
 import com.soul.fire.service.FireConflictPredictService;
-import com.soul.fire.config.PredictConfig;
 import com.soul.fire.entity.FireThreshold;
 import com.soul.fire.service.FireThresholdService;
 import com.soul.fire.service.FireWeaponService;
@@ -78,13 +77,13 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
             if(timeState && pitchState && azimuthState ){
                 conflictReport.setConflictType(0);
                 GenerateDetail(scenariosA,scenariosB);
-                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(PredictConfig.PREDICT_KEY,
+                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.PREDICT_KEY,
                         conflictReport.getId(), JsonUtils.serialize(conflictReport));
 
-                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,
+                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.PREDICTDETAIL_KEY,
                         conflictReportDetailA.getId(), JsonUtils.serialize(conflictReportDetailA));
 
-                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,
+                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.PREDICTDETAIL_KEY,
                         conflictReportDetailB.getId(), JsonUtils.serialize(conflictReportDetailB));
                 return conflictReport;
 
@@ -99,11 +98,11 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
             if(timeState && frequencyState){
                 conflictReport.setConflictType(1);
                 GenerateDetail(scenariosA,scenariosB);
-                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(PredictConfig.PREDICT_KEY,
+                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.PREDICT_KEY,
                         conflictReport.getId(), JsonUtils.serialize(conflictReport));
-                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,
+                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.PREDICTDETAIL_KEY,
                         conflictReportDetailA.getId(), JsonUtils.serialize(conflictReportDetailA));
-                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,
+                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.PREDICTDETAIL_KEY,
                         conflictReportDetailB.getId(), JsonUtils.serialize(conflictReportDetailB));
                 return conflictReport;
             }else{
@@ -123,11 +122,11 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
             if(timeState && frequencyState){
                 conflictReport.setConflictType(2);
                 GenerateDetail(scenariosA,scenariosB);
-                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(PredictConfig.PREDICT_KEY,
+                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.PREDICT_KEY,
                         conflictReport.getId(), JsonUtils.serialize(conflictReport));
-                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,
+                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.PREDICTDETAIL_KEY,
                         conflictReportDetailA.getId(), JsonUtils.serialize(conflictReportDetailA));
-                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(PredictConfig.PREDICTDETAIL_KEY,
+                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.PREDICTDETAIL_KEY,
                         conflictReportDetailB.getId(), JsonUtils.serialize(conflictReportDetailB));
                 return conflictReport;
             }else{

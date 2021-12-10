@@ -29,14 +29,14 @@ public interface FireConflictService {
      * @param fireConflict 冲突表
      * @return 主键
      */
-    String insert(@RequestBody FireConflict fireConflict);
+    String insert(FireConflict fireConflict);
 
     /**
      * 更新
      *
      * @param fireConflict 冲突表
      */
-    void update(@RequestBody FireConflict fireConflict);
+    void update(FireConflict fireConflict);
 
     /**
      * 删除
@@ -44,7 +44,7 @@ public interface FireConflictService {
      * @param id 主键
      * @return 影响记录行数
      */
-    int deleteById(@PathVariable("id") String id);
+    int deleteById(String id);
 
     /**
      * 根据冲突类型type和任务id查询
