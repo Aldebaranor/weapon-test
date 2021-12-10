@@ -4,6 +4,7 @@ import com.egova.data.service.AbstractRepositoryBase;
 import com.egova.data.service.TemplateService;
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
+import com.flagwind.persistent.model.Sorting;
 import com.soul.weapon.condition.ExecutionStatusReportCondition;
 import com.soul.weapon.condition.FireControlReportCondition;
 import com.soul.weapon.condition.InfoProcessTestReportCondition;
@@ -49,7 +50,7 @@ public class FireControlReportServiceImpl extends TemplateService<FireControlRep
 
     @Override
     public List<FireControlReport> list(FireControlReportCondition condition) {
-        //TODO:1209
-        return super.query(condition,null);
+
+        return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
 }

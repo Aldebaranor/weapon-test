@@ -4,6 +4,7 @@ import com.egova.data.service.AbstractRepositoryBase;
 import com.egova.data.service.TemplateService;
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
+import com.flagwind.persistent.model.Sorting;
 import com.soul.weapon.condition.TorpedoTestReportCondition;
 import com.soul.weapon.domain.historyInfo.TorpedoTestReportRepository;
 import com.soul.weapon.entity.historyInfo.TorpedoTestReport;
@@ -41,7 +42,7 @@ public class TorpedoTestReportServiceImpl extends TemplateService<TorpedoTestRep
 
     @Override
     public List<TorpedoTestReport> list(TorpedoTestReportCondition condition) {
-        //TODO:
-        return super.query(condition,null);
+
+        return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
 }

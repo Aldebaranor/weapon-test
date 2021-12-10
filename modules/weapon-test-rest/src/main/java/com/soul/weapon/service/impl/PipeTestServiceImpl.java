@@ -30,34 +30,30 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Priority(5)
 @CacheConfig(cacheNames = PipeTest.NAME)
-public class PipeTestServiceImpl extends TemplateService<PipeTest,String> implements PipeTestService {
+public class PipeTestServiceImpl extends TemplateService<PipeTest, String> implements PipeTestService {
 
     private final PipeTestRepository pipeTestRepository;
 
     @Override
-    protected AbstractRepositoryBase<PipeTest,String> getRepository(){
+    protected AbstractRepositoryBase<PipeTest, String> getRepository() {
         return pipeTestRepository;
     }
 
     @Override
-    public String insert(PipeTest pipeTest){
+    public String insert(PipeTest pipeTest) {
         pipeTest.setCreateTime(new Timestamp(System.currentTimeMillis()));
         return super.insert(pipeTest);
     }
 
-    //TODO:1209
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void update(@RequestBody PipeTest pipeTest){
+    public void update(PipeTest pipeTest) {
         pipeTest.setModifyTime(new Timestamp(System.currentTimeMillis()));
         super.update(pipeTest);
     }
 
-    //TODO:1209
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public List<PipeTest> getByTaskId(String taskId) {
-        PipeTestCondition pipeTestCondition=new PipeTestCondition();
+        PipeTestCondition pipeTestCondition = new PipeTestCondition();
         pipeTestCondition.setTaskId(taskId);
         return super.query(pipeTestCondition);
     }
@@ -69,6 +65,7 @@ public class PipeTestServiceImpl extends TemplateService<PipeTest,String> implem
 
         List<String> ids = pipeTests.stream().map(PipeTest::getId).collect(Collectors.toList());
         //TODO:1209 可以用Lamda表达式，这样更优雅
+
 //        List<String> ids=new ArrayList<>();
 //        for (PipeTest pipeTest : pipeTests) {
 //            ids.add(pipeTest.getId());
@@ -78,12 +75,15 @@ public class PipeTestServiceImpl extends TemplateService<PipeTest,String> implem
 
     //TODO:1209 两个事物需要加回滚，需要先判断第一步删除是否成功，否则无法进行第二步！！！
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public void saveByTaskId(String taskId, List<PipeTest> list) {
-        deleteByTaskId(taskId);
-        super.insertList(list);
+        int i = deleteByTaskId(taskId);
+        if (i != 0) {
+            super.insertList(list);
+        }
+
+
     }
-
-
 
 
 }

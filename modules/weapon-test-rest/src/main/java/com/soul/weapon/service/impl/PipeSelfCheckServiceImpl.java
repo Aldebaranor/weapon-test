@@ -46,18 +46,15 @@ public class PipeSelfCheckServiceImpl extends TemplateService<PipeSelfCheck,Stri
         return super.query(pipeSelfCheckCondition).stream().findFirst().orElse(null);
     }
 
-    //TODO:1209
+
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public String insert(@RequestBody PipeSelfCheck pipeSelfCheck){
+    public String insert( PipeSelfCheck pipeSelfCheck){
         pipeSelfCheck.setCreateTime(new Timestamp(System.currentTimeMillis()));
         return super.insert(pipeSelfCheck);
     }
 
-    //TODO:1209
     @Override
-    @Transactional(rollbackFor = Exception.class)
-    public void update(@RequestBody PipeSelfCheck pipeSelfCheck){
+    public void update(PipeSelfCheck pipeSelfCheck){
         pipeSelfCheck.setModifyTime(new Timestamp(System.currentTimeMillis()));
         super.update(pipeSelfCheck);
     }

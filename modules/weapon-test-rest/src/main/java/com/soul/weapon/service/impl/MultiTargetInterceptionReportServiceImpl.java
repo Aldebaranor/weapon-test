@@ -4,6 +4,7 @@ import com.egova.data.service.AbstractRepositoryBase;
 import com.egova.data.service.TemplateService;
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
+import com.flagwind.persistent.model.Sorting;
 import com.soul.weapon.condition.MultiTargetInterceptionReportCondition;
 import com.soul.weapon.domain.historyInfo.MultiTargetInterceptionReportRepository;
 import com.soul.weapon.entity.historyInfo.MultiTargetInterceptionReport;
@@ -41,7 +42,7 @@ public class MultiTargetInterceptionReportServiceImpl extends TemplateService<Mu
 
     @Override
     public List<MultiTargetInterceptionReport> list(MultiTargetInterceptionReportCondition condition) {
-        //TODO:1209
-        return super.query(condition,null);
+
+        return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
 }

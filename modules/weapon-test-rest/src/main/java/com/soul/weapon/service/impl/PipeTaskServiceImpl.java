@@ -40,10 +40,7 @@ import java.util.*;
 @CacheConfig(cacheNames = PipeTask.NAME)
 public class PipeTaskServiceImpl extends TemplateService<PipeTask, String> implements PipeTaskService {
 
-    //TODO:1209 没用到的变量删掉
-    public static List<String> pipeTestRunningCodes;
     private final PipeTaskRepository pipeTaskRepository;
-    private final PipeTestServiceImpl pipeTestServiceImpl;
     private final CommonConfig config;
 
     @Override
@@ -89,7 +86,7 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask, String> imple
         if (!StringUtils.isEmpty(currentTaskId)) {
             throw ExceptionUtils.api("已有任务正在运行，请关闭当前运行任务再开启本任务", new Object[0]);
         }
-        if(CollectionUtils.isEmpty(pipeTests)){
+        if (CollectionUtils.isEmpty(pipeTests)) {
             throw ExceptionUtils.api("当前任务没有测试项", new Object[0]);
         }
         RedisUtils.getService(config.getPumpDataBase()).extrasForValue().set(Constant.WEAPON_CURRENT_TASK, takeId);
@@ -103,7 +100,7 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask, String> imple
     }
 
     @Override
-    public Boolean stopTest(String takeId){
+    public Boolean stopTest(String takeId) {
         if (!StringUtils.isEmpty(takeId)) {
             throw ExceptionUtils.api("任务Id为空", new Object[0]);
         }
@@ -116,14 +113,12 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask, String> imple
         return true;
     }
 
-//TODO:1209 对齐
-
-        @Override
-        public List<PipeTask> getByName (String name){
-            PipeTaskCondition pipeTaskCondition = new PipeTaskCondition();
-            pipeTaskCondition.setName(name);
-            return super.query(pipeTaskCondition);
-        }
+    @Override
+    public List<PipeTask> getByName(String name) {
+        PipeTaskCondition pipeTaskCondition = new PipeTaskCondition();
+        pipeTaskCondition.setName(name);
+        return super.query(pipeTaskCondition);
     }
+}
 
 

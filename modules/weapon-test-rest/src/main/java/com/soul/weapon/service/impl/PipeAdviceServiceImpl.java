@@ -35,17 +35,13 @@ public class PipeAdviceServiceImpl extends TemplateService<PipeAdvice,String> im
         return pipeAdviceRepository;
     }
 
-    //TODO:1209
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public String insert(@RequestBody PipeAdvice pipeAdvice){
         pipeAdvice.setCreateTime(new Timestamp(System.currentTimeMillis()));
         return super.insert(pipeAdvice);
     }
 
-    //TODO:1209
     @Override
-    @Transactional(rollbackFor = Exception.class)
     public void update(@RequestBody PipeAdvice pipeAdvice){
 
         pipeAdvice.setModifyTime(new Timestamp(System.currentTimeMillis()));

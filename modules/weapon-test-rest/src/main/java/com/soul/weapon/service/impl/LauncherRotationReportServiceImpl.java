@@ -4,6 +4,7 @@ import com.egova.data.service.AbstractRepositoryBase;
 import com.egova.data.service.TemplateService;
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
+import com.flagwind.persistent.model.Sorting;
 import com.soul.weapon.condition.LauncherRotationReportCondition;
 import com.soul.weapon.domain.historyInfo.LauncherRotationReportRepository;
 import com.soul.weapon.entity.historyInfo.LauncherRotationReport;
@@ -41,7 +42,7 @@ public class LauncherRotationReportServiceImpl extends TemplateService<LauncherR
 
     @Override
     public List<LauncherRotationReport> list(LauncherRotationReportCondition condition) {
-        //TODO:1209
-        return super.query(condition,null);
+
+        return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
 }

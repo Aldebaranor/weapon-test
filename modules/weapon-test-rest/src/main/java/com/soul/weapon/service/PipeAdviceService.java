@@ -29,22 +29,20 @@ public interface PipeAdviceService {
      * @param pipeAdvice
      * @return
      */
-    //TODO:1209
-    String insert(@RequestBody PipeAdvice pipeAdvice);
+
+    String insert(PipeAdvice pipeAdvice);
 
     /**
      * update a pip advice
      * @param pipeAdvice
      */
-    //TODO:1209
-    void update(@RequestBody PipeAdvice pipeAdvice);
+    void update( PipeAdvice pipeAdvice);
 
     /**
      * delete by id
      * @param id
      * @return
      */
-    //TODO:1209
-    int deleteById(@PathVariable("id") String id);
+    int deleteById(String id);
     
 }

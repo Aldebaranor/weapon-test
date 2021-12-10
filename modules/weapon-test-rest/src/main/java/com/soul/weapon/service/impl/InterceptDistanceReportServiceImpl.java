@@ -4,6 +4,7 @@ import com.egova.data.service.AbstractRepositoryBase;
 import com.egova.data.service.TemplateService;
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
+import com.flagwind.persistent.model.Sorting;
 import com.soul.weapon.condition.InterceptDistanceReportCondition;
 import com.soul.weapon.domain.historyInfo.InterceptDistanceReportRepository;
 import com.soul.weapon.entity.historyInfo.InterceptDistanceReport;
@@ -41,7 +42,7 @@ public class InterceptDistanceReportServiceImpl extends TemplateService<Intercep
 
     @Override
     public List<InterceptDistanceReport> list(InterceptDistanceReportCondition condition) {
-        //TODO:1209
-        return super.query(condition,null);
+
+        return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
 }

@@ -4,6 +4,7 @@ import com.egova.data.service.AbstractRepositoryBase;
 import com.egova.data.service.TemplateService;
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
+import com.flagwind.persistent.model.Sorting;
 import com.soul.weapon.condition.ThreatenReportCondition;
 import com.soul.weapon.domain.historyInfo.ThreatenReportRepository;
 import com.soul.weapon.entity.historyInfo.ThreatenReport;
@@ -41,7 +42,7 @@ public class ThreatenReportServiceImpl extends TemplateService<ThreatenReport,St
 
     @Override
     public List<ThreatenReport> list(ThreatenReportCondition condition) {
-        //TODO:
-        return super.query(condition,null);
+
+        return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
 }

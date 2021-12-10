@@ -252,7 +252,7 @@ public class AllAlgorithm {
                 meetTestCycleHelper(timeVec, PIPETEST_CYCLE_THRESHOLD);
         tmpReport.setStatus(pipeStatus);
 
-        //TODO:添加taskId
+        tmpReport.setTaskId(taskId);
         tmpReport.setId(UUID.randomUUID().toString());
         tmpReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
         tmpReport.setDisabled(false);

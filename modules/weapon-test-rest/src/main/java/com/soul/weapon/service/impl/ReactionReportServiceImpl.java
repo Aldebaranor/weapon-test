@@ -4,6 +4,7 @@ import com.egova.data.service.AbstractRepositoryBase;
 import com.egova.data.service.TemplateService;
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
+import com.flagwind.persistent.model.Sorting;
 import com.soul.weapon.condition.ReactionReportCondition;
 import com.soul.weapon.domain.historyInfo.ReactionReportRepository;
 import com.soul.weapon.entity.historyInfo.ReactionReport;
@@ -41,7 +42,7 @@ public class ReactionReportServiceImpl extends TemplateService<ReactionReport,St
 
     @Override
     public List<ReactionReport> list(ReactionReportCondition condition) {
-        //TODO:
-        return super.query(condition,null);
+
+        return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
 }

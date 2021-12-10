@@ -50,7 +50,6 @@ public class FireConflictServiceImpl extends TemplateService<FireConflict, Strin
          super.update(fireConflict);
     }
 
-    //TODO:使用super的方法
 
     @Override
     public FireConflict getById(String id){

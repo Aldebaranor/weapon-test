@@ -4,6 +4,7 @@ import com.egova.data.service.AbstractRepositoryBase;
 import com.egova.data.service.TemplateService;
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
+import com.flagwind.persistent.model.Sorting;
 import com.soul.weapon.condition.WaterWeaponTestReportCondition;
 import com.soul.weapon.domain.historyInfo.WaterWeaponTestReportRepository;
 import com.soul.weapon.entity.historyInfo.WaterWeaponTestReport;
@@ -41,7 +42,7 @@ public class WaterWeaponTestReportServiceImpl extends TemplateService<WaterWeapo
 
     @Override
     public List<WaterWeaponTestReport> list(WaterWeaponTestReportCondition condition) {
-        //TODO:
-        return super.query(condition,null);
+
+        return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
 }

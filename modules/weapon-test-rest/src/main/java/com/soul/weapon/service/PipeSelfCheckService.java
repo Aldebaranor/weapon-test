@@ -37,21 +37,18 @@ public interface PipeSelfCheckService {
      * @param pipeSelfCheck
      * @return
      */
-    //TODO:1209
-    String insert(@RequestBody PipeSelfCheck pipeSelfCheck);
+    String insert( PipeSelfCheck pipeSelfCheck);
 
     /**
      * update one item
      * @param pipeSelfCheck
      */
-    //TODO:1209
-    void update(@RequestBody PipeSelfCheck pipeSelfCheck);
+    void update(PipeSelfCheck pipeSelfCheck);
 
     /**
      * del by id
      * @param id
      * @return
      */
-    //TODO:1209
-    int deleteById(@PathVariable("id") String id);
+    int deleteById(String id);
 }

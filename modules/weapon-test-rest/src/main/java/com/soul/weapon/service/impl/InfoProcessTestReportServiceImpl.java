@@ -4,6 +4,7 @@ import com.egova.data.service.AbstractRepositoryBase;
 import com.egova.data.service.TemplateService;
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
+import com.flagwind.persistent.model.Sorting;
 import com.soul.weapon.condition.FireControlReportCondition;
 import com.soul.weapon.condition.InfoProcessTestReportCondition;
 import com.soul.weapon.domain.historyInfo.FireControlReportRepository;
@@ -45,7 +46,7 @@ public class InfoProcessTestReportServiceImpl extends TemplateService<InfoProces
 
     @Override
     public List<InfoProcessTestReport> list(InfoProcessTestReportCondition condition) {
-        //TODO:1209
-        return super.query(condition,null);
+
+        return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
 }

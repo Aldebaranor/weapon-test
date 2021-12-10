@@ -4,6 +4,7 @@ import com.egova.data.service.AbstractRepositoryBase;
 import com.egova.data.service.TemplateService;
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
+import com.flagwind.persistent.model.Sorting;
 import com.soul.weapon.condition.AntiMissileShipGunTestReportCondition;
 import com.soul.weapon.condition.ExecutionStatusReportCondition;
 import com.soul.weapon.domain.historyInfo.AntiMissileShipGunTestReportRepository;
@@ -45,7 +46,7 @@ public class ExecutionStatusReportServiceImpl extends TemplateService<ExecutionS
 
     @Override
     public List<ExecutionStatusReport> list(ExecutionStatusReportCondition condition) {
-        //TODO:1209
-        return super.query(condition,null);
+
+        return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
 }
