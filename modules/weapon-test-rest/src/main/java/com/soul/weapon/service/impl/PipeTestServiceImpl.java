@@ -62,14 +62,7 @@ public class PipeTestServiceImpl extends TemplateService<PipeTest, String> imple
     @Override
     public int deleteByTaskId(String taskId) {
         List<PipeTest> pipeTests = getByTaskId(taskId);
-
         List<String> ids = pipeTests.stream().map(PipeTest::getId).collect(Collectors.toList());
-        //TODO:1209 可以用Lamda表达式，这样更优雅
-
-//        List<String> ids=new ArrayList<>();
-//        for (PipeTest pipeTest : pipeTests) {
-//            ids.add(pipeTest.getId());
-//        }
         return super.deleteByIds(ids);
     }
 

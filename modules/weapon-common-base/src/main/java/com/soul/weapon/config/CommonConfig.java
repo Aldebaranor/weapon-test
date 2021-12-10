@@ -20,5 +20,4 @@ public class CommonConfig {
     /** 火力兼容项目redis数据库配置 **/
     private int fireDataBase;
 
-    //TODO :同步膝盖所有的配置文件
 }

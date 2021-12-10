@@ -3,13 +3,17 @@ package com.soul.weapon.controller.unity;
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
 import com.egova.web.annotation.Api;
+import com.flagwind.commons.Monment;
 import com.soul.weapon.condition.PipeTaskCondition;
 import com.soul.weapon.entity.PipeTask;
 import com.soul.weapon.service.PipeTaskService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.DateUtil;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -42,6 +46,8 @@ public class PipeTaskController {
     @PostMapping
     public String insert(@RequestBody PipeTask pipeTask)
     {
+        //TODO：增加CreatTime
+        pipeTask.setCreateTime(new Timestamp(System.currentTimeMillis()));
         return pipeTaskService.insert(pipeTask);
     }
 
