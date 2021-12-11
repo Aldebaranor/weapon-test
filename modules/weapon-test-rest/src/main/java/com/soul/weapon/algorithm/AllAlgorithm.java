@@ -208,7 +208,7 @@ public class AllAlgorithm {
         }
 
         String key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
-
+        
         if (!Boolean.TRUE.equals(RedisUtils.getService(config.getPumpDataBase()).getTemplate()
                 .hasKey(key))) {
             log.error("从Redis中获取装备信息失败！-2");
