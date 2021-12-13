@@ -94,7 +94,7 @@ public class AllAlgorithm {
      **/
     private Long MIN_INTERCEPTION_DISTANCE = 50L;
 
-    private final PipeHistoryService pipeHistoryService;
+    //private final PipeHistoryService pipeHistoryService;
 
     private final ShipToAirMissileTestReportService shipToAirMissileTestReportService;
     private final AntiMissileShipGunTestReportService antiMissileShipGunTestReportService;

@@ -40,7 +40,7 @@ public class ConflictPredictJob  {
 
 
     @Scheduled(fixedDelay = 1000)
-    public void execute(JobExecutionContext context) throws JobExecutionException{
+    public void execute() {
         try {
             fireConflictPredictService.predictTest();
             fireConflictCharge.chargeTest();

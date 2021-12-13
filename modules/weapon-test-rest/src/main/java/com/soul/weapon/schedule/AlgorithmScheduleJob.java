@@ -30,7 +30,7 @@ public class AlgorithmScheduleJob  {
     public AllAlgorithm allAlgorithm;
 
     @Scheduled(fixedDelay = 1000)
-    public void execute(JobExecutionContext context) throws JobExecutionException{
+    public void execute() {
         try {
             String currentTask = getCurrentTask();
             Map<String, PipeTest> currentPipeTest = getCurrentPipeTest();
