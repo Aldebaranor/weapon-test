@@ -85,6 +85,9 @@ public class PumpController {
                 EquipmentLaunchStatus equipmentLaunchStatus = JsonUtils.deserialize(JsonUtils.serialize(msg), EquipmentLaunchStatus.class);
 
                 String keyAll = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY,getTime());
+                String keyTarget = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + Constant.TARGET_ID
+                        ,getTime());
+                // 以发射的武器id为KEY存储
                 if (RedisUtils.getService(config.getPumpDataBase()).exists(keyAll)){
                     RedisUtils.getService(config.getPumpDataBase()).
                             boundHashOps(keyAll).put(
@@ -94,6 +97,17 @@ public class PumpController {
                             boundHashOps(keyAll).put(
                             equipmentLaunchStatus.getEquipmentId(), JsonUtils.serialize(equipmentLaunchStatus));
                     RedisUtils.getService(config.getPumpDataBase()).expire(keyAll,ONE_DAY);
+                }
+                // 以目标id为KEY存储
+                if (RedisUtils.getService(config.getPumpDataBase()).exists(keyTarget)){
+                    RedisUtils.getService(config.getPumpDataBase()).
+                            boundHashOps(keyTarget).put(
+                            equipmentLaunchStatus.getTargetId(), JsonUtils.serialize(equipmentLaunchStatus));
+                }else{
+                    RedisUtils.getService(config.getPumpDataBase()).
+                            boundHashOps(keyTarget).put(
+                            equipmentLaunchStatus.getTargetId(), JsonUtils.serialize(equipmentLaunchStatus));
+                    RedisUtils.getService(config.getPumpDataBase()).expire(keyTarget,ONE_DAY);
                 }
 
                 String key = String.format("%s_%s:%s",Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY,equipmentLaunchStatus.getEquipmentId(),getTime());
@@ -140,14 +154,32 @@ public class PumpController {
             }break;
             case "LauncherRotationInfo": {
 
+                LauncherRotationInfo launcherRotationInfo=JsonUtils.deserialize(JsonUtils.serialize(msg),LauncherRotationInfo.class);
+
                 String key=String.format("%s:%s",Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY,getTime());
+
+                String key2=String.format("%s:%s",Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY+Constant.TARGET_ID,getTime());
+
+                // 以发射架id为KEY存储
                 if(RedisUtils.getService(config.getPumpDataBase()).exists(key)){
-                    RedisUtils.getService(config.getPumpDataBase()).extrasForValue().set(
-                            key, JsonUtils.serialize(msg));
+                    RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key).
+                            put(launcherRotationInfo.getLauncherId(),JsonUtils.serialize(launcherRotationInfo));
+
                 }else{
-                    RedisUtils.getService(config.getPumpDataBase()).extrasForValue().set(
-                            key, JsonUtils.serialize(msg));
+                    RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key).
+                            put(launcherRotationInfo.getLauncherId(),JsonUtils.serialize(launcherRotationInfo));
                     RedisUtils.getService(config.getPumpDataBase()).expire(key,ONE_DAY);
+                }
+
+                // 以目标id为KEY存储
+                if(RedisUtils.getService(config.getPumpDataBase()).exists(key2)){
+                    RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key2).
+                            put(launcherRotationInfo.getTargetId(),JsonUtils.serialize(launcherRotationInfo));
+
+                }else{
+                    RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key2).
+                            put(launcherRotationInfo.getTargetId(),JsonUtils.serialize(launcherRotationInfo));
+                    RedisUtils.getService(config.getPumpDataBase()).expire(key2,ONE_DAY);
                 }
 
             }break;
@@ -200,17 +232,17 @@ public class PumpController {
             case "TargetInstructionsInfo": {
                 TargetInstructionsInfo targetInstructionsInfo = JsonUtils.deserialize(JsonUtils.serialize(msg),
                         TargetInstructionsInfo.class);
+//                // 目标指示历史报文
+//                RedisUtils.getService(config.getPumpDataBase()).getTemplate().boundHashOps(
+//                        Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY).put(targetInstructionsInfo.getTargetId(),
+//                        JsonUtils.serialize(targetInstructionsInfo));
+//
+//                // 根据每个目标id存的目标指示历史报文
+//                RedisUtils.getService(config.getPumpDataBase()).getTemplate().boundListOps(
+//                        Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY+"_"+targetInstructionsInfo.getTargetId()).
+//                        leftPush(JsonUtils.serialize(targetInstructionsInfo));
+
                 // 目标指示历史报文
-                RedisUtils.getService(config.getPumpDataBase()).getTemplate().boundHashOps(
-                        Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY).put(targetInstructionsInfo.getTargetId(),
-                        JsonUtils.serialize(targetInstructionsInfo));
-
-                // 根据每个目标id存的目标指示历史报文
-                RedisUtils.getService(config.getPumpDataBase()).getTemplate().boundListOps(
-                        Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY+"_"+targetInstructionsInfo.getTargetId()).
-                        leftPush(JsonUtils.serialize(targetInstructionsInfo));
-
-                // 目标真值历史报文
                 String keyAll = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY,getTime());
                 if (RedisUtils.getService(config.getPumpDataBase()).exists(keyAll)){
                     RedisUtils.getService(config.getPumpDataBase()).boundHashOps(keyAll).
@@ -223,7 +255,7 @@ public class PumpController {
                     RedisUtils.getService(config.getPumpDataBase()).expire(keyAll,ONE_DAY);
                 }
 
-                // 根据每个目标id存的目标真值历史报文
+                // 根据每个目标id存的目标指示历史报文
                 String key = String.format("%s_%s:%s",Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY,
                         targetInstructionsInfo.getTargetId(),getTime());
                 if ( RedisUtils.getService(config.getPumpDataBase()).exists(key)){
@@ -278,7 +310,7 @@ public class PumpController {
                 EquipmentLaunchStatus equipmentLaunchStatus1=new EquipmentLaunchStatus();
                 equipmentLaunchStatus1.setSender("1");
                 equipmentLaunchStatus1.setMsgTime(System.currentTimeMillis());
-                equipmentLaunchStatus1.setEquipmentId("6");
+                equipmentLaunchStatus1.setEquipmentId("2");
                 equipmentLaunchStatus1.setEquipmentMode("6");
                 equipmentLaunchStatus1.setTime(System.currentTimeMillis());
                 equipmentLaunchStatus1.setTargetId("6");
@@ -289,9 +321,9 @@ public class PumpController {
                 EquipmentLaunchStatus equipmentLaunchStatus2=new EquipmentLaunchStatus();
                 equipmentLaunchStatus2.setSender("2");
                 equipmentLaunchStatus2.setMsgTime(System.currentTimeMillis());
-                equipmentLaunchStatus2.setEquipmentId("2");
+                equipmentLaunchStatus2.setEquipmentId("1");
                 equipmentLaunchStatus2.setEquipmentMode("2");
-                equipmentLaunchStatus2.setTime(111L);
+                equipmentLaunchStatus2.setTime(System.currentTimeMillis());
                 equipmentLaunchStatus2.setTargetId("2");
                 equipmentLaunchStatus2.setTargetTypeId("6");
                 equipmentLaunchStatus2.setLaunchAzimuth(0.1f);
@@ -359,18 +391,47 @@ public class PumpController {
                 return responseEntity.toString();
             }
             case "LauncherRotationInfo": {
-                return JsonUtils.serialize(new LauncherRotationInfo());
+                LauncherRotationInfo launcherRotationInfo = new LauncherRotationInfo();
+                launcherRotationInfo.setLauncherId("1");
+                launcherRotationInfo.setAzimuth(1.0f);
+                launcherRotationInfo.setPitchAngle(2.0f);
+                launcherRotationInfo.setLauncherTypeId("0");
+                launcherRotationInfo.setTargetId("2");
+                launcherRotationInfo.setTargetTypeId("2");
+                launcherRotationInfo.setTime(System.currentTimeMillis());
+                launcherRotationInfo.setMsgTime(System.currentTimeMillis());
+
+                LauncherRotationInfo launcherRotationInfo2 = new LauncherRotationInfo();
+                launcherRotationInfo2.setLauncherId("1");
+                launcherRotationInfo2.setAzimuth(3.0f);
+                launcherRotationInfo2.setPitchAngle(2.2f);
+                launcherRotationInfo2.setLauncherTypeId("0");
+                launcherRotationInfo2.setTargetId("6");
+                launcherRotationInfo2.setTargetTypeId("1");
+                launcherRotationInfo2.setTime(System.currentTimeMillis());
+                launcherRotationInfo2.setMsgTime(System.currentTimeMillis());
+
+                HttpEntity<Object> request = new HttpEntity<>(launcherRotationInfo, headers);
+                ResponseEntity<String> responseEntity = restTemplate.postForEntity(
+                        "http://127.0.0.1:8016/free/pump/" + structName, request, String.class);
+
+                HttpEntity<Object> request2 = new HttpEntity<>(launcherRotationInfo2, headers);
+                ResponseEntity<String> responseEntity2 = restTemplate.postForEntity(
+                        "http://127.0.0.1:8016/free/pump/" + structName, request2, String.class);
+
+                return responseEntity2.toString();
             }
             case "TargetFireControlInfo": {
                 TargetFireControlInfo targetFireControlInfo=new TargetFireControlInfo();
                 targetFireControlInfo.setTargetId("2");
-                targetFireControlInfo.setSender("2");
-                targetFireControlInfo.setTime(111L);
-                targetFireControlInfo.setTargetTypeId("2");
+                targetFireControlInfo.setSender("1");
+                targetFireControlInfo.setTime(System.currentTimeMillis());
+                targetFireControlInfo.setTargetTypeId("1");
                 targetFireControlInfo.setMsgTime(System.currentTimeMillis());
                 targetFireControlInfo.setDistance(1f);
                 targetFireControlInfo.setSpeed(2f);
                 targetFireControlInfo.setPitchAngle(2f);
+
 
                 HttpEntity<Object> request2 = new HttpEntity<>(targetFireControlInfo, headers);
                 ResponseEntity<String> responseEntity = restTemplate.postForEntity(
@@ -382,7 +443,7 @@ public class PumpController {
                 TargetInfo tarInfo = new TargetInfo();
                 tarInfo.setSender("xxx");
                 tarInfo.setMsgTime(100L);
-                tarInfo.setTime(100L);
+                tarInfo.setTime(System.currentTimeMillis());
                 tarInfo.setTargetId("6");
                 tarInfo.setTargetTypeId("6");
                 tarInfo.setDistance(9.0F);
@@ -394,7 +455,7 @@ public class PumpController {
                 TargetInfo tarInfo2 = new TargetInfo();
                 tarInfo2.setSender("xxx");
                 tarInfo2.setMsgTime(104L);
-                tarInfo2.setTime(111L);
+                tarInfo2.setTime(System.currentTimeMillis());
                 tarInfo2.setTargetId("2");
                 tarInfo2.setTargetTypeId("2");
                 tarInfo2.setDistance(6.0F);
@@ -406,7 +467,7 @@ public class PumpController {
                 TargetInfo tarInfo3 = new TargetInfo();
                 tarInfo3.setSender("xxx");
                 tarInfo3.setMsgTime(104L);
-                tarInfo3.setTime(108L);
+                tarInfo3.setTime(System.currentTimeMillis());
                 tarInfo3.setTargetId("6");
                 tarInfo3.setTargetTypeId("6");
                 tarInfo3.setDistance(3.0F);
@@ -432,9 +493,9 @@ public class PumpController {
                 TargetInstructionsInfo targetInstructionsInfo = new TargetInstructionsInfo();
                 targetInstructionsInfo.setSender("xxx");
                 targetInstructionsInfo.setMsgTime(100L);
-                targetInstructionsInfo.setTime(100L);
+                targetInstructionsInfo.setTime(System.currentTimeMillis());
                 targetInstructionsInfo.setTargetId("6");
-                targetInstructionsInfo.setTargetTypeId("6");
+                targetInstructionsInfo.setTargetTypeId("对空目标");
                 targetInstructionsInfo.setDistance(8.8F);
                 targetInstructionsInfo.setSpeed(9.1F);
                 targetInstructionsInfo.setAzimuth(9.2F);
@@ -444,9 +505,9 @@ public class PumpController {
                 TargetInstructionsInfo targetInstructionsInfo2 = new TargetInstructionsInfo();
                 targetInstructionsInfo2.setSender("xxx");
                 targetInstructionsInfo2.setMsgTime(103L);
-                targetInstructionsInfo2.setTime(103L);
-                targetInstructionsInfo2.setTargetId("6");
-                targetInstructionsInfo2.setTargetTypeId("6");
+                targetInstructionsInfo2.setTime(System.currentTimeMillis());
+                targetInstructionsInfo2.setTargetId("2");
+                targetInstructionsInfo2.setTargetTypeId("对空目标");
                 targetInstructionsInfo2.setDistance(6.8F);
                 targetInstructionsInfo2.setSpeed(6.2F);
                 targetInstructionsInfo2.setAzimuth(5.7F);
@@ -468,14 +529,13 @@ public class PumpController {
                 HttpEntity<Object> request = new HttpEntity<>(targetInstructionsInfo, headers);
                 restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName,
                         request, String.class).toString();
+                HttpEntity<Object> request2 = new HttpEntity<>(targetInstructionsInfo3, headers);
+                restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName,
+                        request2, String.class).toString();
 
                 HttpEntity<Object> request1 = new HttpEntity<>(targetInstructionsInfo2, headers);
-                restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName,
-                        request1, String.class).toString();
-
-                HttpEntity<Object> request2 = new HttpEntity<>(targetInstructionsInfo3, headers);
                 return restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName,
-                        request2, String.class).toString();
+                        request1, String.class).toString();
 
             }
             default: {

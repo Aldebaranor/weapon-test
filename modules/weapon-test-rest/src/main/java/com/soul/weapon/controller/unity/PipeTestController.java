@@ -3,8 +3,10 @@ package com.soul.weapon.controller.unity;
 
 import com.egova.web.annotation.Api;
 //import com.soul.weapon.algorithm.AlgoFactoryContext;
+import com.soul.weapon.algorithm.AllAlgorithm;
 import com.soul.weapon.entity.PipeTest;
 import com.soul.weapon.model.MissileWeapon;
+import com.soul.weapon.model.StateAnalysisTimeReport;
 import com.soul.weapon.service.PipeTestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +25,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PipeTestController {
 
-//    @Autowired
-//    private AlgoFactoryContext ctx;
-
     private final PipeTestService pipeTestService;
+    private final AllAlgorithm allAlgorithm;
 
     @Api
     @GetMapping(value = "/{id}")
@@ -34,14 +34,6 @@ public class PipeTestController {
     {
         return pipeTestService.getById(id);
     }
-//
-//    @Api
-//    @PostMapping(value = "/exec/{algorithm}")
-//    public void execAlgo(@PathVariable("algorithm") String algorithm,@RequestBody List<MissileWeapon> missileInfo)
-//    {
-//        System.out.println(missileInfo.toString());
-//        ctx.execAlgo(algorithm, missileInfo.toString());
-//    }
 
     @Api
     @GetMapping(value = "/list-all")
@@ -72,6 +64,16 @@ public class PipeTestController {
     @DeleteMapping(value = "/{id}")
     public int deleteById(@PathVariable String id) {
         return pipeTestService.deleteById(id);
+    }
+
+    @Api
+    @PostMapping(value = "/defend/{type}")
+    public List<StateAnalysisTimeReport> getDefendInfo(@PathVariable String type){
+        if(type.equals("underWater")){
+            return allAlgorithm.getUnderWaterDefendInfo();
+        }else if(type.equals("toAir")){
+            return allAlgorithm.getAirDefendInfo();
+        }else return null;
     }
 
 }
