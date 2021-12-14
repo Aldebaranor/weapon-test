@@ -1363,25 +1363,46 @@ public class AllAlgorithm {
             stateAnalysisTimeReport.setId(targetId);
             stateAnalysisTimeReport.setInstructionTime(targetInstructionsInfo.getTime());
 
-            TargetFireControlInfo targetFireControlInfo = JsonUtils.deserialize(RedisUtils.getService(
-                    config.getPumpDataBase()).boundHashOps(Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY).get(targetId),
-                    TargetFireControlInfo.class);
+            Map<String,String> allFireControlInfo = RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
+                    fireControlKey).entries();
+            if(allFireControlInfo==null) continue;
 
+            String temp = allFireControlInfo.get(targetId);
+            if(temp==null) continue;
+            TargetFireControlInfo targetFireControlInfo = JsonUtils.deserialize(
+                    temp,
+                    TargetFireControlInfo.class);
             if(targetFireControlInfo==null) continue;
             stateAnalysisTimeReport.setFireControlTime(targetFireControlInfo.getTime());
 
-            LauncherRotationInfo launcherRotationInfo = JsonUtils.deserialize(RedisUtils.getService(
-                    config.getPumpDataBase()).boundHashOps(Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY+
-                        Constant.TARGET_ID).get(targetId), LauncherRotationInfo.class);
+            launcherKey = String.format("%s:%s", Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY + Constant.TARGET_ID, getTime());
+            Map<String,String> allLauncherRotationInfo = RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
+                    launcherKey).entries();
+            if(allLauncherRotationInfo==null) continue;
 
+            temp = allLauncherRotationInfo.get(targetId);
+            if(temp==null) continue;
+
+            LauncherRotationInfo launcherRotationInfo = JsonUtils.deserialize(
+                    temp,
+                    LauncherRotationInfo.class);
             if(launcherRotationInfo==null) continue;
-            stateAnalysisTimeReport.setFireControlTime(launcherRotationInfo.getTime());
 
-            EquipmentLaunchStatus equipmentLaunchStatus = JsonUtils.deserialize(RedisUtils.getService(
-                    config.getPumpDataBase()).boundHashOps(Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY).get(targetId),
-                    EquipmentLaunchStatus.class
-            );
+            stateAnalysisTimeReport.setLauncherRotationTime(launcherRotationInfo.getTime());
+
+            fireKey =String.format("%s:%s",Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + Constant.TARGET_ID,getTime());
+            Map<String,String> allEquipmentLaunchStatus = RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
+                    fireKey).entries();
+            if(allEquipmentLaunchStatus==null) continue;
+
+            temp = allEquipmentLaunchStatus.get(targetId);
+            if(temp==null) continue;
+
+            EquipmentLaunchStatus equipmentLaunchStatus = JsonUtils.deserialize(
+                    temp,
+                    EquipmentLaunchStatus.class);
             if(equipmentLaunchStatus==null) continue;
+
             stateAnalysisTimeReport.setFireTime(equipmentLaunchStatus.getTime());
 
             stateAnalysisTimeReportList.add(stateAnalysisTimeReport);
@@ -1411,7 +1432,7 @@ public class AllAlgorithm {
         }
         String fireKey =String.format("%s:%s",Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY,getTime());
         if(Boolean.FALSE.equals(template.hasKey(fireKey))){
-            log.error("从Redis中获取发射架调转信息失败！");
+            log.error("从Redis中获取武器发射信息失败！");
             return null;
         }
         String launcherKey = String.format("%s:%s", Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY, getTime());
@@ -1440,25 +1461,46 @@ public class AllAlgorithm {
             stateAnalysisTimeReport.setId(targetId);
             stateAnalysisTimeReport.setInstructionTime(targetInstructionsInfo.getTime());
 
-            TargetFireControlInfo targetFireControlInfo = JsonUtils.deserialize(RedisUtils.getService(
-                    config.getPumpDataBase()).boundHashOps(Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY).get(targetId),
-                    TargetFireControlInfo.class);
+            Map<String,String> allFireControlInfo = RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
+                    fireControlKey).entries();
+            if(allFireControlInfo==null) continue;
 
+            String temp = allFireControlInfo.get(targetId);
+            if(temp==null) continue;
+            TargetFireControlInfo targetFireControlInfo = JsonUtils.deserialize(
+                    temp,
+                    TargetFireControlInfo.class);
             if(targetFireControlInfo==null) continue;
             stateAnalysisTimeReport.setFireControlTime(targetFireControlInfo.getTime());
 
-            LauncherRotationInfo launcherRotationInfo = JsonUtils.deserialize(RedisUtils.getService(
-                    config.getPumpDataBase()).boundHashOps(Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY+
-                    Constant.TARGET_ID).get(targetId), LauncherRotationInfo.class);
+            launcherKey = String.format("%s:%s", Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY + Constant.TARGET_ID, getTime());
+            Map<String,String> allLauncherRotationInfo = RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
+                    launcherKey).entries();
+            if(allLauncherRotationInfo==null) continue;
 
+            temp = allLauncherRotationInfo.get(targetId);
+            if(temp==null) continue;
+
+            LauncherRotationInfo launcherRotationInfo = JsonUtils.deserialize(
+                    temp,
+                    LauncherRotationInfo.class);
             if(launcherRotationInfo==null) continue;
-            stateAnalysisTimeReport.setFireControlTime(launcherRotationInfo.getTime());
 
-            EquipmentLaunchStatus equipmentLaunchStatus = JsonUtils.deserialize(RedisUtils.getService(
-                    config.getPumpDataBase()).boundHashOps(Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY).get(targetId),
-                    EquipmentLaunchStatus.class
-            );
+            stateAnalysisTimeReport.setLauncherRotationTime(launcherRotationInfo.getTime());
+
+            fireKey =String.format("%s:%s",Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + Constant.TARGET_ID,getTime());
+            Map<String,String> allEquipmentLaunchStatus = RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
+                    fireKey).entries();
+            if(allEquipmentLaunchStatus==null) continue;
+
+            temp = allEquipmentLaunchStatus.get(targetId);
+            if(temp==null) continue;
+
+            EquipmentLaunchStatus equipmentLaunchStatus = JsonUtils.deserialize(
+                    temp,
+                    EquipmentLaunchStatus.class);
             if(equipmentLaunchStatus==null) continue;
+
             stateAnalysisTimeReport.setFireTime(equipmentLaunchStatus.getTime());
 
             stateAnalysisTimeReportList.add(stateAnalysisTimeReport);
