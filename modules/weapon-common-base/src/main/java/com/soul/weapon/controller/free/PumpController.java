@@ -85,6 +85,9 @@ public class PumpController {
                 EquipmentLaunchStatus equipmentLaunchStatus = JsonUtils.deserialize(JsonUtils.serialize(msg), EquipmentLaunchStatus.class);
 
                 String keyAll = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY,getTime());
+                String keyTarget = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + Constant.TARGET_ID
+                        ,getTime());
+                // 以发射的武器id为KEY存储
                 if (RedisUtils.getService(config.getPumpDataBase()).exists(keyAll)){
                     RedisUtils.getService(config.getPumpDataBase()).
                             boundHashOps(keyAll).put(
@@ -94,6 +97,17 @@ public class PumpController {
                             boundHashOps(keyAll).put(
                             equipmentLaunchStatus.getEquipmentId(), JsonUtils.serialize(equipmentLaunchStatus));
                     RedisUtils.getService(config.getPumpDataBase()).expire(keyAll,ONE_DAY);
+                }
+                // 以目标id为KEY存储
+                if (RedisUtils.getService(config.getPumpDataBase()).exists(keyTarget)){
+                    RedisUtils.getService(config.getPumpDataBase()).
+                            boundHashOps(keyTarget).put(
+                            equipmentLaunchStatus.getTargetId(), JsonUtils.serialize(equipmentLaunchStatus));
+                }else{
+                    RedisUtils.getService(config.getPumpDataBase()).
+                            boundHashOps(keyTarget).put(
+                            equipmentLaunchStatus.getTargetId(), JsonUtils.serialize(equipmentLaunchStatus));
+                    RedisUtils.getService(config.getPumpDataBase()).expire(keyTarget,ONE_DAY);
                 }
 
                 String key = String.format("%s_%s:%s",Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY,equipmentLaunchStatus.getEquipmentId(),getTime());
@@ -140,14 +154,32 @@ public class PumpController {
             }break;
             case "LauncherRotationInfo": {
 
+                LauncherRotationInfo launcherRotationInfo=JsonUtils.deserialize(JsonUtils.serialize(msg),LauncherRotationInfo.class);
+
                 String key=String.format("%s:%s",Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY,getTime());
+
+                String key2=String.format("%s:%s",Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY+Constant.TARGET_ID,getTime());
+
+                // 以发射架id为KEY存储
                 if(RedisUtils.getService(config.getPumpDataBase()).exists(key)){
-                    RedisUtils.getService(config.getPumpDataBase()).extrasForValue().set(
-                            key, JsonUtils.serialize(msg));
+                    RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key).
+                            put(launcherRotationInfo.getLauncherId(),JsonUtils.serialize(launcherRotationInfo));
+
                 }else{
-                    RedisUtils.getService(config.getPumpDataBase()).extrasForValue().set(
-                            key, JsonUtils.serialize(msg));
+                    RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key).
+                            put(launcherRotationInfo.getLauncherId(),JsonUtils.serialize(launcherRotationInfo));
                     RedisUtils.getService(config.getPumpDataBase()).expire(key,ONE_DAY);
+                }
+
+                // 以目标id为KEY存储
+                if(RedisUtils.getService(config.getPumpDataBase()).exists(key2)){
+                    RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key2).
+                            put(launcherRotationInfo.getTargetId(),JsonUtils.serialize(launcherRotationInfo));
+
+                }else{
+                    RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key2).
+                            put(launcherRotationInfo.getTargetId(),JsonUtils.serialize(launcherRotationInfo));
+                    RedisUtils.getService(config.getPumpDataBase()).expire(key2,ONE_DAY);
                 }
 
             }break;

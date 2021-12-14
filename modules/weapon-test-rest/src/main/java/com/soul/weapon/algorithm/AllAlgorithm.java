@@ -9,6 +9,7 @@ import com.soul.weapon.config.Constant;
 import com.soul.weapon.entity.*;
 import com.soul.weapon.entity.historyInfo.*;
 import com.soul.weapon.entity.enums.PipeWeaponIndices;
+import com.soul.weapon.model.StateAnalysisTimeReport;
 import com.soul.weapon.model.dds.*;
 import com.soul.weapon.service.*;
 import com.soul.weapon.utils.MathUtils;
@@ -1308,6 +1309,161 @@ public class AllAlgorithm {
      */
     public Boolean IsStart(String taskId, PipeTest pipeTest) {
         return StringUtils.isEmpty(taskId) || pipeTest == null;
+    }
+
+
+    /**
+     * 获得水下防御时间节点信息
+     * @return 水下防御事件的时间节点列表
+     */
+    public List<StateAnalysisTimeReport> getUnderWaterDefendInfo(){
+
+        List<StateAnalysisTimeReport> stateAnalysisTimeReportList = new ArrayList<>();
+
+        String target_key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, getTime());
+
+        StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
+        if (Boolean.FALSE.equals(template.hasKey(target_key))) {
+            log.error("从Redis中获取目标指示信息失败！");
+            return null;
+        }
+        String fireControlKey = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, getTime());
+        if (Boolean.FALSE.equals(template.hasKey(fireControlKey))) {
+            log.error("从Redis中获取目标火控信息失败！");
+            return null;
+        }
+        String fireKey =String.format("%s:%s",Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY,getTime());
+        if(Boolean.FALSE.equals(template.hasKey(fireKey))){
+            log.error("从Redis中获取发射架调转信息失败！");
+            return null;
+        }
+        String launcherKey = String.format("%s:%s", Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY, getTime());
+        if (Boolean.FALSE.equals(template.hasKey(launcherKey))) {
+            log.error("从Redis中获取发射架调转信息失败！");
+            return null;
+        }
+
+        Map<String,String> allInstructionsInfo = RedisUtils.getService(config.getPumpDataBase())
+                .boundHashOps(target_key).entries();
+
+        if(allInstructionsInfo==null) return null;
+
+        Map<String,TargetInstructionsInfo> targetInstructionsInfoMap = allInstructionsInfo.entrySet().stream().collect(
+                Collectors.toMap(
+                        Map.Entry::getKey,
+                        pair->JsonUtils.deserialize(pair.getValue(),TargetInstructionsInfo.class)
+                ));
+
+        for(TargetInstructionsInfo targetInstructionsInfo:targetInstructionsInfoMap.values()){
+
+            if(!targetInstructionsInfo.getTargetTypeId().equals("水下目标")) continue;
+            StateAnalysisTimeReport stateAnalysisTimeReport = new StateAnalysisTimeReport();
+            String targetId = targetInstructionsInfo.getTargetId();
+
+            stateAnalysisTimeReport.setId(targetId);
+            stateAnalysisTimeReport.setInstructionTime(targetInstructionsInfo.getTime());
+
+            TargetFireControlInfo targetFireControlInfo = JsonUtils.deserialize(RedisUtils.getService(
+                    config.getPumpDataBase()).boundHashOps(Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY).get(targetId),
+                    TargetFireControlInfo.class);
+
+            if(targetFireControlInfo==null) continue;
+            stateAnalysisTimeReport.setFireControlTime(targetFireControlInfo.getTime());
+
+            LauncherRotationInfo launcherRotationInfo = JsonUtils.deserialize(RedisUtils.getService(
+                    config.getPumpDataBase()).boundHashOps(Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY+
+                        Constant.TARGET_ID).get(targetId), LauncherRotationInfo.class);
+
+            if(launcherRotationInfo==null) continue;
+            stateAnalysisTimeReport.setFireControlTime(launcherRotationInfo.getTime());
+
+            EquipmentLaunchStatus equipmentLaunchStatus = JsonUtils.deserialize(RedisUtils.getService(
+                    config.getPumpDataBase()).boundHashOps(Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY).get(targetId),
+                    EquipmentLaunchStatus.class
+            );
+            if(equipmentLaunchStatus==null) continue;
+            stateAnalysisTimeReport.setFireTime(equipmentLaunchStatus.getTime());
+
+            stateAnalysisTimeReportList.add(stateAnalysisTimeReport);
+        }
+        return stateAnalysisTimeReportList;
+    }
+
+    /**
+     * 获得对空防御时间节点信息
+     * @return 对空防御事件的时间节点列表
+     */
+    public List<StateAnalysisTimeReport> getAirDefendInfo(){
+
+        List<StateAnalysisTimeReport> stateAnalysisTimeReportList = new ArrayList<>();
+
+        String target_key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, getTime());
+
+        StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
+        if (Boolean.FALSE.equals(template.hasKey(target_key))) {
+            log.error("从Redis中获取目标指示信息失败！");
+            return null;
+        }
+        String fireControlKey = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, getTime());
+        if (Boolean.FALSE.equals(template.hasKey(fireControlKey))) {
+            log.error("从Redis中获取目标火控信息失败！");
+            return null;
+        }
+        String fireKey =String.format("%s:%s",Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY,getTime());
+        if(Boolean.FALSE.equals(template.hasKey(fireKey))){
+            log.error("从Redis中获取发射架调转信息失败！");
+            return null;
+        }
+        String launcherKey = String.format("%s:%s", Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY, getTime());
+        if (Boolean.FALSE.equals(template.hasKey(launcherKey))) {
+            log.error("从Redis中获取发射架调转信息失败！");
+            return null;
+        }
+
+        Map<String,String> allInstructionsInfo = RedisUtils.getService(config.getPumpDataBase())
+                .boundHashOps(target_key).entries();
+
+        if(allInstructionsInfo==null) return null;
+
+        Map<String,TargetInstructionsInfo> targetInstructionsInfoMap = allInstructionsInfo.entrySet().stream().collect(
+                Collectors.toMap(
+                        Map.Entry::getKey,
+                        pair->JsonUtils.deserialize(pair.getValue(),TargetInstructionsInfo.class)
+                ));
+
+        for(TargetInstructionsInfo targetInstructionsInfo:targetInstructionsInfoMap.values()){
+
+            if(!targetInstructionsInfo.getTargetTypeId().equals("对空目标")) continue;
+            StateAnalysisTimeReport stateAnalysisTimeReport = new StateAnalysisTimeReport();
+            String targetId = targetInstructionsInfo.getTargetId();
+
+            stateAnalysisTimeReport.setId(targetId);
+            stateAnalysisTimeReport.setInstructionTime(targetInstructionsInfo.getTime());
+
+            TargetFireControlInfo targetFireControlInfo = JsonUtils.deserialize(RedisUtils.getService(
+                    config.getPumpDataBase()).boundHashOps(Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY).get(targetId),
+                    TargetFireControlInfo.class);
+
+            if(targetFireControlInfo==null) continue;
+            stateAnalysisTimeReport.setFireControlTime(targetFireControlInfo.getTime());
+
+            LauncherRotationInfo launcherRotationInfo = JsonUtils.deserialize(RedisUtils.getService(
+                    config.getPumpDataBase()).boundHashOps(Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY+
+                    Constant.TARGET_ID).get(targetId), LauncherRotationInfo.class);
+
+            if(launcherRotationInfo==null) continue;
+            stateAnalysisTimeReport.setFireControlTime(launcherRotationInfo.getTime());
+
+            EquipmentLaunchStatus equipmentLaunchStatus = JsonUtils.deserialize(RedisUtils.getService(
+                    config.getPumpDataBase()).boundHashOps(Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY).get(targetId),
+                    EquipmentLaunchStatus.class
+            );
+            if(equipmentLaunchStatus==null) continue;
+            stateAnalysisTimeReport.setFireTime(equipmentLaunchStatus.getTime());
+
+            stateAnalysisTimeReportList.add(stateAnalysisTimeReport);
+        }
+        return stateAnalysisTimeReportList;
     }
 
 }
