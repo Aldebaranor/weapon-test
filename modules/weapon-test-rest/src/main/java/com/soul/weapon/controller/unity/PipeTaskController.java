@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * @Author: nash5
@@ -25,7 +26,7 @@ import java.util.List;
  */
 @Slf4j
 @RestController
-@RequestMapping("/pipe/unity/task")
+@RequestMapping("/unity/task")
 @RequiredArgsConstructor
 public class PipeTaskController {
 
@@ -98,6 +99,10 @@ public class PipeTaskController {
         if (pipeTaskService.getById(taskId) == null) {
             throw ExceptionUtils.api("没有找到该任务", new Object[0]);
         }
+        pipeTests.stream().forEach(pipeTest -> {
+            pipeTest.setId(UUID.randomUUID().toString());
+            pipeTest.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        });
         pipeTestService.insertList(pipeTests);
 
     }

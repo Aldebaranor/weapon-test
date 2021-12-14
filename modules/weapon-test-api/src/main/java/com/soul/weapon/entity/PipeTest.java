@@ -41,6 +41,7 @@ public class PipeTest extends BaseEntity {
     @Column(name = "code")
     private String code;
 
+    //TODO
     @Display("测试类别")
     @Column(name = "type")
     private PipeTestType pipeTest;
