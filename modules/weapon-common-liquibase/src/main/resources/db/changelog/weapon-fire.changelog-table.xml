@@ -151,50 +151,13 @@
             <column name="id" value="weapon_test"></column>
             <column name="name" value="火力兼容"></column>
         </insert>
-
-        <insert tableName="com_dictionary_item">
-            <column name="id" value="00001"></column>
-            <column name="code" value="weapon-type1"></column>
-            <column name="value" value="1"></column>
-            <column name="text" value="硬杀伤WQ"></column>
-            <column name="icon" value=""></column>
-            <column name="type" value="weapon-test:weapon-type"></column>
-            <column name="phonetic" value=""></column>
-            <column name="parentId" value=""></column>
-            <column name="groupId" value="weapon-test"></column>
-            <column name="sort" value="0"></column>
-        </insert>
-        <insert tableName="com_dictionary_item">
-            <column name="id" value="00002"></column>
-            <column name="code" value="weapon-type2"></column>
-            <column name="value" value="2"></column>
-            <column name="text" value="软杀伤WQ"></column>
-            <column name="icon" value=""></column>
-            <column name="type" value="weapon-test:weapon-type"></column>
-            <column name="phonetic" value=""></column>
-            <column name="parentId" value=""></column>
-            <column name="groupId" value="weapon-test"></column>
-            <column name="sort" value="0"></column>
-        </insert>
-        <insert tableName="com_dictionary_item">
-            <column name="id" value="00003"></column>
-            <column name="code" value="weapon-type3"></column>
-            <column name="value" value="3"></column>
-            <column name="text" value="传感器"></column>
-            <column name="icon" value=""></column>
-            <column name="type" value="weapon-test:weapon-type"></column>
-            <column name="phonetic" value=""></column>
-            <column name="parentId" value=""></column>
-            <column name="groupId" value="weapon-test"></column>
-            <column name="sort" value="0"></column>
-        </insert>
     </changeSet>
 
     <changeSet id="1630288315483-9" author="nemo">
         <sqlFile path="fire_weapon.sql"/>
     </changeSet>
     <changeSet id="1630288315484-10" author="dxq">
-        <sqlFile path="weapon_test_type.sql"/>
+        <sqlFile path="com_dictionary_item.sql"/>
     </changeSet>
 
 </databaseChangeLog>

@@ -118,41 +118,7 @@
             <column name="pipeTestId" remarks="外键-测试项id" type="VARCHAR(50)"/>
         </createTable>
     </changeSet>
-   <!-- <changeSet author="nash5 (generated)" id="1630566618258-6">
-        <createIndex indexName="pipeTestId" tableName="pipe_history">
-            <column name="pipeTestId"/>
-        </createIndex>
-    </changeSet>
-    <changeSet author="nash5 (generated)" id="1630566618258-7">
-        <createIndex indexName="taskId" tableName="pipe_history">
-            <column name="taskId"/>
-        </createIndex>
-    </changeSet>
-    <changeSet author="nash5 (generated)" id="1630566618258-8">
-        <createIndex indexName="taskId" tableName="pipe_test">
-            <column name="taskId"/>
-        </createIndex>
-    </changeSet>
-    <changeSet author="nash5 (generated)" id="1630566618258-9">
-        <createIndex indexName="taskId" tableName="pipe_self_check">
-            <column name="taskId"/>
-        </createIndex>
-    </changeSet>
--->
-<!--
-    <changeSet author="nash5 (generated)" id="1630566618258-11">
-        <addForeignKeyConstraint baseColumnNames="taskId" baseTableName="pipe_history" constraintName="pipe_history_ibfk_1" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="pipe_task" validate="true"/>
-    </changeSet>
-    <changeSet author="nash5 (generated)" id="1630566618258-12">
-        <addForeignKeyConstraint baseColumnNames="pipeTestId" baseTableName="pipe_history" constraintName="pipe_history_ibfk_2" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="pipe_test" validate="true"/>
-    </changeSet>
-    <changeSet author="nash5 (generated)" id="1630566618258-13">
-        <addForeignKeyConstraint baseColumnNames="taskId" baseTableName="pipe_test" constraintName="pipe_test_ibfk_1" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="pipe_task" validate="true"/>
-    </changeSet>
-    <changeSet author="nash5 (generated)" id="1630566618258-14">
-        <addForeignKeyConstraint baseColumnNames="taskId" baseTableName="pipe_self_check" constraintName="pipe_self_check_ibfk_1" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="id" referencedTableName="pipe_task" validate="true"/>
-    </changeSet>
--->
+
 
     <changeSet id="1630566618258-15" author="xinlai">
         <sqlFile path="pipe_advice.sql"/>
