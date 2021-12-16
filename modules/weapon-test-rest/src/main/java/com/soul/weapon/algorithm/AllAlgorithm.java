@@ -13,14 +13,13 @@ import com.soul.weapon.model.StateAnalysisTimeReport;
 import com.soul.weapon.model.dds.*;
 import com.soul.weapon.service.*;
 import com.soul.weapon.utils.MathUtils;
+import com.soul.weapon.utils.DateParserUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -37,8 +36,6 @@ public class AllAlgorithm {
     private final PipeTaskService pipeTaskService;
 
     private final PipeTestService pipeTestService;
-
-    private final DictionaryItemService DictionaryItemService;
 
     /**
      * 不执行算法返回值
@@ -125,7 +122,7 @@ public class AllAlgorithm {
             PIPETEST_CYCLE_THRESHOLD = Long.parseLong(pipeTest.getThreshold());
         }
 
-        String key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
+        String key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, DateParserUtils.getTime());
         if (!Boolean.TRUE.equals(RedisUtils.getService(config.getPumpDataBase()).getTemplate()
                 .hasKey(key))) {
             log.error("从Redis中获取装备信息失败！-1");
@@ -208,7 +205,7 @@ public class AllAlgorithm {
             PIPETEST_CYCLE_THRESHOLD = Long.parseLong(pipeTest.getThreshold());
         }
 
-        String key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
+        String key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, DateParserUtils.getTime());
         
         if (!Boolean.TRUE.equals(RedisUtils.getService(config.getPumpDataBase()).getTemplate()
                 .hasKey(key))) {
@@ -273,7 +270,7 @@ public class AllAlgorithm {
             PIPETEST_CYCLE_THRESHOLD = Long.parseLong(pipeTest.getThreshold());
         }
 
-        String key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
+        String key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, DateParserUtils.getTime());
 
         if (!Boolean.TRUE.equals(RedisUtils.getService(config.getPumpDataBase()).getTemplate()
                 .hasKey(Constant.EQUIPMENT_STATUS_HTTP_KEY))) {
@@ -341,7 +338,7 @@ public class AllAlgorithm {
             PIPETEST_CYCLE_THRESHOLD = Long.parseLong(pipeTest.getThreshold());
         }
 
-        String key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
+        String key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, DateParserUtils.getTime());
 
 
         if (!Boolean.TRUE.equals(RedisUtils.getService(config.getPumpDataBase()).exists(Constant.EQUIPMENT_STATUS_HTTP_KEY))) {
@@ -417,7 +414,7 @@ public class AllAlgorithm {
             PIPETEST_CYCLE_THRESHOLD = Long.parseLong(pipeTest.getThreshold());
         }
 
-        String key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
+        String key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, DateParserUtils.getTime());
 
 
         if (!Boolean.TRUE.equals(RedisUtils.getService(config.getPumpDataBase()).getTemplate()
@@ -484,9 +481,9 @@ public class AllAlgorithm {
         if (StringUtils.isEmpty(threshold)) {
             PROGRESS_TIME_THRESHOLD = Long.parseLong(pipeTest.getThreshold());
         }
-        String instructions_key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
-        String target_key = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, getTime());
-        String equipment_key = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, getTime());
+        String instructions_key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, DateParserUtils.getTime());
+        String target_key = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, DateParserUtils.getTime());
+        String equipment_key = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, DateParserUtils.getTime());
 
 
         StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
@@ -507,8 +504,8 @@ public class AllAlgorithm {
         for (String key2 : allFireControlInfos.keySet()) {
             TargetFireControlInfo targetFireControlInfo = allFireControlInfos.get(key2);
 
-            String key_target = String.format("%s_%s:%s", Constant.TARGET_INFO_HTTP_KEY, targetFireControlInfo.getTargetId(), getTime());
-            String key_equipment = String.format("%s_%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, targetFireControlInfo.getTargetId(), getTime());
+            String key_target = String.format("%s_%s:%s", Constant.TARGET_INFO_HTTP_KEY, targetFireControlInfo.getTargetId(), DateParserUtils.getTime());
+            String key_equipment = String.format("%s_%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, targetFireControlInfo.getTargetId(), DateParserUtils.getTime());
 
             Long n = template.boundListOps(key_target).size();
 
@@ -568,8 +565,8 @@ public class AllAlgorithm {
             return;
         }
 
-        String instructions_key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, getTime());
-        String target_key = String.format("%s:%s", Constant.TARGET_INFO_HTTP_KEY, getTime());
+        String instructions_key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, DateParserUtils.getTime());
+        String target_key = String.format("%s:%s", Constant.TARGET_INFO_HTTP_KEY, DateParserUtils.getTime());
 
         String threshold = pipeTest.getThreshold();
         if (StringUtils.isEmpty(threshold)) {
@@ -593,7 +590,7 @@ public class AllAlgorithm {
 
         for (String key2 : allInstructionInfos.keySet()) {
             TargetInstructionsInfo targetInstructionsInfo = allInstructionInfos.get(key2);
-            String key = String.format("%s_%s:%s", Constant.TARGET_INFO_HTTP_KEY, targetInstructionsInfo.getTargetId(), getTime());
+            String key = String.format("%s_%s:%s", Constant.TARGET_INFO_HTTP_KEY, targetInstructionsInfo.getTargetId(), DateParserUtils.getTime());
             Long n = template.boundListOps(key).size();
 
             for (int i = 0; i < n; i++) {
@@ -640,8 +637,8 @@ public class AllAlgorithm {
             return;
         }
 
-        String instructions_key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, getTime());
-        String target_key = String.format("%s:%s", Constant.TARGET_INFO_HTTP_KEY, getTime());
+        String instructions_key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, DateParserUtils.getTime());
+        String target_key = String.format("%s:%s", Constant.TARGET_INFO_HTTP_KEY, DateParserUtils.getTime());
 
         String threshold = pipeTest.getThreshold();
         if (StringUtils.isEmpty(threshold)) {
@@ -664,7 +661,7 @@ public class AllAlgorithm {
 
         for (String key2 : allInstructionInfos.keySet()) {
             TargetInstructionsInfo targetInstructionsInfo = allInstructionInfos.get(key2);
-            String key = String.format("%s_%s:%s", Constant.TARGET_INFO_HTTP_KEY, targetInstructionsInfo.getTargetId(), getTime());
+            String key = String.format("%s_%s:%s", Constant.TARGET_INFO_HTTP_KEY, targetInstructionsInfo.getTargetId(), DateParserUtils.getTime());
             Long n = template.boundListOps(key).size();
 
             for (int i = 0; i < n; i++) {
@@ -716,9 +713,9 @@ public class AllAlgorithm {
             return;
         }
 
-        String instructions_key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
-        String target_key = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, getTime());
-        String equipment_key = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, getTime());
+        String instructions_key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, DateParserUtils.getTime());
+        String target_key = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, DateParserUtils.getTime());
+        String equipment_key = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, DateParserUtils.getTime());
 
 
         StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
@@ -740,8 +737,8 @@ public class AllAlgorithm {
         for (String key2 : allFireControlInfos.keySet()) {
             TargetFireControlInfo targetFireControlInfo = allFireControlInfos.get(key2);
 
-            String key_target = String.format("%s_%s:%s", Constant.TARGET_INFO_HTTP_KEY, targetFireControlInfo.getTargetId(), getTime());
-            String key_equipment = String.format("%s_%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, targetFireControlInfo.getTargetId(), getTime());
+            String key_target = String.format("%s_%s:%s", Constant.TARGET_INFO_HTTP_KEY, targetFireControlInfo.getTargetId(), DateParserUtils.getTime());
+            String key_equipment = String.format("%s_%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, targetFireControlInfo.getTargetId(), DateParserUtils.getTime());
 
             Long n = template.boundListOps(key_target).size();
 
@@ -787,7 +784,6 @@ public class AllAlgorithm {
 
                     }
                 }
-
             }
         }
     }
@@ -801,8 +797,8 @@ public class AllAlgorithm {
         if (IsStart(taskId, pipeTest)) {
             return;
         }
-        String instructions_key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, getTime());
-        String target_key = String.format("%s:%s", Constant.TARGET_INFO_HTTP_KEY, getTime());
+        String instructions_key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, DateParserUtils.getTime());
+        String target_key = String.format("%s:%s", Constant.TARGET_INFO_HTTP_KEY, DateParserUtils.getTime());
 
         String threshold = pipeTest.getThreshold();
         if (StringUtils.isEmpty(threshold)) {
@@ -825,7 +821,7 @@ public class AllAlgorithm {
 
         for (String key2 : allInstructionInfos.keySet()) {
             TargetInstructionsInfo targetInstructionsInfo = allInstructionInfos.get(key2);
-            String key = String.format("%s_%s:%s", Constant.TARGET_INFO_HTTP_KEY, targetInstructionsInfo.getTargetId(), getTime());
+            String key = String.format("%s_%s:%s", Constant.TARGET_INFO_HTTP_KEY, targetInstructionsInfo.getTargetId(), DateParserUtils.getTime());
             Long n = template.boundListOps(key).size();
 
             for (int i = 0; i < n; i++) {
@@ -858,12 +854,8 @@ public class AllAlgorithm {
                         radarPathReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
                         radarPathReport.setDisabled(false);
                         radarPathReportService.insert(radarPathReport);
-
                     }
-
                 }
-
-
             }
         }
     }
@@ -886,7 +878,7 @@ public class AllAlgorithm {
             return;
         }
 
-        String key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, getTime());
+        String key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, DateParserUtils.getTime());
 
         Map<String, String> tempInstructions = RedisUtils.getService(config.getPumpDataBase()).
                 boundHashOps(key).entries();
@@ -898,7 +890,7 @@ public class AllAlgorithm {
         ));
 
         for (TargetInstructionsInfo targetInstructionsInfo : allInstructions.values()) {
-            String key_target = String.format("%s_%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, targetInstructionsInfo.getTargetId(), getTime());
+            String key_target = String.format("%s_%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, targetInstructionsInfo.getTargetId(), DateParserUtils.getTime());
 
 
             Long n = template.boundListOps(key_target).size();
@@ -963,7 +955,7 @@ public class AllAlgorithm {
             log.error("从Redis中获取目标指示信息或目标火控信息失败！");
             return;
         }
-        String target_key = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, getTime());
+        String target_key = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, DateParserUtils.getTime());
 
         Map<String, String> tmpFireControls = RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
                 target_key).entries();
@@ -975,7 +967,7 @@ public class AllAlgorithm {
 
         for (TargetFireControlInfo targetFireControlInfo : allFireControlInfos.values()) {
 
-            String key_target = String.format("%s_%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, targetFireControlInfo.getTargetId(), getTime());
+            String key_target = String.format("%s_%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, targetFireControlInfo.getTargetId(), DateParserUtils.getTime());
 
             Long n = template.boundListOps(
                     key_target).size();
@@ -1030,8 +1022,8 @@ public class AllAlgorithm {
             return;
         }
 
-        String equipment_key = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, getTime());
-        String target_key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, getTime());
+        String equipment_key = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, DateParserUtils.getTime());
+        String target_key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, DateParserUtils.getTime());
 
 
         StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
@@ -1052,7 +1044,7 @@ public class AllAlgorithm {
 
         for (EquipmentLaunchStatus equipmentLaunchStatus : allEquipmentStatus.values()) {
 
-            String key_target = String.format("%s_%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, equipmentLaunchStatus.getTargetId(), getTime());
+            String key_target = String.format("%s_%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, equipmentLaunchStatus.getTargetId(), DateParserUtils.getTime());
 
             Long n = template.boundListOps(
                     key_target).size();
@@ -1109,8 +1101,8 @@ public class AllAlgorithm {
         if (StringUtils.isEmpty(threshold)) {
             PROGRESS_TIME_THRESHOLD = Long.parseLong(pipeTest.getThreshold());
         }
-        String equipment_key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
-        String target_key = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, getTime());
+        String equipment_key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, DateParserUtils.getTime());
+        String target_key = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, DateParserUtils.getTime());
 
 
         StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
@@ -1130,7 +1122,7 @@ public class AllAlgorithm {
 
         for (TargetFireControlInfo targetFireControlInfo : allFireControlInfos.values()) {
 
-            String key_equipment = String.format("%s_%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, targetFireControlInfo.getTargetId(), getTime());
+            String key_equipment = String.format("%s_%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, targetFireControlInfo.getTargetId(), DateParserUtils.getTime());
 
 
             Long n = template.boundListOps(
@@ -1190,7 +1182,7 @@ public class AllAlgorithm {
         if (StringUtils.isEmpty(threshold)) {
             MIN_INTERCEPTION_DISTANCE = Long.parseLong(pipeTest.getThreshold());
         }
-        String target_key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, getTime());
+        String target_key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, DateParserUtils.getTime());
 
 
         StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
@@ -1216,7 +1208,7 @@ public class AllAlgorithm {
 
         for (String targetInstructionInfoId : targetInstructionInfoIndices) {
 
-            String targetInstructionInfoHistoryId = String.format("%s_%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, targetInstructionInfoId, getTime());
+            String targetInstructionInfoHistoryId = String.format("%s_%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, targetInstructionInfoId, DateParserUtils.getTime());
             String targetType = "";
 
             // 目标最后消失时间
@@ -1291,15 +1283,6 @@ public class AllAlgorithm {
                 pipeTestCycleThreshold * 1000;
     }
 
-    /**
-     * 获取时间
-     *
-     * @return
-     */
-    private String getTime() {
-        DateFormat df = new SimpleDateFormat("yyyyMMdd");
-        return df.format(System.currentTimeMillis());
-    }
 
     /**
      * 是否开始执行
@@ -1320,24 +1303,24 @@ public class AllAlgorithm {
 
         List<StateAnalysisTimeReport> stateAnalysisTimeReportList = new ArrayList<>();
 
-        String target_key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, getTime());
+        String target_key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, DateParserUtils.getTime());
 
         StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
         if (Boolean.FALSE.equals(template.hasKey(target_key))) {
             log.error("从Redis中获取目标指示信息失败！");
             return null;
         }
-        String fireControlKey = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, getTime());
+        String fireControlKey = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, DateParserUtils.getTime());
         if (Boolean.FALSE.equals(template.hasKey(fireControlKey))) {
             log.error("从Redis中获取目标火控信息失败！");
             return null;
         }
-        String fireKey =String.format("%s:%s",Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY,getTime());
+        String fireKey =String.format("%s:%s",Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, DateParserUtils.getTime());
         if(Boolean.FALSE.equals(template.hasKey(fireKey))){
             log.error("从Redis中获取发射架调转信息失败！");
             return null;
         }
-        String launcherKey = String.format("%s:%s", Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY, getTime());
+        String launcherKey = String.format("%s:%s", Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY, DateParserUtils.getTime());
         if (Boolean.FALSE.equals(template.hasKey(launcherKey))) {
             log.error("从Redis中获取发射架调转信息失败！");
             return null;
@@ -1375,7 +1358,7 @@ public class AllAlgorithm {
             if(targetFireControlInfo==null) continue;
             stateAnalysisTimeReport.setFireControlTime(targetFireControlInfo.getTime());
 
-            launcherKey = String.format("%s:%s", Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY + Constant.TARGET_ID, getTime());
+            launcherKey = String.format("%s:%s", Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY + Constant.TARGET_ID, DateParserUtils.getTime());
             Map<String,String> allLauncherRotationInfo = RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
                     launcherKey).entries();
             if(allLauncherRotationInfo==null) continue;
@@ -1390,7 +1373,7 @@ public class AllAlgorithm {
 
             stateAnalysisTimeReport.setLauncherRotationTime(launcherRotationInfo.getTime());
 
-            fireKey =String.format("%s:%s",Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + Constant.TARGET_ID,getTime());
+            fireKey =String.format("%s:%s",Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + Constant.TARGET_ID, DateParserUtils.getTime());
             Map<String,String> allEquipmentLaunchStatus = RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
                     fireKey).entries();
             if(allEquipmentLaunchStatus==null) continue;
@@ -1418,24 +1401,24 @@ public class AllAlgorithm {
 
         List<StateAnalysisTimeReport> stateAnalysisTimeReportList = new ArrayList<>();
 
-        String target_key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, getTime());
+        String target_key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, DateParserUtils.getTime());
 
         StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
         if (Boolean.FALSE.equals(template.hasKey(target_key))) {
             log.error("从Redis中获取目标指示信息失败！");
             return null;
         }
-        String fireControlKey = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, getTime());
+        String fireControlKey = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, DateParserUtils.getTime());
         if (Boolean.FALSE.equals(template.hasKey(fireControlKey))) {
             log.error("从Redis中获取目标火控信息失败！");
             return null;
         }
-        String fireKey =String.format("%s:%s",Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY,getTime());
+        String fireKey =String.format("%s:%s",Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, DateParserUtils.getTime());
         if(Boolean.FALSE.equals(template.hasKey(fireKey))){
             log.error("从Redis中获取武器发射信息失败！");
             return null;
         }
-        String launcherKey = String.format("%s:%s", Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY, getTime());
+        String launcherKey = String.format("%s:%s", Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY, DateParserUtils.getTime());
         if (Boolean.FALSE.equals(template.hasKey(launcherKey))) {
             log.error("从Redis中获取发射架调转信息失败！");
             return null;
@@ -1473,7 +1456,7 @@ public class AllAlgorithm {
             if(targetFireControlInfo==null) continue;
             stateAnalysisTimeReport.setFireControlTime(targetFireControlInfo.getTime());
 
-            launcherKey = String.format("%s:%s", Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY + Constant.TARGET_ID, getTime());
+            launcherKey = String.format("%s:%s", Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY + Constant.TARGET_ID, DateParserUtils.getTime());
             Map<String,String> allLauncherRotationInfo = RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
                     launcherKey).entries();
             if(allLauncherRotationInfo==null) continue;
@@ -1488,7 +1471,7 @@ public class AllAlgorithm {
 
             stateAnalysisTimeReport.setLauncherRotationTime(launcherRotationInfo.getTime());
 
-            fireKey =String.format("%s:%s",Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + Constant.TARGET_ID,getTime());
+            fireKey =String.format("%s:%s",Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + Constant.TARGET_ID, DateParserUtils.getTime());
             Map<String,String> allEquipmentLaunchStatus = RedisUtils.getService(config.getPumpDataBase()).boundHashOps(
                     fireKey).entries();
             if(allEquipmentLaunchStatus==null) continue;
@@ -1507,5 +1490,4 @@ public class AllAlgorithm {
         }
         return stateAnalysisTimeReportList;
     }
-
 }

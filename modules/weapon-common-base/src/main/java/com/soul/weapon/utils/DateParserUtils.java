@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.lang3.time.DateUtils;
 
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -154,5 +155,15 @@ public final class DateParserUtils {
             e.printStackTrace();
             return 0L;
         }
+    }
+
+    /**
+     * 获取当前天的时间
+     *
+     * @return
+     */
+    public static String getTime() {
+        DateFormat df = new SimpleDateFormat("yyyyMMdd");
+        return df.format(System.currentTimeMillis());
     }
 }

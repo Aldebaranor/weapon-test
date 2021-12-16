@@ -4,6 +4,7 @@ import com.soul.weapon.entity.PipeSelfCheck;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -51,4 +52,15 @@ public interface PipeSelfCheckService {
      * @return
      */
     int deleteById(String id);
+
+    /**
+     * equipment status evaluation air/water
+     * @return [
+     *     ["搜索雷达", ...],
+     *     ["true", ...]
+     * ]
+     */
+    ArrayList<ArrayList<String>> getPipeShow() ;
+
+
 }

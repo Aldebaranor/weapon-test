@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -46,6 +47,12 @@ public class PipeSelfCheckController {
     @PutMapping
     public void update(@RequestBody PipeSelfCheck pipeSelfCheck) {
         pipeSelfCheckService.update(pipeSelfCheck);
+    }
+
+    @Api
+    @GetMapping(value = "/pipe-show")
+    public ArrayList<ArrayList<String>> getPipeTestShow() {
+        return pipeSelfCheckService.getPipeShow();
     }
 
     /**

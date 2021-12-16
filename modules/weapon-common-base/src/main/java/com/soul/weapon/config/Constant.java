@@ -71,6 +71,4 @@ public class Constant {
     //多目标拦截能力测试
     public static String MULTI_TARGET_INTERCEPTION="15";
 
-
-
 }
