@@ -9,7 +9,6 @@ import com.egova.model.QueryModel;
 import com.egova.redis.RedisUtils;
 import com.flagwind.commons.StringUtils;
 import com.soul.weapon.condition.PipeTaskCondition;
-import com.soul.weapon.condition.PipeTestCondition;
 import com.soul.weapon.config.CommonConfig;
 import com.soul.weapon.config.Constant;
 import com.soul.weapon.domain.PipeTaskRepository;
@@ -21,9 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Priority;
 import java.sql.Timestamp;
