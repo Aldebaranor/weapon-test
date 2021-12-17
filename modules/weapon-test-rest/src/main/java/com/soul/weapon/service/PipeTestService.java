@@ -1,9 +1,7 @@
 package com.soul.weapon.service;
 
-import com.soul.weapon.entity.PipeTask;
+import com.egova.entity.DictionaryItem;
 import com.soul.weapon.entity.PipeTest;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
@@ -73,4 +71,9 @@ public interface PipeTestService {
      */
     void insertList(List<PipeTest> entities);
 
+    /**
+     * get pipe test tree for show
+     * @return pipe test tree
+     */
+    List<DictionaryItem> getPipeTestTree();
 }

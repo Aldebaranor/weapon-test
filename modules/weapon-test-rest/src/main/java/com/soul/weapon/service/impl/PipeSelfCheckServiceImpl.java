@@ -2,7 +2,6 @@ package com.soul.weapon.service.impl;
 
 import com.egova.data.service.AbstractRepositoryBase;
 import com.egova.data.service.TemplateService;
-import com.egova.entity.DictionaryItem;
 import com.egova.generic.service.DictionaryService;
 import com.egova.json.utils.JsonUtils;
 import com.egova.redis.RedisUtils;
@@ -79,13 +78,6 @@ public class PipeSelfCheckServiceImpl extends TemplateService<PipeSelfCheck,Stri
 
     @Override
     public ArrayList<ArrayList<String>> getPipeShow() {
-        List<DictionaryItem> a = dictionaryService.getItemTreeByType("weapon-test:pipe-test-type");
-        List<DictionaryItem> b = dictionaryService.getItemChildren("00101");
-        // List<DictionaryGroup> c = dictionaryService.groupTypeTree();
-        // List<DictionaryType> d = dictionaryService.getTypeList("pipe-test-type");
-        List<DictionaryItem> e = dictionaryService.getItemListByType("weapon-test:pipe-test-type");
-
-
         Map<String, Boolean> res = new HashMap<>();
         ArrayList<ArrayList<String>> ret = new ArrayList<>();
 

@@ -2,7 +2,8 @@ package com.soul.weapon.service.impl;
 
 import com.egova.data.service.AbstractRepositoryBase;
 import com.egova.data.service.TemplateService;
-import com.flagwind.persistent.model.SingleClause;
+import com.egova.entity.DictionaryItem;
+import com.egova.generic.service.DictionaryService;
 import com.soul.weapon.condition.PipeTestCondition;
 import com.soul.weapon.domain.PipeTestRepository;
 import com.soul.weapon.entity.PipeTest;
@@ -12,12 +13,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.annotation.Priority;
-import javax.annotation.Resource;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +31,7 @@ import java.util.stream.Collectors;
 public class PipeTestServiceImpl extends TemplateService<PipeTest, String> implements PipeTestService {
 
     private final PipeTestRepository pipeTestRepository;
+    private final DictionaryService dictionaryService;
 
     @Override
     protected AbstractRepositoryBase<PipeTest, String> getRepository() {
@@ -78,5 +77,9 @@ public class PipeTestServiceImpl extends TemplateService<PipeTest, String> imple
 
     }
 
+    @Override
+    public List<DictionaryItem> getPipeTestTree() {
+        return dictionaryService.getItemTreeByType("weapon-test:pipe-test-type");
+    }
 
 }
