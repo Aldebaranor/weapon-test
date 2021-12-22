@@ -79,4 +79,10 @@ public class PipeTestController {
     public List<DictionaryItem> getPipeTestTree() {
         return pipeTestService.getPipeTestTree();
     }
+
+    @Api
+    @GetMapping(value = "/getByTaskId/{taskId}")
+    public List<PipeTest> getByTaskId(@PathVariable("taskId") String taskId) {
+        return pipeTestService.getByTaskId(taskId);
+    }
 }

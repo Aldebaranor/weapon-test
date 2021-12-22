@@ -85,7 +85,7 @@ public class PipeSelfCheckServiceImpl extends TemplateService<PipeSelfCheck,Stri
         for(String equipShow : WeaponTestConstant.MAP_ID_TO_SHOW.values()) {
             res.put(equipShow, true);
         }
-
+        
         // 获取所有装备的状态
         String key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, DateParserUtils.getTime());
         if (!Boolean.TRUE.equals(RedisUtils.getService(config.getPumpDataBase()).getTemplate()
