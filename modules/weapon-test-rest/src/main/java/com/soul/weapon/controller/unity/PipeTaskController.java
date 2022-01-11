@@ -118,5 +118,12 @@ public class PipeTaskController {
 
     }
 
+    @Api
+    @GetMapping(value = "/name/{name}")
+    public List<PipeTask> getByName(@PathVariable String name)
+    {
+        return pipeTaskService.getByName(name);
+    }
+
 
 }

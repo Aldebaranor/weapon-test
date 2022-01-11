@@ -160,4 +160,8 @@
         <sqlFile path="com_dictionary_item.sql"/>
     </changeSet>
 
+    <changeSet id="1630288315485-11" author="nemo">
+        <sqlFile path="fire_priority.sql"/>
+    </changeSet>
+
 </databaseChangeLog>

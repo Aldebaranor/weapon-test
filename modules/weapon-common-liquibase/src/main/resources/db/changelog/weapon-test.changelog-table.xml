@@ -36,6 +36,7 @@
             <column name="id" remarks="主键" type="VARCHAR(50)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
+            <column name="name" remarks="测试名称" type="VARCHAR(50)"/>
             <column name="code" remarks="测试编号" type="VARCHAR(10)"/>
             <column name="type" remarks="测试类别(单武器通道测试, 自动防御系统测试)" type="VARCHAR(50)"/>
             <column name="createTime" remarks="创建时间" type="datetime"/>

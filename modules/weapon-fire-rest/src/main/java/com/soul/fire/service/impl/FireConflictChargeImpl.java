@@ -44,6 +44,7 @@ public class FireConflictChargeImpl implements FireConflictCharge {
     private final String AZIMUTH_ID = "3";
     private final String ELECTFREQUENCY_ID = "12";
     private final String WATERFREQUENCY_ID = "13";
+    private final int AN_HOUR=3600;
 
     ReportDetail chargeReportDetailA = new ReportDetail();
     ReportDetail chargeReportDetailB = new ReportDetail();
@@ -199,8 +200,15 @@ public class FireConflictChargeImpl implements FireConflictCharge {
                 if(!statusA.getEquipmentId().equals(statusB.getEquipmentId())){
                     ChargeReport chargeReport = chargeReport(statusA,statusB);
                     if(chargeReport!=null) {
-                        RedisUtils.getService(config.getFireDataBase()).boundHashOps(Constant.CHARGE_KEY).put(
-                                chargeReport.getId(),JsonUtils.serialize(chargeReport));
+                        if(RedisUtils.getService(config.getFireDataBase()).exists(Constant.CHARGE_KEY)){
+                            RedisUtils.getService(config.getFireDataBase()).boundHashOps(Constant.CHARGE_KEY).put(
+                                    chargeReport.getId(),JsonUtils.serialize(chargeReport));
+                        }else{
+                            RedisUtils.getService(config.getFireDataBase()).boundHashOps(Constant.CHARGE_KEY).put(
+                                    chargeReport.getId(),JsonUtils.serialize(chargeReport));
+                            RedisUtils.getService(config.getFireDataBase()).expire(Constant.CHARGE_KEY,AN_HOUR);
+                        }
+
                     }
                 }
             }

@@ -56,7 +56,7 @@ public class FireConflict extends BaseEntity {
 
     @Display("冲突发生时间")
     @Column(name = "conflictTime")
-    private Timestamp conflictTime;
+    private Long conflictTime;
 
     @Display("冲突实体")
     @Column(name = "conflictObjects")

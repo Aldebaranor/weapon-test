@@ -92,18 +92,19 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask, String> imple
         }
         PipeTask pipeTask = super.getById(takeId);
         pipeTask.setStatus(new PipeState("1"));
+        pipeTask.setStartTime(new Timestamp(System.currentTimeMillis()));
         super.update(pipeTask);
         return true;
     }
 
     @Override
     public Boolean stopTest(String takeId) {
-        if (!StringUtils.isEmpty(takeId)) {
+        if (StringUtils.isEmpty(takeId)) {
             throw ExceptionUtils.api("任务Id为空", new Object[0]);
         }
-        PipeTask pipeTask = new PipeTask();
-        pipeTask.setId(takeId);
+        PipeTask pipeTask = super.getById(takeId);
         pipeTask.setStatus(new PipeState("2"));
+        pipeTask.setEndTime(new Timestamp(System.currentTimeMillis()));
         super.update(pipeTask);
         RedisUtils.getService(config.getPumpDataBase()).delete(Constant.WEAPON_CURRENT_TASK);
         RedisUtils.getService(config.getPumpDataBase()).delete(Constant.WEAPON_CURRENT_PIPETEST);
