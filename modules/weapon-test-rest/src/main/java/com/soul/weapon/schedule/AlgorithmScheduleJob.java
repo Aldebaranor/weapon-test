@@ -1,13 +1,11 @@
 package com.soul.weapon.schedule;
 
 import com.egova.redis.RedisUtils;
-import com.soul.weapon.algorithm.AllAlgorithm;
+import com.soul.weapon.service.impl.AllAlgorithmServiceImpl;
 import com.soul.weapon.config.CommonConfig;
 import com.soul.weapon.config.Constant;
 import com.soul.weapon.entity.PipeTest;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -27,7 +25,7 @@ public class AlgorithmScheduleJob  {
     public CommonConfig config;
 
     @Autowired
-    public AllAlgorithm allAlgorithm;
+    public AllAlgorithmServiceImpl allAlgorithm;
 
     @Scheduled(fixedDelay = 1000)
     public void execute() {

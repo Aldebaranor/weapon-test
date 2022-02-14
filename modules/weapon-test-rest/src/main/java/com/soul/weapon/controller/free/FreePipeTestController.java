@@ -2,17 +2,14 @@ package com.soul.weapon.controller.free;
 
 
 import com.egova.web.annotation.Api;
-import com.soul.weapon.algorithm.AllAlgorithm;
+import com.soul.weapon.service.impl.AllAlgorithmServiceImpl;
 import com.soul.weapon.entity.PipeTest;
-import com.soul.weapon.model.MissileWeapon;
 import com.soul.weapon.model.StateAnalysisTimeReport;
 import com.soul.weapon.service.PipeTestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -26,7 +23,7 @@ import java.util.List;
 public class FreePipeTestController {
 
     private final PipeTestService pipeTestService;
-    private final AllAlgorithm allAlgorithm;
+    private final AllAlgorithmServiceImpl allAlgorithm;
 
     @Api
     @GetMapping(value = "/{id}")

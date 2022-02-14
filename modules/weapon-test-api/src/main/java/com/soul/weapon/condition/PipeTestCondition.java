@@ -22,6 +22,10 @@ public class PipeTestCondition {
     @ConditionOperator(name="taskId", operator = ClauseOperator.Equal)
     private String taskId;
 
+    @Display("类型")
+    @ConditionOperator(name="type", operator = ClauseOperator.Equal)
+    private String type;
+
     @Display("运行状态, 0: 未执行, 1: 执行中, 2: 执行完")
     @ConditionOperator(name="status", operator = ClauseOperator.Equal)
     private String status;

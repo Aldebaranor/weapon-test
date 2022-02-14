@@ -1,11 +1,16 @@
 package com.soul.weapon.controller.unity;
 
 import com.egova.exception.ExceptionUtils;
+import com.egova.json.utils.JsonUtils;
 import com.egova.model.PageResult;
+import com.egova.model.PropertyItem;
 import com.egova.model.QueryModel;
 import com.egova.web.annotation.Api;
 import com.flagwind.commons.Monment;
+import com.flagwind.commons.StringUtils;
 import com.soul.weapon.condition.PipeTaskCondition;
+import com.soul.weapon.condition.PipeTestCondition;
+import com.soul.weapon.config.WeaponTestConstant;
 import com.soul.weapon.entity.PipeTask;
 import com.soul.weapon.entity.PipeTest;
 import com.soul.weapon.service.PipeTaskService;
@@ -104,17 +109,16 @@ public class PipeTaskController {
             pipeTest.setCreateTime(new Timestamp(System.currentTimeMillis()));
         });
         pipeTestService.insertList(pipeTests);
-
     }
 
     /**
      * 停止任务
-     * @param takeId
+     * @param taskId
      */
     @Api
-    @DeleteMapping(value = "/stop/{takeId}")
-    public void safeTest(@PathVariable String takeId) {
-        pipeTaskService.stopTest(takeId);
+    @DeleteMapping(value = "/stop/{taskId}")
+    public void safeTest(@PathVariable String taskId) {
+        pipeTaskService.stopTest(taskId);
 
     }
 
@@ -124,6 +128,30 @@ public class PipeTaskController {
     {
         return pipeTaskService.getByName(name);
     }
+
+    @Api
+    @GetMapping(value = "/getThreshold")
+    public List<PropertyItem<Double>> getThreshold(@RequestParam(value="taskId") String taskId, @RequestParam(value="pipeTestType") String pipeTestType)
+    {
+        PipeTestCondition condition = new PipeTestCondition();
+        condition.setTaskId(taskId);
+        condition.setType(pipeTestType);
+        try {
+            PipeTest pipeTest = pipeTestService.list(condition).stream().findFirst().orElse(null);
+            if(pipeTest == null ){
+                return null;
+            }
+            if(StringUtils.isBlank(pipeTest.getThreshold())){
+                return WeaponTestConstant.WEAPON_THRESHOLD.get(pipeTestType);
+            }else{
+                return JsonUtils.deserializeList(pipeTest.getThreshold(),PropertyItem.class);
+            }
+        } catch (Exception e) {
+            throw ExceptionUtils.api("获取阈值失败", new Object[0]);
+        }
+    }
+
+
 
 
 }

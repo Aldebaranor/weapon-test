@@ -18,7 +18,8 @@ public class Constant {
     public static String TARGET_INFO_HTTP_KEY = "weapon:pump:target_info";
     public static String TARGET_INSTRUCTIONS_INFO_HTTP_KEY = "weapon:pump:target_instructions_info";
 
-    public static String TARGET_ID = "_target_id";
+    public static String TARGET_ID = ":targetId";
+    public static String EQUIPMENT_ID = ":equipmentId";
 
     /**
      * 目标信息(雷达探测到的目标信息)于influxdb中的表名

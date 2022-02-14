@@ -57,6 +57,11 @@ public class PipeTestServiceImpl extends TemplateService<PipeTest, String> imple
         return super.query(pipeTestCondition);
     }
 
+    @Override
+    public List<PipeTest> list(PipeTestCondition pipeTestCondition) {
+        return super.query(pipeTestCondition);
+    }
+
 
     @Override
     public int deleteByTaskId(String taskId) {

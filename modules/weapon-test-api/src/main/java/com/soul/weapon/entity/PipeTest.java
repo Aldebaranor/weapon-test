@@ -41,11 +41,11 @@ public class PipeTest extends BaseEntity {
     @Column(name = "code")
     private String code;
 
-    //TODO
     @Display("测试类别")
     @Column(name = "type")
-    private PipeTestType pipeTest;
+    private PipeTestType type;
 
+    //JSON [{"name":"","text":"","value":0}]
     @Display("测试阈值")
     @Column(name = "threshold")
     private String threshold;

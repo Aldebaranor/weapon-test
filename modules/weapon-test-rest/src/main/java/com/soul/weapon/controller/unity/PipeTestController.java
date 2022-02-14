@@ -3,7 +3,7 @@ package com.soul.weapon.controller.unity;
 
 import com.egova.entity.DictionaryItem;
 import com.egova.web.annotation.Api;
-import com.soul.weapon.algorithm.AllAlgorithm;
+import com.soul.weapon.service.impl.AllAlgorithmServiceImpl;
 import com.soul.weapon.entity.PipeTest;
 import com.soul.weapon.model.StateAnalysisTimeReport;
 import com.soul.weapon.service.PipeTestService;
@@ -24,7 +24,7 @@ import java.util.List;
 public class PipeTestController {
 
     private final PipeTestService pipeTestService;
-    private final AllAlgorithm allAlgorithm;
+    private final AllAlgorithmServiceImpl allAlgorithm;
 
     @Api
     @GetMapping(value = "/{id}")
@@ -42,7 +42,7 @@ public class PipeTestController {
 
     @Api
     @PostMapping
-    public String inset(@RequestBody PipeTest pipeTest)
+    public String insert(@RequestBody PipeTest pipeTest)
     {
         return pipeTestService.insert(pipeTest);
     }
@@ -71,7 +71,9 @@ public class PipeTestController {
             return allAlgorithm.getUnderWaterDefendInfo();
         }else if(type.equals("toAir")){
             return allAlgorithm.getAirDefendInfo();
-        }else return null;
+        }else{
+            return null;
+        }
     }
 
     @Api

@@ -1,6 +1,7 @@
 package com.soul.weapon.service;
 
 import com.egova.entity.DictionaryItem;
+import com.soul.weapon.condition.PipeTestCondition;
 import com.soul.weapon.entity.PipeTest;
 
 import java.util.List;
@@ -50,6 +51,13 @@ public interface PipeTestService {
      * @return
      */
     List<PipeTest> getByTaskId(String taskId);
+
+    /**
+     * 查询
+     * @param pipeTestCondition
+     * @return
+     */
+    List<PipeTest> list(PipeTestCondition pipeTestCondition);
 
     /**
      * delete by TaskId
