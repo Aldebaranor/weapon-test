@@ -12,25 +12,25 @@ import javax.persistence.Entity;
 public class EquipmentSelfCheck {
 
     @Display("跟踪雷达")
-    Boolean TrackingRadarState;
+    Boolean trackingRadarState;
 
     @Display("对空防御指控设备")
-    Boolean AirDefenseChargesState;
+    Boolean airDefenseChargesState;
 
     @Display("舰空导弹发射装置")
-    Boolean ShipSirMissileLaunchState;
+    Boolean shipSirMissileLaunchState;
 
     @Display("舰空导弹武器")
-    Boolean ShipAirMissileWeaponState;
+    Boolean shipAirMissileWeaponState;
 
     @Display("反倒舰炮")
-    Boolean InvertedNavalGunState;
+    Boolean invertedNavalGunState;
 
     @Display("舰壳声纳")
-    Boolean HullSonarState;
+    Boolean hullSonarState;
 
     @Display("水下防御指控设备")
-    Boolean UnderwaterDefenseChargesState;
+    Boolean underwaterDefenseChargesState;
 
 /*    @Display("鱼类防御发射装置")
     Boolean TrackingRadarState;

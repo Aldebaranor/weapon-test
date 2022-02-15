@@ -45,8 +45,8 @@ public class EquipmentStatus {
     private Float electromagneticFrequency;
 
     @Display("最小工作频率")
-    private Float MinFrequency;
+    private Float minFrequency;
 
     @Display("最大工作频率")
-    private Float MaxFrequency;
+    private Float maxFrequency;
 }

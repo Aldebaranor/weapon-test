@@ -2,6 +2,7 @@ package com.soul.weapon.controller.free;
 
 
 import com.egova.web.annotation.Api;
+import com.flagwind.commons.StringUtils;
 import com.soul.weapon.service.impl.AllAlgorithmServiceImpl;
 import com.soul.weapon.entity.PipeTest;
 import com.soul.weapon.model.StateAnalysisTimeReport;
@@ -66,11 +67,13 @@ public class FreePipeTestController {
     @Api
     @PostMapping(value = "/defend/{type}")
     public List<StateAnalysisTimeReport> getDefendInfo(@PathVariable String type){
-        if(type.equals("underWater")){
+        if(StringUtils.equals("underWater",type)){
             return allAlgorithm.getUnderWaterDefendInfo();
-        }else if(type.equals("toAir")){
+        }else if(StringUtils.equals("toAir",type)){
             return allAlgorithm.getAirDefendInfo();
-        }else return null;
+        }else {
+            return null;
+        }
     }
 
 }

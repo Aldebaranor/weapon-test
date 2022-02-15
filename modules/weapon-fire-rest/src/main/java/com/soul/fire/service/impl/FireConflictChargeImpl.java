@@ -68,7 +68,7 @@ public class FireConflictChargeImpl implements FireConflictCharge {
     @Override
     public ChargeReport chargeReport(EquipmentStatus equipmentStatusA,EquipmentStatus equipmentStatusB){
 
-        ReadThreshold(equipmentStatusA,equipmentStatusB);
+        readThreshold(equipmentStatusA,equipmentStatusB);
 
         chargeReport.setId(equipmentStatusA.getEquipmentId()+" " +equipmentStatusB.getEquipmentId());
 
@@ -93,7 +93,7 @@ public class FireConflictChargeImpl implements FireConflictCharge {
 
             if(timeState && pitchState && azimuthState && beWork){
                 chargeReport.setChargeType(0);
-                GenerateDetail(equipmentStatusA,equipmentStatusB);
+                generateDetail(equipmentStatusA,equipmentStatusB);
                 FirePriority firePriority = firePriorityService.getPriorityByIds(equipmentStatusA.getEquipmentTypeId(),equipmentStatusB.getEquipmentTypeId());
                 if(firePriority==null)
                 {
@@ -126,7 +126,7 @@ public class FireConflictChargeImpl implements FireConflictCharge {
 
             if(timeState && frequencyState && beWork){
                 chargeReport.setChargeType(1);
-                GenerateDetail(equipmentStatusA,equipmentStatusB);
+                generateDetail(equipmentStatusA,equipmentStatusB);
                 FirePriority firePriority = firePriorityService.getPriorityByIds(equipmentStatusA.getEquipmentTypeId(),equipmentStatusB.getEquipmentTypeId());
                 if(firePriority.isABetterThanB()){
                     chargeReport.setFreeEquipId(equipmentStatusA.getEquipmentId());
@@ -155,7 +155,7 @@ public class FireConflictChargeImpl implements FireConflictCharge {
 
             if(timeState && frequencyState && beWork){
                 chargeReport.setChargeType(2);
-                GenerateDetail(equipmentStatusA,equipmentStatusB);
+                generateDetail(equipmentStatusA,equipmentStatusB);
                 FirePriority firePriority = firePriorityService.getPriorityByIds(equipmentStatusA.getEquipmentTypeId(),equipmentStatusB.getEquipmentTypeId());
                 if(firePriority.isABetterThanB()){
                     chargeReport.setFreeEquipId(equipmentStatusA.getEquipmentId());
@@ -221,7 +221,7 @@ public class FireConflictChargeImpl implements FireConflictCharge {
      * @param equipmentStatusA
      * @param equipmentStatusB
      */
-    private void GenerateDetail(EquipmentStatus equipmentStatusA, EquipmentStatus equipmentStatusB){
+    private void generateDetail(EquipmentStatus equipmentStatusA, EquipmentStatus equipmentStatusB){
 
         chargeReportDetailA.setId(chargeReport.getId());
         chargeReportDetailA.setId(equipmentStatusA.getEquipmentId());
@@ -247,7 +247,7 @@ public class FireConflictChargeImpl implements FireConflictCharge {
     /**
      * 从数据库中读取阈值
      */
-    private void ReadThreshold( EquipmentStatus equipmentStatusA, EquipmentStatus equipmentStatusB){
+    private void readThreshold( EquipmentStatus equipmentStatusA, EquipmentStatus equipmentStatusB){
 
         FireThreshold fireThreshold;
         fireChargeTimeThreshold = ((fireThreshold=fireThresholdService.getById(TIME_ID))!=null)?Long.valueOf(fireThreshold.getThresholdValue()):3L;

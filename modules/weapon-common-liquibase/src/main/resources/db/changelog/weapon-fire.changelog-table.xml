@@ -43,7 +43,7 @@
             <column name="modifyTime" remarks="修改时间" type="datetime"/>
             <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
             <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
-            <column name="ABetterThanB" remarks="A对B的优先级" type="TINYINT(3)"/>
+            <column name="aBetterThanB" remarks="A对B的优先级" type="TINYINT(3)"/>
             <column name="weaponAId" remarks="外键-武器Aid" type="VARCHAR(50)"/>
             <column name="weaponBId" remarks="外键-武器Bid" type="VARCHAR(50)"/>
         </createTable>

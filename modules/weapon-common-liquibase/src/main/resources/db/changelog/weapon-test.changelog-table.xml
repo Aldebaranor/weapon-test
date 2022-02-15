@@ -43,7 +43,7 @@
             <column name="modifyTime" remarks="修改时间" type="datetime"/>
             <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
             <column name="sortKey" remarks="排序字段" type="INT"/>
-            <column name="threshold" remarks="阈值, eg: [{&quot;time&quot;: &quot;5&quot;, ...}]" type="VARCHAR(100)"/>
+            <column name="threshold" remarks="阈值, eg: [{&quot;time&quot;: &quot;5&quot;, ...}]" type="longtext"/>
             <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
             <column name="status" remarks="运行状态, 0: 未执行, 1: 执行中, 2: 执行完" type="TINYINT(3)"/>
             <column name="taskId" remarks="外键-任务id" type="VARCHAR(50)"/>

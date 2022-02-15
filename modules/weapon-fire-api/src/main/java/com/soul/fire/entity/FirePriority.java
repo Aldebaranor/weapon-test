@@ -57,8 +57,8 @@ public class FirePriority extends BaseEntity{
     private boolean disabled;
 
     @Display("A对B的优先级")
-    @Column(name = "ABetterThanB")
-    private boolean ABetterThanB;
+    @Column(name = "aBetterThanB")
+    private boolean aBetterThanB;
 
     @Display("外键-武器Aid")
     @Column(name = "weaponAId")

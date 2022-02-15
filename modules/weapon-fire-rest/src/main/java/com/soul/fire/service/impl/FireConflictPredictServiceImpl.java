@@ -2,9 +2,6 @@ package com.soul.fire.service.impl;
 
 import com.egova.json.utils.JsonUtils;
 import com.egova.redis.RedisUtils;
-import com.soul.fire.entity.FireConflict;
-import com.soul.fire.entity.enums.ConflictSourceType;
-import com.soul.fire.entity.enums.ConflictType;
 import com.soul.fire.service.FireConflictPredictService;
 import com.soul.fire.entity.FireThreshold;
 import com.soul.fire.service.FireThresholdService;
@@ -20,9 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Priority;
-import java.sql.Timestamp;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -64,7 +59,7 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
     @Override
     public ConflictReport conflictPredict(ScenariosInfo scenariosA , ScenariosInfo scenariosB) {
 
-        ReadThreshold(scenariosA,scenariosB);
+        readThreshold(scenariosA,scenariosB);
         conflictReport.setId(UUID.randomUUID().toString());
 
         Long timeA = scenariosA.getBeginTime();
@@ -83,7 +78,7 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
 
             if(timeState && pitchState && azimuthState ){
                 conflictReport.setConflictType(0);
-                GenerateDetail(scenariosA,scenariosB);
+                generateDetail(scenariosA,scenariosB);
 
                 if(!RedisUtils.getService(config.getFireDataBase()).exists(Constant.PREDICT_KEY)){
                     RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.PREDICT_KEY,
@@ -118,7 +113,7 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
 
             if(timeState && frequencyState){
                 conflictReport.setConflictType(1);
-                GenerateDetail(scenariosA,scenariosB);
+                generateDetail(scenariosA,scenariosB);
 
                 if(!RedisUtils.getService(config.getFireDataBase()).exists(Constant.PREDICT_KEY)){
                     RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.PREDICT_KEY,
@@ -159,7 +154,7 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
 
             if(timeState && frequencyState){
                 conflictReport.setConflictType(2);
-                GenerateDetail(scenariosA,scenariosB);
+                generateDetail(scenariosA,scenariosB);
 
                 if(!RedisUtils.getService(config.getFireDataBase()).exists(Constant.PREDICT_KEY)){
                     RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.PREDICT_KEY,
@@ -219,7 +214,7 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
      * @param scenariosInfoA
      * @param scenariosInfoB
      */
-    private void GenerateDetail(ScenariosInfo scenariosInfoA,ScenariosInfo scenariosInfoB){
+    private void generateDetail(ScenariosInfo scenariosInfoA, ScenariosInfo scenariosInfoB){
 
         conflictReportDetailA.setId(conflictReport.getId());
         conflictReportDetailA.setId(scenariosInfoA.getEquipmentId());
@@ -245,7 +240,7 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
     /**
      * 从数据库中读取阈值
      */
-    private void ReadThreshold(ScenariosInfo scenariosA, ScenariosInfo scenariosB){
+    private void readThreshold(ScenariosInfo scenariosA, ScenariosInfo scenariosB){
         FireThreshold fireThreshold;
         fireConflictTimeThreshold = ((fireThreshold=fireThresholdService.getById(TIME_ID))!=null)?Long.valueOf(fireThreshold.getThresholdValue()):3L;
 
