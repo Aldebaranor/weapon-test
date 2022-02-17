@@ -31,17 +31,9 @@ public class PipeAdvice extends BaseEntity {
     @Column(name = "id")
     private String id;
 
-    @Display("测试项(1级)名称")
-    @Column(name = "l1Name")
-    private String l1Name;
-
-    @Display("测试项子项(2级)名称")
-    @Column(name = "l2Name")
-    private String l2Name;
-
-    @Display("l2是否有Err")
-    @Column(name = "l2HasErr")
-    private boolean l2HasErr;
+    @Display("字段标识")
+    @Column(name = "code")
+    private String code;
 
     @Display("对策建议")
     @Column(name = "advice")

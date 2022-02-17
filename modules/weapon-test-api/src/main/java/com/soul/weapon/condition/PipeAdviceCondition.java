@@ -17,9 +17,12 @@ public class PipeAdviceCondition {
     @ConditionOperator(name="id", operator = ClauseOperator.Equal)
     private String id;
 
-    @Display("外键-任务")
+/*    @Display("外键-任务")
     @ConditionOperator(name = "taskId",operator = ClauseOperator.Equal)
-    private String taskId;
+    private String taskId;*/
 
+    @Display("字段标识")
+    @ConditionOperator(name="code",operator = ClauseOperator.Equal)
+    private String code;
 
 }

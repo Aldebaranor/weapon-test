@@ -38,7 +38,7 @@ public class PipeAdviceController {
 
     @Api
     @PostMapping
-    public String inset(@RequestBody PipeAdvice pipeAdvice)
+    public String insert(@RequestBody PipeAdvice pipeAdvice)
     {
         return pipeAdviceService.insert(pipeAdvice);
     }
@@ -47,6 +47,14 @@ public class PipeAdviceController {
     @PutMapping
     public void update(@RequestBody PipeAdvice pipeAdvice) {
         pipeAdviceService.update(pipeAdvice);
+    }
+
+
+    //根据code获取对策建议结果
+    @Api
+    @GetMapping(value = "/code/{code}")
+    public List<PipeAdvice> getByCode(@PathVariable("code") String code){
+        return pipeAdviceService.getByCode(code);
     }
 
     /**

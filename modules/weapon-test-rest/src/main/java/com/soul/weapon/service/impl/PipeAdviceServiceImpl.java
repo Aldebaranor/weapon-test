@@ -3,6 +3,7 @@ package com.soul.weapon.service.impl;
 import com.egova.data.service.AbstractRepositoryBase;
 import com.egova.data.service.TemplateService;
 import com.flagwind.persistent.model.SingleClause;
+import com.soul.weapon.condition.PipeAdviceCondition;
 import com.soul.weapon.domain.PipeAdviceRepository;
 import com.soul.weapon.entity.PipeAdvice;
 import com.soul.weapon.service.PipeAdviceService;
@@ -46,6 +47,13 @@ public class PipeAdviceServiceImpl extends TemplateService<PipeAdvice,String> im
 
         pipeAdvice.setModifyTime(new Timestamp(System.currentTimeMillis()));
         super.update(pipeAdvice);
+    }
+
+    @Override
+    public List<PipeAdvice> getByCode(String code) {
+        PipeAdviceCondition pipeAdviceCondition = new PipeAdviceCondition();
+        pipeAdviceCondition.setCode(code);
+        return super.query(pipeAdviceCondition);
     }
 
 }

@@ -83,9 +83,7 @@
             <column name="id" remarks="主键" type="VARCHAR(50)">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="l1Name" remarks="测试项(1级)名称" type="VARCHAR(50)"/>
-            <column name="l2Name" remarks="测试项子项(2级)名称" type="VARCHAR(50)"/>
-            <column name="l2HasErr" remarks="l2是否有Err" type="TINYINT(3)"/>
+            <column name="code" remarks="字段标识" type="VARCHAR(50)"/>
             <column name="advice" remarks="对策建议" type="VARCHAR(10000)"/>
             <column name="createTime" remarks="创建时间" type="datetime"/>
             <column name="modifyTime" remarks="修改时间" type="datetime"/>

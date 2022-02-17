@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-@Description("运动状态字典表")
+@Description("武器类型字典表")
 @Associative(name = "_${name}", providerClass = CodeTypeProvider.class)
 public class WeaponType extends DataDict {
 
