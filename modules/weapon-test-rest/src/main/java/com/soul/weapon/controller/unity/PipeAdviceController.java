@@ -36,24 +36,27 @@ public class PipeAdviceController {
         return pipeAdviceService.getAll();
     }
 
+
+    //对advic建议表进行新增或修改
+
     @Api
     @PostMapping
     public String insert(@RequestBody PipeAdvice pipeAdvice)
     {
         return pipeAdviceService.insert(pipeAdvice);
     }
-
+/*
     @Api
     @PutMapping
     public void update(@RequestBody PipeAdvice pipeAdvice) {
         pipeAdviceService.update(pipeAdvice);
-    }
+    }*/
 
 
     //根据code获取对策建议结果
     @Api
     @GetMapping(value = "/code/{code}")
-    public List<PipeAdvice> getByCode(@PathVariable("code") String code){
+    public PipeAdvice getByCode(@PathVariable("code") String code){
         return pipeAdviceService.getByCode(code);
     }
 

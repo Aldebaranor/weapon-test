@@ -54,6 +54,7 @@ public class FireWeaponServiceImpl extends TemplateService<FireWeapon, String> i
     }
 
     @Override
+    @Cacheable
     public List<FireWeapon> list(FireWeaponCondition condition) {
         return super.query(condition, Sorting.descending("modifyTime", "createTime"));
     }

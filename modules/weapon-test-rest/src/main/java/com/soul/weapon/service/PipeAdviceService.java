@@ -45,5 +45,5 @@ public interface PipeAdviceService {
      */
     int deleteById(String id);
 
-    List<PipeAdvice> getByCode(String code);
+    PipeAdvice getByCode(String code);
 }

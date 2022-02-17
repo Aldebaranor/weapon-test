@@ -42,6 +42,10 @@ INSERT IGNORE INTO `com_dictionary_item` VALUES ('00017', 'test14', '14', '发�
 INSERT IGNORE INTO `com_dictionary_item` VALUES ('00018', 'test15', '15', '多目标拦截能力测试', NULL, 'weapon-test:pipe-test-type', NULL, '00102', 'weapon-test', 0);
 INSERT IGNORE INTO `com_dictionary_item` VALUES ('00101', 'pipe-type1', '1', '单武器通道级测试', NULL, 'weapon-test:pipe-test-type', NULL, '', 'weapon-test', NULL);
 INSERT IGNORE INTO `com_dictionary_item` VALUES ('00102', 'pipe-type2', '2', '自防御系统级测试', NULL, 'weapon-test:pipe-test-type', NULL, '', 'weapon-test', NULL);
+INSERT IGNORE INTO `com_dictionary_item` VALUES ('00201', 'test1-1', '16', '舰空导弹武器跟踪雷达', NULL, 'weapon-test:pipe-test-type', '', '00004', 'weapon-test', 0);
+INSERT IGNORE INTO `com_dictionary_item` VALUES ('00202', 'test1-2', '17', '舰空导弹武器火控系统', NULL, 'weapon-test:pipe-test-type', '', '00004', 'weapon-test', 0);
+INSERT IGNORE INTO `com_dictionary_item` VALUES ('00203', 'test1-3', '18', '舰空导弹武器发射系统', NULL, 'weapon-test:pipe-test-type', '', '00004', 'weapon-test', 0);
+INSERT IGNORE INTO `com_dictionary_item` VALUES ('00204', 'test1-4', '19', '舰空导弹武器', NULL, 'weapon-test:pipe-test-type', '', '00004', 'weapon-test', 0);
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
