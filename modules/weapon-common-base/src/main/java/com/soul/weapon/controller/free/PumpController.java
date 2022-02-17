@@ -149,7 +149,7 @@ public class PumpController {
                     RedisUtils.getService(config.getPumpDataBase()).expire(keyAll,ONE_DAY);
                 }
 
-                String key = String.format("%s_%s:%s",Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY,equipmentStatus.getEquipmentId(),getTime());
+                String key = String.format("%s_%s:%s",Constant.EQUIPMENT_STATUS_HTTP_KEY,equipmentStatus.getEquipmentId(),getTime());
                 if (RedisUtils.getService(config.getPumpDataBase()).exists(key)){
                     RedisUtils.getService(config.getPumpDataBase()).boundListOps(key).
                             leftPush(JsonUtils.serialize(equipmentStatus));

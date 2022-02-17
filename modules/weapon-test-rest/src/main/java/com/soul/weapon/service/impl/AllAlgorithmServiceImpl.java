@@ -70,7 +70,6 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
         if (StringUtils.isEmpty(threshold)) {
             item = WeaponTestConstant.WEAPON_THRESHOLD.get(pipeTest.getType())
                     .stream().filter((q -> StringUtils.equals(q.getName(), key))).findFirst().orElse(null);
-
         }else{
             List<PropertyItem<Double>> list = null;
             try {

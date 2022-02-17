@@ -1,19 +1,9 @@
 package com.soul.fire.task;
 
-import com.egova.json.utils.JsonUtils;
-import com.egova.redis.RedisUtils;
-import com.flagwind.commons.StringUtils;
-import com.soul.fire.service.FireConflictCharge;
+import com.soul.fire.service.FireConflictChargeService;
 import com.soul.fire.service.FireConflictPredictService;
 import com.soul.weapon.config.CommonConfig;
-import com.soul.weapon.config.Constant;
-import com.soul.weapon.model.ScenariosInfo;
-import com.soul.weapon.model.dds.CombatScenariosInfo;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.DisallowConcurrentExecution;
-import org.quartz.Job;
-import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -33,7 +23,7 @@ public class ConflictPredictJob  {
     @Autowired
     public FireConflictPredictService fireConflictPredictService;
     @Autowired
-    public FireConflictCharge fireConflictCharge;
+    public FireConflictChargeService fireConflictCharge;
 
     @Autowired
     public CommonConfig config;

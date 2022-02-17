@@ -9,7 +9,7 @@ import com.soul.weapon.model.ScenariosInfo;
  * @Author: XinLai
  * @Date: 2021/11/1 11:03
  */
-public interface FireConflictCharge {
+public interface FireConflictChargeService {
 
     /**
      * 预判装备之间是否存在火力冲突

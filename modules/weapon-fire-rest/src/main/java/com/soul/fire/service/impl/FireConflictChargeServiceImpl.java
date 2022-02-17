@@ -4,7 +4,7 @@ import com.egova.json.utils.JsonUtils;
 import com.egova.redis.RedisUtils;
 import com.soul.fire.entity.FirePriority;
 import com.soul.fire.entity.FireWeapon;
-import com.soul.fire.service.FireConflictCharge;
+import com.soul.fire.service.FireConflictChargeService;
 
 import com.soul.fire.entity.FireThreshold;
 import com.soul.fire.service.FirePriorityService;
@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 @Service
 @Priority(5)
 @RequiredArgsConstructor
-public class FireConflictChargeImpl implements FireConflictCharge {
+public class FireConflictChargeServiceImpl implements FireConflictChargeService {
 
     private final FirePriorityService firePriorityService;
     private final FireWeaponService fireWeaponService;
