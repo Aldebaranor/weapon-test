@@ -7,10 +7,13 @@ import com.egova.redis.RedisUtils;
 import com.egova.web.annotation.Api;
 import com.flagwind.commons.StringUtils;
 import com.soul.weapon.config.CommonConfig;
+import com.soul.weapon.model.ChargeReport;
+import com.soul.weapon.model.ConflictReport;
 import com.soul.weapon.model.ScenariosInfo;
 import com.soul.weapon.model.dds.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.C;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -267,6 +270,20 @@ public class PumpController {
                     RedisUtils.getService(config.getPumpDataBase()).getTemplate().boundListOps(key).
                             leftPush(JsonUtils.serialize(targetInstructionsInfo));
                     RedisUtils.getService(config.getPumpDataBase()).expire(key,ONE_DAY);
+                }
+
+            }break;
+            case "Report":{
+                ConflictReport conflictReport = JsonUtils.deserialize(JsonUtils.serialize(msg),
+                        ChargeReport.class);
+
+                if(RedisUtils.getService(config.getFireDataBase()).exists(Constant.PREDICT_KEY)){
+                    RedisUtils.getService(config.getFireDataBase()).boundHashOps(Constant.PREDICT_KEY).put(
+                            conflictReport.getId(),JsonUtils.serialize(conflictReport));
+                }else{
+                    RedisUtils.getService(config.getFireDataBase()).boundHashOps(Constant.PREDICT_KEY).put(
+                            conflictReport.getId(),JsonUtils.serialize(conflictReport));
+                    RedisUtils.getService(config.getFireDataBase()).expire(Constant.PREDICT_KEY,3600);
                 }
 
             }break;
@@ -535,6 +552,38 @@ public class PumpController {
                 return restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName,
                         request1, String.class).toString();
 
+            }
+            case "Report":{
+//                ChargeReport chargeReport = new ChargeReport();
+//                chargeReport.setId("1111");
+//                chargeReport.setChargeType(0);
+//                chargeReport.setChargeEquipId("11");
+//                chargeReport.setFreeEquipId("22");
+//                chargeReport.setTime(System.currentTimeMillis());
+
+                ConflictReport conflictReport = new ConflictReport();
+                conflictReport.setId("2131221456547");
+                conflictReport.setEquipmentIdB("3");
+                conflictReport.setEquipmentIdA("7");
+                conflictReport.setConflictType(1);
+                conflictReport.setTime(System.currentTimeMillis());
+
+                ConflictReport conflictReport2 = new ConflictReport();
+                conflictReport2.setId("423425322342352");
+                conflictReport2.setEquipmentIdB("3");
+                conflictReport2.setEquipmentIdA("7");
+                conflictReport2.setConflictType(1);
+                conflictReport2.setTime(System.currentTimeMillis());
+
+                HttpEntity<Object> request = new HttpEntity<>(conflictReport, headers);
+
+                restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName,
+                        request, String.class).toString();
+
+
+                HttpEntity<Object> request2 = new HttpEntity<>(conflictReport, headers);
+                return restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName,
+                        request2, String.class).toString();
             }
             default: {
                    log.error("unrecognized struct name for http telegram test!");

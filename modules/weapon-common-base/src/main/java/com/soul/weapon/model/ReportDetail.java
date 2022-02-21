@@ -30,10 +30,10 @@ public class ReportDetail {
     @Display("A发射俯仰角")
     private Float launchPitchAngle;
 
-    @Display("A电子装备计划工作频率")
+    @Display("A装备最小工作频率")
     private Float minFrequency;
 
-    @Display("A装备最小工作频率")
+    @Display("A电子装备计划工作频率")
     private Float electromagneticFrequency;
 
     @Display("A装备最大工作频率")

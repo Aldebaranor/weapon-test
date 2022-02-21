@@ -33,7 +33,7 @@ public class ThreatenReport extends BaseEntity {
 
     @Display("目标标识")
     @Column(name = "targetId")
-    private String TargetId;
+    private String targetId;
 
     @Display("目标类型")
     @Column(name = "targetType")

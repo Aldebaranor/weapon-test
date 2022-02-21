@@ -66,7 +66,7 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
     private Float waterFrequencyThreshold = 5.0F;
 
     @Override
-    public ChargeReport chargeReport(EquipmentStatus equipmentStatusA,EquipmentStatus equipmentStatusB){
+    public ChargeReport  chargeReport(EquipmentStatus equipmentStatusA,EquipmentStatus equipmentStatusB){
 
         readThreshold(equipmentStatusA,equipmentStatusB);
 
@@ -108,6 +108,21 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
                     chargeReport.setChargeEquipId(equipmentStatusA.getEquipmentId());
                     chargeReport.setChargeMethod(fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getName()+"禁用3分钟");
                 }
+
+                if(!RedisUtils.getService(config.getFireDataBase()).exists(Constant.CHARGEDETAIL_KEY)){
+                    RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.CHARGEDETAIL_KEY,
+                            chargeReportDetailA.getId(), JsonUtils.serialize(chargeReportDetailA));
+                    RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.CHARGEDETAIL_KEY,
+                            chargeReportDetailA.getId(), JsonUtils.serialize(chargeReportDetailA));
+                    RedisUtils.getService(config.getFireDataBase()).expire(Constant.CHARGEDETAIL_KEY,AN_HOUR);
+                }else{
+                    RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.CHARGEDETAIL_KEY,
+                            chargeReportDetailA.getId(), JsonUtils.serialize(chargeReportDetailA));
+                    RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.CHARGEDETAIL_KEY,
+                            chargeReportDetailA.getId(), JsonUtils.serialize(chargeReportDetailA));
+                }
+
+
                 /*
                      根据装备A和装备B去管控措施表中查询相关信息
                      （需要多加一个措施表项？）
@@ -138,6 +153,19 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
                     chargeReport.setChargeMethod(fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getName()+"禁用3分钟");
                 }
 
+                if(!RedisUtils.getService(config.getFireDataBase()).exists(Constant.CHARGEDETAIL_KEY)){
+                    RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.CHARGEDETAIL_KEY,
+                            chargeReportDetailA.getId(), JsonUtils.serialize(chargeReportDetailA));
+                    RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.CHARGEDETAIL_KEY,
+                            chargeReportDetailA.getId(), JsonUtils.serialize(chargeReportDetailA));
+                    RedisUtils.getService(config.getFireDataBase()).expire(Constant.CHARGEDETAIL_KEY,AN_HOUR);
+                }else{
+                    RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.CHARGEDETAIL_KEY,
+                            chargeReportDetailA.getId(), JsonUtils.serialize(chargeReportDetailA));
+                    RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.CHARGEDETAIL_KEY,
+                            chargeReportDetailA.getId(), JsonUtils.serialize(chargeReportDetailA));
+                }
+
                 return chargeReport;
             }else{
                 return null;
@@ -166,6 +194,19 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
                     chargeReport.setChargeEquipId(equipmentStatusA.getEquipmentId());
                     chargeReport.setChargeMethod(fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getName()+"禁用3分钟");
                 }
+                if(!RedisUtils.getService(config.getFireDataBase()).exists(Constant.CHARGEDETAIL_KEY)){
+                    RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.CHARGEDETAIL_KEY,
+                            chargeReportDetailA.getId(), JsonUtils.serialize(chargeReportDetailA));
+                    RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.CHARGEDETAIL_KEY,
+                            chargeReportDetailA.getId(), JsonUtils.serialize(chargeReportDetailA));
+                    RedisUtils.getService(config.getFireDataBase()).expire(Constant.CHARGEDETAIL_KEY,AN_HOUR);
+                }else{
+                    RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.CHARGEDETAIL_KEY,
+                            chargeReportDetailA.getId(), JsonUtils.serialize(chargeReportDetailA));
+                    RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.CHARGEDETAIL_KEY,
+                            chargeReportDetailA.getId(), JsonUtils.serialize(chargeReportDetailA));
+                }
+
                 return chargeReport;
             }else{
                 return null;
@@ -199,6 +240,7 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
             for(EquipmentStatus statusB:equipmentStatusMap.values()){
                 if(!statusA.getEquipmentId().equals(statusB.getEquipmentId())){
                     ChargeReport chargeReport = chargeReport(statusA,statusB);
+
                     if(chargeReport!=null) {
                         if(RedisUtils.getService(config.getFireDataBase()).exists(Constant.CHARGE_KEY)){
                             RedisUtils.getService(config.getFireDataBase()).boundHashOps(Constant.CHARGE_KEY).put(
@@ -208,8 +250,8 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
                                     chargeReport.getId(),JsonUtils.serialize(chargeReport));
                             RedisUtils.getService(config.getFireDataBase()).expire(Constant.CHARGE_KEY,AN_HOUR);
                         }
-
                     }
+
                 }
             }
         }

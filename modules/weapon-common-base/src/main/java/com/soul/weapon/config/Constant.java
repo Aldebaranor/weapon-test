@@ -33,6 +33,7 @@ public class Constant {
     public static String CONFLICT_CHARGE_REPORT = "fire:pump:conflict_charge_report";
 
     public static String CHARGE_KEY = "fire:pump:charge";
+    public static String CHARGEDETAIL_KEY = "fire:pump:charge_detail";
 
     public static String PREDICT_KEY = "fire:pump:predict";
     public static String PREDICTDETAIL_KEY = "fire:pump:predict_detail";

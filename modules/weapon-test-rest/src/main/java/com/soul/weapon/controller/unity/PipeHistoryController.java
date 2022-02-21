@@ -69,16 +69,4 @@ public class PipeHistoryController {
 
 
 
-//    /**
-//     * 主键删除
-//     * @param taskId 主键
-//     * @return 影响记录行数
-//     */
-//    @Api
-//    @DeleteMapping(value = "/anti/{taskId}")
-//    public int deleteAntiByTaskId(@PathVariable String taskId) {
-//        return antiMissileShipGunTestReportService.deleteById(taskId);
-//    }
-
-
 }
