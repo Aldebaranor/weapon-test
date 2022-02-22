@@ -121,7 +121,10 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
         if(! allEquipmentStatus.containsKey(PipeWeaponIndices.AirMissileLongRange.getValue())){
             return;
         }
+        //创建测试报告
         ShipToAirMissileTestReport tmpReport = new ShipToAirMissileTestReport();
+
+        //添加装备标识和自检状态
         tmpReport.setTime(System.currentTimeMillis());
         tmpReport.setRadarSelfCheck(allEquipmentStatus.get(
                 PipeWeaponIndices.AirMissileRadar.getValue()).getCheckStatus());
@@ -142,6 +145,8 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
         tmpReport.setMissileSelfLongCheck(allEquipmentStatus.get(
                 PipeWeaponIndices.AirMissileLongRange.getValue()).getCheckStatus());
 
+
+        //获取信息采集时间
         long[] timeVec = {
                 allEquipmentStatus.get(PipeWeaponIndices.AirMissileRadar.getValue()).getTime(),
                 allEquipmentStatus.get(PipeWeaponIndices.AirMissileFireControl.getValue()).getTime(),
@@ -151,7 +156,11 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
                 allEquipmentStatus.get(PipeWeaponIndices.AirMissileLongRange.getValue()).getTime()
         };
 
+        //获取测试项的阈值
         Double threshold = getThreshold(pipeTest,"pipeTest_cycle_threshold");
+
+
+        //对测试项进行计算并判断是否合格
         boolean pipeStatus = tmpReport.getRadarSelfCheck() &&
                 tmpReport.getFireControlSelfCheck() &&
                 tmpReport.getLauncherSelfCheck() &&
@@ -159,6 +168,8 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
                 tmpReport.getMissileSelfMediumCheck() &&
                 tmpReport.getMissileSelfLongCheck() &&
                 meetTestCycleHelper(timeVec, threshold);
+
+        //设置测试项的状态
         tmpReport.setStatus(pipeStatus);
 
         tmpReport.setTaskId(taskId);
@@ -436,9 +447,9 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
             return;
         }
 
-        String instructionsKey = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, DateParserUtils.getTime());
-        String targetKey = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, DateParserUtils.getTime());
-        String equipmentKey = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, DateParserUtils.getTime());
+        String instructionsKey = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, DateParserUtils.getTime());
+        String targetKey = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, DateParserUtils.getTime());
+        String equipmentKey = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, DateParserUtils.getTime());
 
 
         StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();

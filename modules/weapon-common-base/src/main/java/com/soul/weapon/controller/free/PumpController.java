@@ -56,7 +56,7 @@ public class PumpController {
         }
         structName = StringUtils.trim(structName);
         switch (structName) {
-            //value-> weapon:pump:combat_scenarios_info
+            //value-> weapon:pump:combat_scenarios_info 作战方案
             case "CombatScenariosInfo": {
                 CombatScenariosInfo combatScenariosInfo = JsonUtils.deserialize(JsonUtils.serialize(msg), CombatScenariosInfo.class);
                 combatScenariosInfo.setScenariosList(JsonUtils.deserializeList(
@@ -73,7 +73,7 @@ public class PumpController {
                 }
 
             }break;
-            //value-> weapon:pump:environment_info
+            //value-> weapon:pump:environment_info  战场环境
             case "EnvironmentInfo": {
                 String key=String.format("%s:%s", Constant.ENVIRONMENT_INFO_HTTP_KEY,getTime());
                 if (RedisUtils.getService(config.getPumpDataBase()).exists(key)){
@@ -87,7 +87,7 @@ public class PumpController {
             }break;
             //hash-> weapon:pump:equipment_launch_status:equipmentId hk->EquipmentId
             //hash-> weapon:pump:equipment_launch_status:targetId hk->TargetId
-            //list-> weapon:pump:equipment_launch_status_{equipmentId}
+            //list-> weapon:pump:equipment_launch_status_{equipmentId}  武器发射
             case "EquipmentLaunchStatus": {
                 EquipmentLaunchStatus equipmentLaunchStatus = JsonUtils.deserialize(JsonUtils.serialize(msg), EquipmentLaunchStatus.class);
 
@@ -129,17 +129,9 @@ public class PumpController {
                 }
             }break;
             //hash-> weapon:pump:equipment_status
-            //list->weapon:pump:equipment_status_{equipmentId}
+            //list->weapon:pump:equipment_status_{equipmentId}  装备状态
             case "EquipmentStatus": {
                 EquipmentStatus equipmentStatus = JsonUtils.deserialize(JsonUtils.serialize(msg), EquipmentStatus.class);
-
-                RedisUtils.getService(config.getPumpDataBase()).
-                        boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).put(
-                                equipmentStatus.getEquipmentId(), JsonUtils.serialize(equipmentStatus));
-
-                RedisUtils.getService(config.getPumpDataBase()).boundListOps(
-                        Constant.EQUIPMENT_STATUS_HTTP_KEY+"_"+ equipmentStatus.getEquipmentId()).leftPush(JsonUtils.serialize(equipmentStatus));
-
                 String keyAll = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY,getTime());
                 if (RedisUtils.getService(config.getPumpDataBase()).exists(keyAll)){
                     RedisUtils.getService(config.getPumpDataBase()).
@@ -163,7 +155,7 @@ public class PumpController {
                 }
             }break;
             //hash-> weapon:pump:launcher_rotation_info:equipmentId hk->EquipmentId
-            //hash-> weapon:pump:launcher_rotation_info:targetId hk->TargetId
+            //hash-> weapon:pump:launcher_rotation_info:targetId hk->TargetId   发射架调转
             case "LauncherRotationInfo": {
 
                 LauncherRotationInfo launcherRotationInfo=JsonUtils.deserialize(JsonUtils.serialize(msg),LauncherRotationInfo.class);
@@ -196,7 +188,7 @@ public class PumpController {
                 }
 
             }break;
-            //hash-> weapon:pump:target_fire_control_info hk->TargetId
+            //hash-> weapon:pump:target_fire_control_info hk->TargetId  目标火控
             case "TargetFireControlInfo": {
                 TargetFireControlInfo tmpTargetFireControlInfo=JsonUtils.deserialize(JsonUtils.serialize(msg),TargetFireControlInfo.class);
                 String key=String.format("%s:%s",Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY,getTime());
@@ -212,7 +204,7 @@ public class PumpController {
 
             }break;
             //hash-> weapon:pump:target_info hk->TargetId
-            //list->weapon:pump:target_info_{targetId}
+            //list->weapon:pump:target_info_{targetId}  目标信息
             case "TargetInfo": {
                 TargetInfo tmpTargetInfo = JsonUtils.deserialize(JsonUtils.serialize(msg), TargetInfo.class);
 
@@ -243,7 +235,7 @@ public class PumpController {
 //                influxdbTemplate.insert(Constant.TARGET_INFO_INFLUX_MEASURMENT_NAME, msg);
             }break;
             //hash-> weapon:pump:target_instructions_info hk->TargetId
-            //list->weapon:pump:target_instructions_info_{targetId}
+            //list->weapon:pump:target_instructions_info_{targetId} 目标指示
             case "TargetInstructionsInfo": {
                 TargetInstructionsInfo targetInstructionsInfo = JsonUtils.deserialize(JsonUtils.serialize(msg),
                         TargetInstructionsInfo.class);

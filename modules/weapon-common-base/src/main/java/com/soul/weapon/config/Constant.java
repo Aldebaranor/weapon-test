@@ -9,13 +9,21 @@ public class Constant {
     /**
      * http 报文存入redis方法
      */
+    //作战方案
     public static String COMBAT_SCENARIOS_INFO_HTTP_KEY = "weapon:pump:combat_scenarios_info";
+    //战场环境
     public static String ENVIRONMENT_INFO_HTTP_KEY = "weapon:pump:environment_info";
+    //武器发射
     public static String EQUIPMENT_LAUNCH_STATUS_HTTP_KEY = "weapon:pump:equipment_launch_status";
+    //设备状态
     public static String EQUIPMENT_STATUS_HTTP_KEY = "weapon:pump:equipment_status";
+    //发射器架跳转
     public static String LAUNCHER_ROTATION_INFO_HTTP_KEY = "weapon:pump:launcher_rotation_info";
+    //目标火控
     public static String TARGET_FIRE_CONTROL_INFO_HTTP_KEY = "weapon:pump:target_fire_control_info";
+    //目标信息
     public static String TARGET_INFO_HTTP_KEY = "weapon:pump:target_info";
+    //目标指示
     public static String TARGET_INSTRUCTIONS_INFO_HTTP_KEY = "weapon:pump:target_instructions_info";
 
     public static String TARGET_ID = ":targetId";
@@ -43,34 +51,34 @@ public class Constant {
     public static String WEAPON_CURRENT_PIPETEST = "weapon:current:pipeTest";
 
     //舰空导弹武器通道测试
-    public static String SHIP_AIR_MISSILE="1";
+    public static String SHIP_AIR_MISSILE="test1";
     //反导舰炮武器通道测试
-    public static String ANTI_MISSILE_NAVAL_GUN="2";
+    public static String ANTI_MISSILE_NAVAL_GUN="test2";
     //鱼雷防御武器通道测试
-    public static String TORPEDO_DEFENSE="3";
+    public static String TORPEDO_DEFENSE="test3";
     //电子对抗武器通道测试
-    public static String ELECTRONIC_COUNTERMEASURE="4";
+    public static String ELECTRONIC_COUNTERMEASURE="test4";
     //水声对抗武器测试
-    public static String UNDERWATER_ACOUSTIC_COUNTERMEASURE="5";
+    public static String UNDERWATER_ACOUSTIC_COUNTERMEASURE="test5";
     //信息流程测试
-    public static String INFORMATION_FLOW="6";
+    public static String INFORMATION_FLOW="test6";
     //威胁判断测试
-    public static String THREAT_JUDGMENT="7";
+    public static String THREAT_JUDGMENT="test7";
     //指示处理精度测试
-    public static String INDICATES_THE_PROCESSING_ACCURACY="8";
+    public static String INDICATES_THE_PROCESSING_ACCURACY="test8";
     //执行情况测试
-    public static String IMPLEMENTATION="9";
+    public static String IMPLEMENTATION="test9";
     //雷达航迹测试
-    public static String RADAR_TRACK="10";
+    public static String RADAR_TRACK="test10";
     //拦截距离测试
-    public static String INTERCEPT_DISTANCE="11";
+    public static String INTERCEPT_DISTANCE="test11";
     //火控解算精度测试
-    public static String FIRE_CONTROL_CALCULATION_ACCURACY="12";
+    public static String FIRE_CONTROL_CALCULATION_ACCURACY="test12";
     //反应时间测试
-    public static String REACTION_TIME="13";
+    public static String REACTION_TIME="test13";
     //发射架调转精度测试
-    public static String LAUNCHER_ROTATION_ACCURACY="14";
+    public static String LAUNCHER_ROTATION_ACCURACY="test14";
     //多目标拦截能力测试
-    public static String MULTI_TARGET_INTERCEPTION="15";
+    public static String MULTI_TARGET_INTERCEPTION="test15";
 
 }
