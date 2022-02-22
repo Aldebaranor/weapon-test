@@ -7,11 +7,12 @@ import com.flagwind.persistent.model.ClauseOperator;
 import lombok.Data;
 
 import javax.persistence.Column;
+import java.io.Serializable;
 
 @Data
 @Condition
 @Display("武器表")
-public class FireWeaponCondition {
+public class FireWeaponCondition implements Serializable {
 
     @Display("id")
     @ConditionOperator(name = "id", operator = ClauseOperator.Equal)

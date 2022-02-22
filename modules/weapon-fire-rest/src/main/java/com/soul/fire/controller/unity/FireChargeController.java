@@ -41,19 +41,25 @@ public class FireChargeController {
     @GetMapping("/result")
     public List<ChargeReport> chargeResult() {
         List<ChargeReport> results = new ArrayList<>();
-        Map<String,String> chargeResults = RedisUtils.getService(config.
-                getFireDataBase()).boundHashOps(Constant.CHARGE_KEY).entries();
+        Map<String,ChargeReport> chargeResults = RedisUtils.getService(config.
+                getFireDataBase()).extrasForHash().hgetall(Constant.CHARGE_KEY,ChargeReport.class);
         if(chargeResults==null) {
             return results;
         }
-
-        Map<String, ChargeReport> chargeResultsMap = chargeResults.entrySet().stream().collect(
-                Collectors.toMap(
-                        Map.Entry::getKey,
-                        pair -> JsonUtils.deserialize(pair.getValue(), ChargeReport.class)
-                )
-        );
-        return new ArrayList<>(chargeResultsMap.values());
+        return chargeResults.entrySet().stream().map(map->map.getValue()).collect(Collectors.toList());
+//        Map<String,String> chargeResults = RedisUtils.getService(config.
+//                getFireDataBase()).boundHashOps(Constant.CHARGE_KEY).entries();
+//        if(chargeResults==null) {
+//            return results;
+//        }
+//
+//        Map<String, ChargeReport> chargeResultsMap = chargeResults.entrySet().stream().collect(
+//                Collectors.toMap(
+//                        Map.Entry::getKey,
+//                        pair -> JsonUtils.deserialize(pair.getValue(), ChargeReport.class)
+//                )
+//        );
+//        return new ArrayList<>(chargeResultsMap.values());
     }
 
     /**
@@ -63,26 +69,32 @@ public class FireChargeController {
     @Api
     @PostMapping("/detail/{id}")
     public List<ReportDetail> getDetails(@PathVariable String id) {
-
         List<ReportDetail> results = new ArrayList<>();
-        Map<String,String> detailResults = RedisUtils.getService(config.
-                getFireDataBase()).boundHashOps(Constant.CHARGEDETAIL_KEY).entries();
+        Map<String,ReportDetail> detailResults = RedisUtils.getService(config.
+                getFireDataBase()).extrasForHash().hgetall(Constant.CHARGEDETAIL_KEY,ReportDetail.class);
         if(detailResults==null) {
             return results;
         }
-
-        Map<String, ReportDetail> detailResultsMap = detailResults.entrySet().stream().collect(
-                Collectors.toMap(
-                        Map.Entry::getKey,
-                        pair -> JsonUtils.deserialize(pair.getValue(), ReportDetail.class)
-                )
-        );
-        for(String key:detailResultsMap.keySet()){
-            if(key.equals(id)){
-                results.add(detailResultsMap.get(key));
-            }
-        }
-        return results;
+        return detailResults.entrySet().stream().map(map->map.getValue()).collect(Collectors.toList());
+//        List<ReportDetail> results = new ArrayList<>();
+//        Map<String,String> detailResults = RedisUtils.getService(config.
+//                getFireDataBase()).boundHashOps(Constant.CHARGEDETAIL_KEY).entries();
+//        if(detailResults==null) {
+//            return results;
+//        }
+//
+//        Map<String, ReportDetail> detailResultsMap = detailResults.entrySet().stream().collect(
+//                Collectors.toMap(
+//                        Map.Entry::getKey,
+//                        pair -> JsonUtils.deserialize(pair.getValue(), ReportDetail.class)
+//                )
+//        );
+//        for(String key:detailResultsMap.keySet()){
+//            if(key.equals(id)){
+//                results.add(detailResultsMap.get(key));
+//            }
+//        }
+//        return results;
     }
 
 

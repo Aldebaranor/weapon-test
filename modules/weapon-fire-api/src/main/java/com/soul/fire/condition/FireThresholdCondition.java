@@ -6,10 +6,12 @@ import com.flagwind.persistent.annotation.ConditionOperator;
 import com.flagwind.persistent.model.ClauseOperator;
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
 @Condition
 @Display("阈值表")
-public class FireThresholdCondition {
+public class FireThresholdCondition implements Serializable {
 
     @Display("id")
     @ConditionOperator(name = "id", operator = ClauseOperator.Equal)
