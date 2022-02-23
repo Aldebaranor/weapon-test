@@ -4,13 +4,16 @@ import com.egova.web.annotation.Api;
 import com.soul.weapon.condition.AntiMissileShipGunTestReportCondition;
 import com.soul.weapon.condition.ElectronicWeaponTestReportCondition;
 import com.soul.weapon.condition.ExecutionStatusReportCondition;
+import com.soul.weapon.condition.InfoProcessTestReportCondition;
 import com.soul.weapon.entity.PipeHistory;
 import com.soul.weapon.entity.historyInfo.AntiMissileShipGunTestReport;
 import com.soul.weapon.entity.historyInfo.ElectronicWeaponTestReport;
 import com.soul.weapon.entity.historyInfo.ExecutionStatusReport;
+import com.soul.weapon.entity.historyInfo.InfoProcessTestReport;
 import com.soul.weapon.service.AntiMissileShipGunTestReportService;
 import com.soul.weapon.service.ElectronicWeaponTestReportService;
 import com.soul.weapon.service.ExecutionStatusReportService;
+import com.soul.weapon.service.InfoProcessTestReportService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.checkerframework.checker.units.qual.A;
@@ -38,6 +41,8 @@ public class PipeHistoryController {
     @Autowired
     private final ExecutionStatusReportService executionStatusReportService;
 
+    @Autowired
+    private final InfoProcessTestReportService infoProcessTestReportService;
 
 
     @Api
@@ -65,6 +70,16 @@ public class PipeHistoryController {
         ExecutionStatusReportCondition condition = new ExecutionStatusReportCondition();
         condition.setTaskId(taskId);
         return  executionStatusReportService.list(condition);
+    }
+
+
+    //获取信息流程测试历史报告
+    @Api
+    @GetMapping(value = "/infoProcessTest/{taskId}")
+    public List<InfoProcessTestReport> getInfoProcessTest(@PathVariable("taskId") String taskId){
+        InfoProcessTestReportCondition condition = new InfoProcessTestReportCondition();
+        condition.setTaskId(taskId);
+        return infoProcessTestReportService.list(condition);
     }
 
 

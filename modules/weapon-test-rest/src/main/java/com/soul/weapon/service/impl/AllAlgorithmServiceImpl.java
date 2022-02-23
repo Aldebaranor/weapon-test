@@ -66,10 +66,10 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
         if(pipeTest == null ){
             return null;
         }
-        PropertyItem<Double> item = new PropertyItem<>();
+        PropertyItem<Double>  item = new PropertyItem<Double>();
         String threshold = pipeTest.getThreshold();
         if (StringUtils.isEmpty(threshold)) {
-            item = WeaponTestConstant.WEAPON_THRESHOLD.get(pipeTest.getType())
+            item = WeaponTestConstant.WEAPON_THRESHOLD.get(pipeTest.getType().getValue())
                     .stream().filter((q -> StringUtils.equals(q.getName(), key))).findFirst().orElse(null);
         }else{
             List<PropertyItem<Double>> list = null;
@@ -82,11 +82,13 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
                 return null;
             }
             item = list.stream().filter((q -> StringUtils.equals(q.getName(), key))).findFirst().orElse(null);
+            //return Double.valueOf(threshold);
         }
         if(item == null){
             return null;
         }else {
-            return item.getValue();
+            String s = String.valueOf(item.getValue());
+            return Double.valueOf(s);
         }
     }
 
@@ -479,9 +481,9 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
         Double threshold = getThreshold(pipeTest,"progress_time_threshold");
 
         //循环外设置变量用于存储时间用于运算
-        double equipmentLaunchTime;
-        double targetInstructionsTime;
-        double targetFireControlInfoTime;
+        Long equipmentLaunchTime;
+        Long targetInstructionsTime;
+        Long targetFireControlInfoTime;
         //创建测试结果报文
         InfoProcessTestReport infoProcessTestReport = new InfoProcessTestReport();
         infoProcessTestReport.setTaskId(taskId);
@@ -578,17 +580,26 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
             return;
         }
 
+        //获取redis中算法相关dds报文的key
         String instructionsKey = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, DateParserUtils.getTime());
         String targetKey = String.format("%s:%s", Constant.TARGET_INFO_HTTP_KEY, DateParserUtils.getTime());
 
 
-        StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
-        if (!template.hasKey(instructionsKey) || !template.hasKey(targetKey)) {
-            log.error("从Redis中获取目标指示信息或目标真值信息失败！");
-            return;
+        RedisService redisService = RedisUtils.getService(config.getPumpDataBase());
+
+        Map<String, TargetInstructionsInfo> allTargetInstructions = redisService.extrasForHash().hgetall(instructionsKey, TargetInstructionsInfo.class);
+        Map<String, TargetInfo> allTargetInfos = redisService.extrasForHash().hgetall(targetKey, TargetInfo.class);
+
+        if (allTargetInstructions == null || allTargetInfos == null) {
+            log.error("条件无法满足威胁判断算法的要求！");
         }
 
-        Map<String, TargetInstructionsInfo> allInstructionInfos = RedisUtils.getService(config.getPumpDataBase()).extrasForHash().hgetall(
+/*        if (!template.hasKey(instructionsKey) || !template.hasKey(targetKey)) {
+            log.error("从Redis中获取目标指示信息或目标真值信息失败！");
+            return;
+        }*/
+
+        /*Map<String, TargetInstructionsInfo> allInstructionInfos = RedisUtils.getService(config.getPumpDataBase()).extrasForHash().hgetall(
                 instructionsKey,TargetInstructionsInfo.class);
         if(allInstructionInfos == null){
             return;
@@ -632,7 +643,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
 
 
             }
-        }
+        }*/
     }
 
     /**

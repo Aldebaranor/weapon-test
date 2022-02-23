@@ -1,6 +1,7 @@
 package com.soul.weapon.controller.free;
 
 import com.egova.cache.RedisEhcacheProperties;
+import com.egova.utils.TimeUtils;
 import com.google.common.collect.Lists;
 import com.egova.exception.ExceptionUtils;
 import com.egova.json.utils.JsonUtils;
@@ -91,7 +92,8 @@ public class PumpController {
             //list-> weapon:pump:equipment_launch_status_{equipmentId}  武器发射
             case "EquipmentLaunchStatus": {
                 EquipmentLaunchStatus equipmentLaunchStatus = JsonUtils.deserialize(JsonUtils.serialize(msg), EquipmentLaunchStatus.class);
-
+                equipmentLaunchStatus.setMsgTime(System.currentTimeMillis());
+                equipmentLaunchStatus.setTime(100L);
                 String key = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY,getTime());
  /*               String keyEquipment = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + Constant.EQUIPMENT_ID,getTime());
                 String keyTarget = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + Constant.TARGET_ID,getTime());
@@ -199,6 +201,8 @@ public class PumpController {
             //hash-> weapon:pump:target_fire_control_info hk->TargetId  目标火控
             case "TargetFireControlInfo": {
                 TargetFireControlInfo tmpTargetFireControlInfo=JsonUtils.deserialize(JsonUtils.serialize(msg),TargetFireControlInfo.class);
+                tmpTargetFireControlInfo.setMsgTime(System.currentTimeMillis());
+                tmpTargetFireControlInfo.setTime(102L);
                 String key=String.format("%s:%s",Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY,getTime());
                 if(RedisUtils.getService(config.getPumpDataBase()).exists(key)){
                     RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key).
@@ -247,6 +251,9 @@ public class PumpController {
             case "TargetInstructionsInfo": {
                 TargetInstructionsInfo targetInstructionsInfo = JsonUtils.deserialize(JsonUtils.serialize(msg),
                         TargetInstructionsInfo.class);
+                targetInstructionsInfo.setMsgTime(System.currentTimeMillis());
+                targetInstructionsInfo.setTime(101L);
+
                 // 目标指示历史报文
                 String keyAll = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY,getTime());
                 if (RedisUtils.getService(config.getPumpDataBase()).exists(keyAll)){
