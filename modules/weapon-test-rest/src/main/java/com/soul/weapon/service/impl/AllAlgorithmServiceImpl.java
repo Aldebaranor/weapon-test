@@ -484,16 +484,17 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
         double targetFireControlInfoTime;
         //创建测试结果报文
         InfoProcessTestReport infoProcessTestReport = new InfoProcessTestReport();
+        infoProcessTestReport.setTaskId(taskId);
+        infoProcessTestReport.setStatus(false);
+        infoProcessTestReport.setId(UUID.randomUUID().toString());
+        infoProcessTestReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        infoProcessTestReport.setDisabled(false);
         //判断信息流程信息第一个条件
         for (String targetId : allEquipmentLaunchs.keySet()) {
             if (allTargetInstructions.containsKey(targetId) && allTargetFireControlInfos.containsKey(targetId)) {
                 //设置信息流程返回报文信息
                 infoProcessTestReport.setTargetId(targetId);
                 infoProcessTestReport.setTargetType(allEquipmentLaunchs.get(targetId).getTargetTypeId());
-                infoProcessTestReport.setTaskId(taskId);
-                infoProcessTestReport.setId(UUID.randomUUID().toString());
-                infoProcessTestReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                infoProcessTestReport.setDisabled(false);
                 //1.获取时间
                 equipmentLaunchTime = allEquipmentLaunchs.get(targetId).getTime();
                 targetInstructionsTime = allTargetInstructions.get(targetId).getTime();
@@ -509,11 +510,9 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
                     infoProcessTestReport.setStatus(true);
                 }
 
-                infoProcessTestReport.setStatus(false);
-
-                infoProcessTestReportService.insert(infoProcessTestReport);
             }
         }
+        infoProcessTestReportService.insert(infoProcessTestReport);
 /*        for (String key2 : allFireControlInfos.keySet()) {
             TargetFireControlInfo targetFireControlInfo = allFireControlInfos.get(key2);
 
