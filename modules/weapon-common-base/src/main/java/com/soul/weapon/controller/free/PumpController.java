@@ -1,5 +1,6 @@
 package com.soul.weapon.controller.free;
 
+import com.egova.cache.RedisEhcacheProperties;
 import com.google.common.collect.Lists;
 import com.egova.exception.ExceptionUtils;
 import com.egova.json.utils.JsonUtils;
@@ -91,10 +92,10 @@ public class PumpController {
             case "EquipmentLaunchStatus": {
                 EquipmentLaunchStatus equipmentLaunchStatus = JsonUtils.deserialize(JsonUtils.serialize(msg), EquipmentLaunchStatus.class);
 
-                String keyAll = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY,getTime());
-                String keyEquipment = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + Constant.EQUIPMENT_ID,getTime());
-                String keyTarget = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + Constant.TARGET_ID
-                        ,getTime());
+                String key = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY,getTime());
+ /*               String keyEquipment = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + Constant.EQUIPMENT_ID,getTime());
+                String keyTarget = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY + Constant.TARGET_ID,getTime());
+                String keyAll = String.format("%s_%s:%s",Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY,equipmentLaunchStatus.getEquipmentId(),getTime());
                 // 以发射的武器id为KEY存储
                 if (RedisUtils.getService(config.getPumpDataBase()).exists(keyEquipment)){
                     RedisUtils.getService(config.getPumpDataBase()).
@@ -116,17 +117,24 @@ public class PumpController {
                             boundHashOps(keyTarget).put(
                             equipmentLaunchStatus.getTargetId(), JsonUtils.serialize(equipmentLaunchStatus));
                     RedisUtils.getService(config.getPumpDataBase()).expire(keyTarget,ONE_DAY);
+                }*/
+                if (RedisUtils.getService(config.getPumpDataBase()).exists(key)) {
+                    RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key).put(equipmentLaunchStatus.getTargetId(),
+                            JsonUtils.serialize(equipmentLaunchStatus));
+                }else{
+                    RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key).put(equipmentLaunchStatus.getTargetId(),
+                            JsonUtils.serialize(equipmentLaunchStatus));
+                    RedisUtils.getService(config.getPumpDataBase()).expire(key,ONE_DAY);
                 }
 
-                String key = String.format("%s_%s:%s",Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY,equipmentLaunchStatus.getEquipmentId(),getTime());
-                if ( RedisUtils.getService(config.getPumpDataBase()).exists(key)){
+/*                if ( RedisUtils.getService(config.getPumpDataBase()).exists(key)){
                     RedisUtils.getService(config.getPumpDataBase()).boundListOps(key).
                             leftPush(JsonUtils.serialize(equipmentLaunchStatus));
                 }else {
                     RedisUtils.getService(config.getPumpDataBase()).boundListOps(key).
                             leftPush(JsonUtils.serialize(equipmentLaunchStatus));
                     RedisUtils.getService(config.getPumpDataBase()).expire(key,ONE_DAY);
-                }
+                }*/
             }break;
             //hash-> weapon:pump:equipment_status
             //list->weapon:pump:equipment_status_{equipmentId}  装备状态
@@ -251,8 +259,7 @@ public class PumpController {
                             JsonUtils.serialize(targetInstructionsInfo));
                     RedisUtils.getService(config.getPumpDataBase()).expire(keyAll,ONE_DAY);
                 }
-
-                // 根据每个目标id存的目标指示历史报文
+/*                // 根据每个目标id存的目标指示历史报文
                 String key = String.format("%s_%s:%s",Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY,
                         targetInstructionsInfo.getTargetId(),getTime());
                 if ( RedisUtils.getService(config.getPumpDataBase()).exists(key)){
@@ -262,8 +269,7 @@ public class PumpController {
                     RedisUtils.getService(config.getPumpDataBase()).getTemplate().boundListOps(key).
                             leftPush(JsonUtils.serialize(targetInstructionsInfo));
                     RedisUtils.getService(config.getPumpDataBase()).expire(key,ONE_DAY);
-                }
-
+                }*/
             }break;
             case "Report":{
                 ConflictReport conflictReport = JsonUtils.deserialize(JsonUtils.serialize(msg),

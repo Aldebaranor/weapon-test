@@ -3,6 +3,7 @@ package com.soul.weapon.service.impl;
 import com.egova.data.service.AbstractRepositoryBase;
 import com.egova.data.service.TemplateService;
 import com.egova.entity.DictionaryItem;
+import com.egova.generic.domain.DictionaryItemRepository;
 import com.egova.generic.service.DictionaryService;
 import com.soul.weapon.condition.PipeTestCondition;
 import com.soul.weapon.domain.PipeTestRepository;
@@ -16,7 +17,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Priority;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -32,6 +36,7 @@ public class PipeTestServiceImpl extends TemplateService<PipeTest, String> imple
 
     private final PipeTestRepository pipeTestRepository;
     private final DictionaryService dictionaryService;
+    private final DictionaryItemRepository dictionaryItemRepository;
 
     @Override
     protected AbstractRepositoryBase<PipeTest, String> getRepository() {
@@ -85,6 +90,25 @@ public class PipeTestServiceImpl extends TemplateService<PipeTest, String> imple
     @Override
     public List<DictionaryItem> getPipeTestTree() {
         return dictionaryService.getItemTreeByType("weapon-test:pipe-test-type");
+    }
+
+    @Override
+    public List<DictionaryItem> getCurrentTaskTestItems(String taskId) {
+
+        List<DictionaryItem> resultList = new ArrayList<>();
+        List<PipeTest> pipeTestList = this.getByTaskId(taskId);
+        List<DictionaryItem> dictionaryItemList = this.getPipeTestTree();
+        pipeTestList.forEach(pipeTest -> {
+            dictionaryItemList.forEach(dictionaryItem -> {
+                List<DictionaryItem> items = (List<DictionaryItem>) dictionaryItem.get("children");
+                items.forEach(item -> {
+                    if (item.getCode().equals(pipeTest.getCode())) {
+                        resultList.add(item);
+                    }
+                });
+            });
+        });
+        return resultList;
     }
 
 }

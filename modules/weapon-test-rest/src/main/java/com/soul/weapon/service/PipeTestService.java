@@ -5,6 +5,7 @@ import com.soul.weapon.condition.PipeTestCondition;
 import com.soul.weapon.entity.PipeTest;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: nash5
@@ -84,4 +85,6 @@ public interface PipeTestService {
      * @return pipe test tree
      */
     List<DictionaryItem> getPipeTestTree();
+
+    List<DictionaryItem> getCurrentTaskTestItems(String taskId);
 }

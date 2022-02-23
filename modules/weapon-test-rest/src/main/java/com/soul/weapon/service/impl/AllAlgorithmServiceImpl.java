@@ -2,6 +2,7 @@ package com.soul.weapon.service.impl;
 
 import com.egova.json.utils.JsonUtils;
 import com.egova.model.PropertyItem;
+import com.egova.redis.RedisService;
 import com.egova.redis.RedisUtils;
 import com.flagwind.commons.StringUtils;
 import com.soul.weapon.config.CommonConfig;
@@ -402,6 +403,9 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
         if(! allEquipmentStatus.containsKey(PipeWeaponIndices.MultiUsageLaunch.getValue())){
             return;
         }
+        if(! allEquipmentStatus.containsKey(PipeWeaponIndices.Sonar.getValue())){
+            return;
+        }
         WaterWeaponTestReport tmpReport = new WaterWeaponTestReport();
         tmpReport.setTime(System.currentTimeMillis());
         tmpReport.setSonarId(PipeWeaponIndices.Sonar.getValue());
@@ -443,29 +447,74 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
      */
     @Override
     public void infoProcessTest(String taskId, PipeTest pipeTest) {
+
         if (beStart(taskId, pipeTest)) {
             return;
         }
 
-        String instructionsKey = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, DateParserUtils.getTime());
-        String targetKey = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, DateParserUtils.getTime());
-        String equipmentKey = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, DateParserUtils.getTime());
+        //拼接redis中当天信息流程测试相关的key
+        String equipmentLaunchKey = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, DateParserUtils.getTime());
+        String targetInstructionsKey = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, DateParserUtils.getTime());
+        String targetFireControlKey = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, DateParserUtils.getTime());
 
 
-        StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
-        if (!template.hasKey(instructionsKey) ||
-                !template.hasKey(targetKey)
-                || !template.hasKey(equipmentKey)) {
-            log.error("从Redis中获取信息失败！");
+        RedisService redisService = RedisUtils.getService(config.getPumpDataBase());
+/*        if (!redisService.exists(equipmentLaunchKey) &&
+                !redisService.exists(targetInstructionsKey)
+                && !redisService.exists(targetFireControlKey)) {
+            log.error("dds报文信息不满足信息流程测试！");
+            return;
+        }*/
+
+        //获取redis中当天信息流程测试所需dds报文
+        Map<String,EquipmentLaunchStatus> allEquipmentLaunchs = redisService.extrasForHash().hgetall(equipmentLaunchKey,EquipmentLaunchStatus.class);
+        Map<String, TargetInstructionsInfo> allTargetInstructions = redisService.extrasForHash().hgetall(targetInstructionsKey,TargetInstructionsInfo.class);
+        Map<String, TargetFireControlInfo> allTargetFireControlInfos = redisService.extrasForHash().hgetall(targetFireControlKey, TargetFireControlInfo.class);
+
+        if(allEquipmentLaunchs == null || allTargetInstructions == null || allTargetFireControlInfos == null){
+            log.error("dds报文信息不满足信息流程测试！");
             return;
         }
-        Map<String, TargetFireControlInfo> allFireControlInfos = RedisUtils.getService(config.getPumpDataBase()).extrasForHash().hgetall(
-                targetKey,TargetFireControlInfo.class);
-        if(allFireControlInfos == null){
-            return;
-        }
+        //获取信息流程测试的阈值
         Double threshold = getThreshold(pipeTest,"progress_time_threshold");
-        for (String key2 : allFireControlInfos.keySet()) {
+
+        //循环外设置变量用于存储时间用于运算
+        double equipmentLaunchTime;
+        double targetInstructionsTime;
+        double targetFireControlInfoTime;
+        //创建测试结果报文
+        InfoProcessTestReport infoProcessTestReport = new InfoProcessTestReport();
+        //判断信息流程信息第一个条件
+        for (String targetId : allEquipmentLaunchs.keySet()) {
+            if (allTargetInstructions.containsKey(targetId) && allTargetFireControlInfos.containsKey(targetId)) {
+                //设置信息流程返回报文信息
+                infoProcessTestReport.setTargetId(targetId);
+                infoProcessTestReport.setTargetType(allEquipmentLaunchs.get(targetId).getTargetTypeId());
+                infoProcessTestReport.setTaskId(taskId);
+                infoProcessTestReport.setId(UUID.randomUUID().toString());
+                infoProcessTestReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
+                infoProcessTestReport.setDisabled(false);
+                //1.获取时间
+                equipmentLaunchTime = allEquipmentLaunchs.get(targetId).getTime();
+                targetInstructionsTime = allTargetInstructions.get(targetId).getTime();
+                targetFireControlInfoTime = allTargetFireControlInfos.get(targetId).getTime();
+
+                infoProcessTestReport.setTime((long) Math.min((equipmentLaunchTime < targetInstructionsTime ? equipmentLaunchTime : targetInstructionsTime), targetFireControlInfoTime));
+                //2.判断信息流程信息第二个条件
+                if (Math.abs(
+                        Math.max((equipmentLaunchTime > targetInstructionsTime ? equipmentLaunchTime : targetInstructionsTime), targetFireControlInfoTime)
+                        -
+                        Math.min((equipmentLaunchTime < targetInstructionsTime ? equipmentLaunchTime : targetInstructionsTime), targetFireControlInfoTime)
+                ) < threshold) {
+                    infoProcessTestReport.setStatus(true);
+                }
+
+                infoProcessTestReport.setStatus(false);
+
+                infoProcessTestReportService.insert(infoProcessTestReport);
+            }
+        }
+/*        for (String key2 : allFireControlInfos.keySet()) {
             TargetFireControlInfo targetFireControlInfo = allFireControlInfos.get(key2);
 
             String keyTarget = String.format("%s_%s:%s", Constant.TARGET_INFO_HTTP_KEY, targetFireControlInfo.getTargetId(), DateParserUtils.getTime());
@@ -517,7 +566,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
                 }
 
             }
-        }
+        }*/
     }
 
     /**

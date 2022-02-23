@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author: nash5
@@ -89,5 +90,12 @@ public class PipeTestController {
     @GetMapping(value = "/getByTaskId/{taskId}")
     public List<PipeTest> getByTaskId(@PathVariable("taskId") String taskId) {
         return pipeTestService.getByTaskId(taskId);
+    }
+
+    //根据taskId获取测试项tree结构
+    @Api
+    @GetMapping(value = "/getCurrentTaskTestItems/{taskId}")
+    public List<DictionaryItem> getCurrentTaskTestItems(@PathVariable("taskId") String taskId){
+        return pipeTestService.getCurrentTaskTestItems(taskId);
     }
 }
