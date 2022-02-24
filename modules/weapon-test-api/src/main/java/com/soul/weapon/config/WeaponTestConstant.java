@@ -81,7 +81,7 @@ public class WeaponTestConstant {
                     new PropertyItem("depthAccuracy","目标深度指示处理精度阈值(m)",5D)
             ).collect(Collectors.toList())},
             { "9",Stream.of(
-                    new PropertyItem("execution_time_threshold","执行时间阈值(s)",60D)
+                    new PropertyItem("execution_time_threshold","执行情况阈值(s)",60D)
             ).collect(Collectors.toList())},
             { "10",Stream.of(
                     new PropertyItem("radar_path_time_threshold","雷达航迹测试时间阈值时间阈值(s)",2D),

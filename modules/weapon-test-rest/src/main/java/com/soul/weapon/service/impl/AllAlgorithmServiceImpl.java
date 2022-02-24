@@ -460,23 +460,22 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
         String targetFireControlKey = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, DateParserUtils.getTime());
 
 
+
         RedisService redisService = RedisUtils.getService(config.getPumpDataBase());
-/*        if (!redisService.exists(equipmentLaunchKey) &&
-                !redisService.exists(targetInstructionsKey)
-                && !redisService.exists(targetFireControlKey)) {
+
+        if(!redisService.exists(equipmentLaunchKey) && !redisService.exists(targetInstructionsKey) && !redisService.exists(targetFireControlKey)){
             log.error("dds报文信息不满足信息流程测试！");
             return;
-        }*/
+        }
 
         //获取redis中当天信息流程测试所需dds报文
         Map<String,EquipmentLaunchStatus> allEquipmentLaunchs = redisService.extrasForHash().hgetall(equipmentLaunchKey,EquipmentLaunchStatus.class);
         Map<String, TargetInstructionsInfo> allTargetInstructions = redisService.extrasForHash().hgetall(targetInstructionsKey,TargetInstructionsInfo.class);
         Map<String, TargetFireControlInfo> allTargetFireControlInfos = redisService.extrasForHash().hgetall(targetFireControlKey, TargetFireControlInfo.class);
 
-        if(allEquipmentLaunchs == null || allTargetInstructions == null || allTargetFireControlInfos == null){
-            log.error("dds报文信息不满足信息流程测试！");
-            return;
-        }
+        //创建测试结果报文
+        InfoProcessTestReport infoProcessTestReport = new InfoProcessTestReport();
+
         //获取信息流程测试的阈值
         Double threshold = getThreshold(pipeTest,"progress_time_threshold");
 
@@ -484,24 +483,21 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
         Long equipmentLaunchTime;
         Long targetInstructionsTime;
         Long targetFireControlInfoTime;
-        //创建测试结果报文
-        InfoProcessTestReport infoProcessTestReport = new InfoProcessTestReport();
-        infoProcessTestReport.setTaskId(taskId);
-        infoProcessTestReport.setStatus(false);
-        infoProcessTestReport.setId(UUID.randomUUID().toString());
-        infoProcessTestReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
-        infoProcessTestReport.setDisabled(false);
+
         //判断信息流程信息第一个条件
         for (String targetId : allEquipmentLaunchs.keySet()) {
             if (allTargetInstructions.containsKey(targetId) && allTargetFireControlInfos.containsKey(targetId)) {
                 //设置信息流程返回报文信息
+                infoProcessTestReport.setTaskId(taskId);
+                infoProcessTestReport.setId(UUID.randomUUID().toString());
+                infoProcessTestReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
+                infoProcessTestReport.setDisabled(false);
                 infoProcessTestReport.setTargetId(targetId);
                 infoProcessTestReport.setTargetType(allEquipmentLaunchs.get(targetId).getTargetTypeId());
                 //1.获取时间
                 equipmentLaunchTime = allEquipmentLaunchs.get(targetId).getTime();
                 targetInstructionsTime = allTargetInstructions.get(targetId).getTime();
                 targetFireControlInfoTime = allTargetFireControlInfos.get(targetId).getTime();
-
                 infoProcessTestReport.setTime((long) Math.min((equipmentLaunchTime < targetInstructionsTime ? equipmentLaunchTime : targetInstructionsTime), targetFireControlInfoTime));
                 //2.判断信息流程信息第二个条件
                 if (Math.abs(
@@ -510,64 +506,14 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
                         Math.min((equipmentLaunchTime < targetInstructionsTime ? equipmentLaunchTime : targetInstructionsTime), targetFireControlInfoTime)
                 ) < threshold) {
                     infoProcessTestReport.setStatus(true);
+                }else{
+                    infoProcessTestReport.setStatus(false);
                 }
+                infoProcessTestReportService.insert(infoProcessTestReport);
 
             }
         }
-        infoProcessTestReportService.insert(infoProcessTestReport);
-/*        for (String key2 : allFireControlInfos.keySet()) {
-            TargetFireControlInfo targetFireControlInfo = allFireControlInfos.get(key2);
 
-            String keyTarget = String.format("%s_%s:%s", Constant.TARGET_INFO_HTTP_KEY, targetFireControlInfo.getTargetId(), DateParserUtils.getTime());
-            String keyEquipment = String.format("%s_%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, targetFireControlInfo.getTargetId(), DateParserUtils.getTime());
-
-            Long n = template.boundListOps(keyTarget).size();
-
-            for (int i = 0; i < n; i++) {
-
-                TargetInstructionsInfo targetInstructionsInfo = JsonUtils.deserialize(template.boundListOps(
-                        keyTarget).index(i),
-                        TargetInstructionsInfo.class);
-
-                Long m = template.boundListOps(keyEquipment).size();
-
-                for (int j = 0; j < m; j++) {
-
-                    EquipmentLaunchStatus equipmentLaunchStatus = JsonUtils.deserialize(template.boundListOps(
-                            keyEquipment).index(j),
-                            EquipmentLaunchStatus.class);
-
-                    if (StringUtils.equals(targetFireControlInfo.getTargetId(), targetInstructionsInfo.getTargetId()) &&
-                            StringUtils.equals(targetFireControlInfo.getTargetId(), equipmentLaunchStatus.getTargetId())) {
-
-                        InfoProcessTestReport infoProcessTestReport = new InfoProcessTestReport();
-
-                        boolean b = equipmentLaunchStatus.getTime() > targetFireControlInfo.getTime() &&
-                                targetFireControlInfo.getTime() > targetInstructionsInfo.getTime();
-                        boolean d = equipmentLaunchStatus.getTime() - targetInstructionsInfo.getTime() < threshold;
-
-                        // 设置信息流程返回报文信息
-                        infoProcessTestReport.setTargetId(equipmentLaunchStatus.getTargetId());
-                        infoProcessTestReport.setTime(equipmentLaunchStatus.getTime());
-                        infoProcessTestReport.setTargetType(equipmentLaunchStatus.getTargetTypeId());
-                        if (b && d) {
-                            infoProcessTestReport.setStatus(true);
-                        } else {
-                            infoProcessTestReport.setStatus(false);
-                        }
-
-                        infoProcessTestReport.setTaskId(taskId);
-                        infoProcessTestReport.setId(UUID.randomUUID().toString());
-                        infoProcessTestReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                        infoProcessTestReport.setDisabled(false);
-                        infoProcessTestReportService.insert(infoProcessTestReport);
-
-
-                    }
-                }
-
-            }
-        }*/
     }
 
     /**
@@ -587,63 +533,54 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
 
         RedisService redisService = RedisUtils.getService(config.getPumpDataBase());
 
+        if (!redisService.exists(instructionsKey) && !redisService.exists(targetKey)) {
+            log.error("条件无法满足威胁判断算法的要求！");
+            return;
+        }
+
         Map<String, TargetInstructionsInfo> allTargetInstructions = redisService.extrasForHash().hgetall(instructionsKey, TargetInstructionsInfo.class);
         Map<String, TargetInfo> allTargetInfos = redisService.extrasForHash().hgetall(targetKey, TargetInfo.class);
 
-        if (allTargetInstructions == null || allTargetInfos == null) {
-            log.error("条件无法满足威胁判断算法的要求！");
-        }
+        ThreatenReport threatenReport = new ThreatenReport();
 
-/*        if (!template.hasKey(instructionsKey) || !template.hasKey(targetKey)) {
-            log.error("从Redis中获取目标指示信息或目标真值信息失败！");
-            return;
-        }*/
 
-        /*Map<String, TargetInstructionsInfo> allInstructionInfos = RedisUtils.getService(config.getPumpDataBase()).extrasForHash().hgetall(
-                instructionsKey,TargetInstructionsInfo.class);
-        if(allInstructionInfos == null){
-            return;
-        }
-        Double threshold = getThreshold(pipeTest,"detector_time_threshold");
+        //进行算法判断第一个条件  a.A1==B1
+        for (String targetId : allTargetInstructions.keySet()) {
 
-        for (String key2 : allInstructionInfos.keySet()) {
-            TargetInstructionsInfo targetInstructionsInfo = allInstructionInfos.get(key2);
-            String key = String.format("%s_%s:%s", Constant.TARGET_INFO_HTTP_KEY, targetInstructionsInfo.getTargetId(), DateParserUtils.getTime());
-            Long n = template.boundListOps(key).size();
+            if (allTargetInfos.containsKey(targetId)) {
 
-            for (int i = 0; i < n; i++) {
-                TargetInfo targetInfo = JsonUtils.deserialize(template.boundListOps(
-                        key).index(i), TargetInfo.class);
+                //进行算法判断第二个条件 b.|A3-B3| < 传感器探测时间阀值
+                if (Math.abs(allTargetInstructions.get(targetId).getTime() - allTargetInfos.get(targetId).getTime()) < getThreshold(pipeTest,"detector_time_threshold")) {
+                    //通过
 
-                assert targetInfo != null;
+                    //装填测试报文
+                    TargetInstructionsInfo targetInstructionsInfo = allTargetInstructions.get(targetId);
+                    TargetInfo targetInfo = allTargetInfos.get(targetId);
 
-                if (StringUtils.equals(targetInfo.getTargetId(), targetInstructionsInfo.getTargetId())) {
+                    threatenReport.setTime(targetInstructionsInfo.getTime());
+                    threatenReport.setTargetId(targetId);
+                    threatenReport.setTargetType(targetInstructionsInfo.getTargetTypeId());
+                    threatenReport.setDistanceOffset(
+                            Math.abs(targetInstructionsInfo.getDistance() - targetInfo.getDistance())
+                    );
+                    threatenReport.setSpeedOffset(
+                            Math.abs(targetInstructionsInfo.getSpeed() - targetInfo.getSpeed())
+                    );
+                    threatenReport.setPitchOffset(
+                            Math.abs(targetInstructionsInfo.getPitchAngle() - targetInfo.getPitchAngle())
+                    );
+                    threatenReport.setDisabled(false);
+                    threatenReport.setId(UUID.randomUUID().toString());
+                    threatenReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
 
-                    if (Math.abs(targetInfo.getTime() - targetInstructionsInfo.getTime()) < threshold) {
-
-                        ThreatenReport threatenReport = new ThreatenReport();
-                        threatenReport.setTargetId(targetInfo.getTargetId());
-                        threatenReport.setTargetType(targetInfo.getTargetTypeId());
-                        threatenReport.setDistanceOffset(
-                                Math.abs(targetInfo.getDistance() - targetInstructionsInfo.getDistance()));
-                        threatenReport.setTime(targetInstructionsInfo.getTime());
-                        threatenReport.setPitchOffset(
-                                Math.abs(targetInfo.getPitchAngle() - targetInstructionsInfo.getPitchAngle()));
-                        threatenReport.setSpeedOffset(
-                                Math.abs(targetInfo.getSpeed() - targetInstructionsInfo.getSpeed()));
-
-                        threatenReport.setTaskId(taskId);
-                        threatenReport.setId(UUID.randomUUID().toString());
-                        threatenReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                        threatenReport.setDisabled(false);
-                        threatenReportService.insert(threatenReport);
-                    }
+                    threatenReportService.insert(threatenReport);
 
                 }
-
-
             }
-        }*/
+
+            
+        }
+
     }
 
     /**
@@ -659,58 +596,50 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
         String instructionsKey = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, DateParserUtils.getTime());
         String targetKey = String.format("%s:%s", Constant.TARGET_INFO_HTTP_KEY, DateParserUtils.getTime());
 
-        StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
-        if (!template.hasKey(instructionsKey) || !template.hasKey(targetKey)) {
-            log.error("从Redis中获取目标指示信息或目标真值信息失败！");
+        RedisService redisService = RedisUtils.getService(config.getPumpDataBase());
+
+        if (!redisService.exists(instructionsKey) && !redisService.exists(targetKey)) {
+            log.error("从Redis中获取指示处理精度测试dds报文条件不满足！");
             return;
         }
 
-        Map<String, TargetInstructionsInfo> allInstructionInfos = RedisUtils.getService(config.getPumpDataBase()).extrasForHash()
-                .hgetall(instructionsKey,TargetInstructionsInfo.class);
-        if(allInstructionInfos == null){
-            return;
-        }
-        Double threshold = getThreshold(pipeTest,"instruction_time_threshold");
-        for (String key2 : allInstructionInfos.keySet()) {
-            TargetInstructionsInfo targetInstructionsInfo = allInstructionInfos.get(key2);
-            String key = String.format("%s_%s:%s", Constant.TARGET_INFO_HTTP_KEY, targetInstructionsInfo.getTargetId(), DateParserUtils.getTime());
-            Long n = template.boundListOps(key).size();
+        Map<String, TargetInstructionsInfo> allTargetInstructions = redisService.extrasForHash().hgetall(instructionsKey, TargetInstructionsInfo.class);
+        Map<String, TargetInfo> allTargetInfos = redisService.extrasForHash().hgetall(targetKey, TargetInfo.class);
 
-            for (int i = 0; i < n; i++) {
-                TargetInfo targetInfo = JsonUtils.deserialize(template.boundListOps(
-                        key).index(i), TargetInfo.class);
+        InstructionAccuracyReport instructionAccuracyReport = new InstructionAccuracyReport();
 
-                assert targetInfo != null;
+        //进行算法判断第一个条件  a.A1==B1
+        for (String targetId : allTargetInstructions.keySet()){
 
-                if (StringUtils.equals(targetInfo.getTargetId(), targetInstructionsInfo.getTargetId())) {
-                    // 指示处理精度测试
-                    if (Math.abs(targetInfo.getTime() - targetInstructionsInfo.getTime()) < threshold) {
+            if (allTargetInfos.containsKey(targetId)) {
 
-                        InstructionAccuracyReport instructionAccuracyReport = new InstructionAccuracyReport();
-                        instructionAccuracyReport.setTime(targetInstructionsInfo.getTime());
-                        instructionAccuracyReport.setTargetId(targetInstructionsInfo.getTargetId());
-                        instructionAccuracyReport.setTargetType(targetInstructionsInfo.getTargetTypeId());
-                        instructionAccuracyReport.setSensorId(targetInstructionsInfo.getEquipmentId());
-                        instructionAccuracyReport.setSensorType(targetInstructionsInfo.getEquipmentTypeId());
+                TargetInstructionsInfo targetInstructionsInfo = allTargetInstructions.get(targetId);
+                TargetInfo targetInfo = allTargetInfos.get(targetId);
 
-                        instructionAccuracyReport.setDistanceAccuracy(
-                                Math.abs(targetInstructionsInfo.getDistance() - targetInfo.getDistance()));
-                        instructionAccuracyReport.setAzimuthAccuracy(
-                                Math.abs(targetInstructionsInfo.getAzimuth() - targetInfo.getAzimuth()));
-                        instructionAccuracyReport.setDepthAccuracy(
-                                Math.abs(targetInstructionsInfo.getDepth() - targetInfo.getDepth()));
-                        instructionAccuracyReport.setPitchAccuracy(
-                                Math.abs(targetInstructionsInfo.getPitchAngle() - targetInfo.getPitchAngle()));
+                //进行算法判断第二个条件 b.|A5-B3| < 指示处理时间阀值
+                if (Math.abs(targetInstructionsInfo.getTime() - targetInfo.getTime()) < getThreshold(pipeTest,"instruction_time_threshold")){
+                    //装填报文
+                    instructionAccuracyReport.setTime(targetInstructionsInfo.getTime());
+                    instructionAccuracyReport.setTargetId(targetInstructionsInfo.getTargetId());
+                    instructionAccuracyReport.setTargetType(targetInstructionsInfo.getTargetTypeId());
+                    instructionAccuracyReport.setSensorId(targetInstructionsInfo.getEquipmentId());
+                    instructionAccuracyReport.setSensorType(targetInstructionsInfo.getEquipmentTypeId());
 
-                        instructionAccuracyReport.setTaskId(taskId);
-                        instructionAccuracyReport.setId(UUID.randomUUID().toString());
-                        instructionAccuracyReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                        instructionAccuracyReport.setDisabled(false);
-                        instructionAccuracyReportService.insert(instructionAccuracyReport);
-                    }
+                    instructionAccuracyReport.setDistanceAccuracy(
+                            Math.abs(targetInstructionsInfo.getDistance() - targetInfo.getDistance()));
+                    instructionAccuracyReport.setAzimuthAccuracy(
+                            Math.abs(targetInstructionsInfo.getAzimuth() - targetInfo.getAzimuth()));
+                    instructionAccuracyReport.setDepthAccuracy(
+                            Math.abs(targetInstructionsInfo.getDepth() - targetInfo.getDepth()));
+                    instructionAccuracyReport.setPitchAccuracy(
+                            Math.abs(targetInstructionsInfo.getPitchAngle() - targetInfo.getPitchAngle()));
 
+                    instructionAccuracyReport.setTaskId(taskId);
+                    instructionAccuracyReport.setId(UUID.randomUUID().toString());
+                    instructionAccuracyReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
+                    instructionAccuracyReport.setDisabled(false);
+                    instructionAccuracyReportService.insert(instructionAccuracyReport);
                 }
-
             }
         }
     }
@@ -720,79 +649,79 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
      */
     @Override
     public void executionStatusTest(String taskId, PipeTest pipeTest) {
+
         if (beStart(taskId, pipeTest)) {
             return;
         }
+        //拼接redis中当天信息流程测试相关的key
+        String equipmentLaunchKey = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, DateParserUtils.getTime());
+        String targetInstructionsKey = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, DateParserUtils.getTime());
+        String targetFireControlKey = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, DateParserUtils.getTime());
 
-        String instructionsKey = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, DateParserUtils.getTime());
-        String targetKey = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, DateParserUtils.getTime());
-        String equipmentKey = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, DateParserUtils.getTime());
+        RedisService redisService = RedisUtils.getService(config.getPumpDataBase());
 
-
-        StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
-        if (!template.hasKey(instructionsKey) ||
-                !template.hasKey(targetKey)
-                || !template.hasKey(equipmentKey)) {
-            log.error("从Redis中获取信息失败！");
+        if(!redisService.exists(equipmentLaunchKey) && !redisService.exists(targetInstructionsKey) && !redisService.exists(targetFireControlKey)){
+            log.error("dds报文信息不满足执行情况测试！");
             return;
         }
-        Map<String, TargetFireControlInfo> allFireControlInfos = RedisUtils.getService(config.getPumpDataBase()).extrasForHash().hgetall(
-                targetKey,TargetFireControlInfo.class);
+        //获取redis中当天信息流程测试所需dds报文
+        Map<String,EquipmentLaunchStatus> allEquipmentLaunchs = redisService.extrasForHash().hgetall(equipmentLaunchKey,EquipmentLaunchStatus.class);
+        Map<String, TargetInstructionsInfo> allTargetInstructions = redisService.extrasForHash().hgetall(targetInstructionsKey,TargetInstructionsInfo.class);
+        Map<String, TargetFireControlInfo> allTargetFireControlInfos = redisService.extrasForHash().hgetall(targetFireControlKey, TargetFireControlInfo.class);
 
-        if(allFireControlInfos == null){
-            return;
-        }
+        ExecutionStatusReport executionStatusReport = new ExecutionStatusReport();
+
+        //获取测试的阈值
         Double threshold = getThreshold(pipeTest,"execution_time_threshold");
-        for (String key2 : allFireControlInfos.keySet()) {
-            TargetFireControlInfo targetFireControlInfo = allFireControlInfos.get(key2);
 
-            String keyTarget = String.format("%s_%s:%s", Constant.TARGET_INFO_HTTP_KEY, targetFireControlInfo.getTargetId(), DateParserUtils.getTime());
-            String keyEquipment = String.format("%s_%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, targetFireControlInfo.getTargetId(), DateParserUtils.getTime());
+        //循环外设置变量用于存储时间用于运算
+        Long equipmentLaunchTime;
+        Long targetInstructionsTime;
+        Long targetFireControlInfoTime;
 
-            Long n = template.boundListOps(keyTarget).size();
+        //判断第一个条件 A6==B1==C1
+        for (String targetId : allEquipmentLaunchs.keySet()) {
+            if (allTargetInstructions.containsKey(targetId) && allTargetFireControlInfos.containsKey(targetId)) {
 
-            for (int i = 0; i < n; i++) {
+                EquipmentLaunchStatus equipmentLaunchStatus = allEquipmentLaunchs.get(targetId);
 
-                TargetInstructionsInfo targetInstructionsInfo = JsonUtils.deserialize(template.boundListOps(
-                        keyTarget).index(i),
-                        TargetInstructionsInfo.class);
+                //1.获取时间
+                equipmentLaunchTime = allEquipmentLaunchs.get(targetId).getTime();
+                targetInstructionsTime = allTargetInstructions.get(targetId).getTime();
+                targetFireControlInfoTime = allTargetFireControlInfos.get(targetId).getTime();
 
-                Long m = template.boundListOps(keyEquipment).size();
+                // 设置执行情况返回报文信息
+                executionStatusReport.setTargetId(equipmentLaunchStatus.getTargetId());
+                executionStatusReport.setTime(equipmentLaunchStatus.getTime());
+                executionStatusReport.setTargetType(equipmentLaunchStatus.getTargetTypeId());
+                executionStatusReport.setTaskId(taskId);
+                executionStatusReport.setId(UUID.randomUUID().toString());
+                executionStatusReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
+                executionStatusReport.setDisabled(false);
 
-                for (int j = 0; j < m; j++) {
+                //判断第二个条件 B5<C5<A4
+                if(targetInstructionsTime < targetFireControlInfoTime){
+                    if (targetFireControlInfoTime < equipmentLaunchTime){
 
-                    EquipmentLaunchStatus equipmentLaunchStatus = JsonUtils.deserialize(template.boundListOps(
-                            keyEquipment).index(j),
-                            EquipmentLaunchStatus.class);
-
-                    if (StringUtils.equals(targetFireControlInfo.getTargetId(), targetInstructionsInfo.getTargetId()) &&
-                            StringUtils.equals(targetFireControlInfo.getTargetId(), equipmentLaunchStatus.getTargetId())) {
-
-                        ExecutionStatusReport executionStatusReport = new ExecutionStatusReport();
-
-                        boolean b = equipmentLaunchStatus.getTime() > targetFireControlInfo.getTime() &&
-                                targetFireControlInfo.getTime() > targetInstructionsInfo.getTime();
-                        boolean c = equipmentLaunchStatus.getTime() - targetInstructionsInfo.getTime() < threshold;
-
-                        // 设置执行情况返回报文信息
-                        executionStatusReport.setTargetId(equipmentLaunchStatus.getTargetId());
-                        executionStatusReport.setTime(equipmentLaunchStatus.getTime());
-                        executionStatusReport.setTargetType(equipmentLaunchStatus.getTargetTypeId());
-                        if (b && c) {
+                        //判断第三个条件 （A4－B5）< 执行时间阈值
+                        if((equipmentLaunchTime - targetInstructionsTime) < threshold){
+                            //true
                             executionStatusReport.setStatus(true);
-                        } else {
-                            executionStatusReport.setStatus(false);
                         }
-
-
-                        executionStatusReport.setTaskId(taskId);
-                        executionStatusReport.setId(UUID.randomUUID().toString());
-                        executionStatusReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                        executionStatusReport.setDisabled(false);
-                        executionStatusReportService.insert(executionStatusReport);
-
+                    }else{
+                        //false
+                        executionStatusReport.setStatus(false);
                     }
+                }else{
+                    //false
+                    executionStatusReport.setStatus(false);
                 }
+                //判断第三个条件 （A4－B5）< 执行时间阈值
+                if(!((equipmentLaunchTime - targetInstructionsTime) < threshold)){
+                    //false
+                    executionStatusReport.setStatus(false);
+                }
+                executionStatusReportService.insert(executionStatusReport);
             }
         }
     }
@@ -807,39 +736,32 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
         if (beStart(taskId, pipeTest)) {
             return;
         }
+
         String instructionsKey = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, DateParserUtils.getTime());
         String targetKey = String.format("%s:%s", Constant.TARGET_INFO_HTTP_KEY, DateParserUtils.getTime());
 
-        StringRedisTemplate template = RedisUtils.getService(config.getPumpDataBase()).getTemplate();
-        if (!template.hasKey(instructionsKey) || !template.hasKey(targetKey)) {
-            log.error("从Redis中获取目标指示信息或目标真值信息失败！");
+        RedisService redisService = RedisUtils.getService(config.getPumpDataBase());
+
+        if (!redisService.exists(instructionsKey) && !redisService.exists(targetKey)) {
+            log.error("从Redis中获取雷达航迹测试所需报文不满足！");
             return;
         }
-        Map<String, TargetInstructionsInfo> allInstructionInfos = RedisUtils.getService(config.getPumpDataBase()).extrasForHash().hgetall(
-                instructionsKey,TargetInstructionsInfo.class);
-        if(allInstructionInfos == null){
-            return;
-        }
+
+        Map<String, TargetInstructionsInfo> allTargetInstructins = redisService.extrasForHash().hgetall(instructionsKey, TargetInstructionsInfo.class);
+        Map<String, TargetInfo> allTargetInfo = redisService.extrasForHash().hgetall(targetKey, TargetInfo.class);
+
         Double threshold = getThreshold(pipeTest,"radar_path_time_threshold");
-        for (String key2 : allInstructionInfos.keySet()) {
-            TargetInstructionsInfo targetInstructionsInfo = allInstructionInfos.get(key2);
-            String key = String.format("%s_%s:%s", Constant.TARGET_INFO_HTTP_KEY, targetInstructionsInfo.getTargetId(), DateParserUtils.getTime());
-            Long n = template.boundListOps(key).size();
 
-            for (int i = 0; i < n; i++) {
-                TargetInfo targetInfo = JsonUtils.deserialize(template.boundListOps(
-                        key).index(i), TargetInfo.class);
-
-                assert targetInfo != null;
-
-                if (StringUtils.equals(targetInfo.getTargetId(), targetInstructionsInfo.getTargetId())) {
-
-                    // 雷达航迹测试
-                    if (targetInfo.getTime() - targetInstructionsInfo.getTime() > 0
-                            && targetInfo.getTime() - targetInstructionsInfo.getTime() < threshold
-                            && targetInfo.getTargetTypeId().equals(AIRTYPE)
-                            && targetInstructionsInfo.getTargetTypeId().equals(AIRTYPE)) {
-
+        //判断第一个条件 A1==B1
+        for (String targetId : allTargetInstructins.keySet()) {
+            if (allTargetInfo.containsKey(targetId)) {
+                TargetInstructionsInfo targetInstructionsInfo = allTargetInstructins.get(targetId);
+                TargetInfo targetInfo = allTargetInfo.get(targetId);
+                //判断第二个条件 A2==B2==对空目标
+                if (targetInstructionsInfo.getTargetTypeId().equals(targetInfo.getTargetTypeId()) && targetInfo.getTargetTypeId().equals(AIRTYPE)) {
+                    //判断第三个条件 0<（A5－B3）<雷达航迹测试时间阈值
+                    if ((targetInstructionsInfo.getTime() - targetInfo.getTime()) > 0 && (targetInstructionsInfo.getTime() - targetInfo.getTime()) < threshold) {
+                        //封装报文数据
                         RadarPathReport radarPathReport = new RadarPathReport();
                         radarPathReport.setTime(targetInstructionsInfo.getTime());
                         radarPathReport.setTargetId(targetInstructionsInfo.getTargetId());
@@ -850,7 +772,6 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
                         radarPathReport.setActualTargetDistance(targetInfo.getDistance());
                         radarPathReport.setShowedTargetDistance(targetInstructionsInfo.getDistance());
                         radarPathReport.setShowedTargetPitch(targetInstructionsInfo.getPitchAngle());
-
                         radarPathReport.setTaskId(taskId);
                         radarPathReport.setId(UUID.randomUUID().toString());
                         radarPathReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
@@ -859,6 +780,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
                     }
                 }
             }
+
         }
     }
 
