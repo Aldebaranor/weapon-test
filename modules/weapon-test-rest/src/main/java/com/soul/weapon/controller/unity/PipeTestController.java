@@ -2,8 +2,12 @@ package com.soul.weapon.controller.unity;
 
 
 import com.egova.entity.DictionaryItem;
+import com.egova.json.utils.JsonUtils;
+import com.egova.redis.RedisUtils;
 import com.egova.web.annotation.Api;
 import com.flagwind.commons.StringUtils;
+import com.soul.weapon.config.CommonConfig;
+import com.soul.weapon.config.Constant;
 import com.soul.weapon.service.impl.AllAlgorithmServiceImpl;
 import com.soul.weapon.entity.PipeTest;
 import com.soul.weapon.model.StateAnalysisTimeReport;
@@ -27,6 +31,7 @@ public class PipeTestController {
 
     private final PipeTestService pipeTestService;
     private final AllAlgorithmServiceImpl allAlgorithm;
+    private final CommonConfig config;
 
     @Api
     @GetMapping(value = "/{id}")
@@ -52,7 +57,9 @@ public class PipeTestController {
     @Api
     @PutMapping
     public void update(@RequestBody PipeTest pipeTest) {
+        RedisUtils.getService(config.getPumpDataBase()).opsForHash().put(Constant.WEAPON_CURRENT_PIPETEST, pipeTest.getCode(), JsonUtils.serialize(pipeTest));
         pipeTestService.update(pipeTest);
+
     }
 
     /**

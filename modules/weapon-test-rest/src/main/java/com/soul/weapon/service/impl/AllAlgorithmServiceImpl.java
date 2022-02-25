@@ -82,7 +82,6 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
                 return null;
             }
             item = list.stream().filter((q -> StringUtils.equals(q.getName(), key))).findFirst().orElse(null);
-            //return Double.valueOf(threshold);
         }
         if(item == null){
             return null;
@@ -200,7 +199,6 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
         if(allEquipmentStatus == null ){
             return;
         }
-
         if(! allEquipmentStatus.containsKey(PipeWeaponIndices.AntiMissileShipGun.getValue())){
             return;
         }
@@ -211,6 +209,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
             return;
         }
         AntiMissileShipGunTestReport tmpReport = new AntiMissileShipGunTestReport();
+
         tmpReport.setTime(System.currentTimeMillis());
         tmpReport.setRadarId(
                 PipeWeaponIndices.AntiMissileShipGunRadar.getValue());
@@ -459,8 +458,6 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
         String targetInstructionsKey = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, DateParserUtils.getTime());
         String targetFireControlKey = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, DateParserUtils.getTime());
 
-
-
         RedisService redisService = RedisUtils.getService(config.getPumpDataBase());
 
         if(!redisService.exists(equipmentLaunchKey) && !redisService.exists(targetInstructionsKey) && !redisService.exists(targetFireControlKey)){
@@ -469,48 +466,38 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
         }
 
         //获取redis中当天信息流程测试所需dds报文
-        Map<String,EquipmentLaunchStatus> allEquipmentLaunchs = redisService.extrasForHash().hgetall(equipmentLaunchKey,EquipmentLaunchStatus.class);
-        Map<String, TargetInstructionsInfo> allTargetInstructions = redisService.extrasForHash().hgetall(targetInstructionsKey,TargetInstructionsInfo.class);
-        Map<String, TargetFireControlInfo> allTargetFireControlInfos = redisService.extrasForHash().hgetall(targetFireControlKey, TargetFireControlInfo.class);
+        Map<String,Map> allEquipmentLaunchs = redisService.extrasForHash().hgetall(equipmentLaunchKey,Map.class);
+        Map<String,Map> allTargetInstructions = redisService.extrasForHash().hgetall(targetInstructionsKey,Map.class);
+        Map<String,Map> allTargetFireControlInfos = redisService.extrasForHash().hgetall(targetFireControlKey, Map.class);
 
-        //创建测试结果报文
-        InfoProcessTestReport infoProcessTestReport = new InfoProcessTestReport();
 
         //获取信息流程测试的阈值
         Double threshold = getThreshold(pipeTest,"progress_time_threshold");
 
-        //循环外设置变量用于存储时间用于运算
-        Long equipmentLaunchTime;
-        Long targetInstructionsTime;
-        Long targetFireControlInfoTime;
-
         //判断信息流程信息第一个条件
         for (String targetId : allEquipmentLaunchs.keySet()) {
             if (allTargetInstructions.containsKey(targetId) && allTargetFireControlInfos.containsKey(targetId)) {
-                //设置信息流程返回报文信息
-                infoProcessTestReport.setTaskId(taskId);
-                infoProcessTestReport.setId(UUID.randomUUID().toString());
-                infoProcessTestReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                infoProcessTestReport.setDisabled(false);
-                infoProcessTestReport.setTargetId(targetId);
-                infoProcessTestReport.setTargetType(allEquipmentLaunchs.get(targetId).getTargetTypeId());
-                //1.获取时间
-                equipmentLaunchTime = allEquipmentLaunchs.get(targetId).getTime();
-                targetInstructionsTime = allTargetInstructions.get(targetId).getTime();
-                targetFireControlInfoTime = allTargetFireControlInfos.get(targetId).getTime();
-                infoProcessTestReport.setTime((long) Math.min((equipmentLaunchTime < targetInstructionsTime ? equipmentLaunchTime : targetInstructionsTime), targetFireControlInfoTime));
-                //2.判断信息流程信息第二个条件
-                if (Math.abs(
-                        Math.max((equipmentLaunchTime > targetInstructionsTime ? equipmentLaunchTime : targetInstructionsTime), targetFireControlInfoTime)
-                        -
-                        Math.min((equipmentLaunchTime < targetInstructionsTime ? equipmentLaunchTime : targetInstructionsTime), targetFireControlInfoTime)
-                ) < threshold) {
-                    infoProcessTestReport.setStatus(true);
-                }else{
-                    infoProcessTestReport.setStatus(false);
+                Map<String,EquipmentLaunchStatus> map = allEquipmentLaunchs.get(targetId);
+                for (String key : map.keySet()) {
+                    //创建测试结果报文
+                    InfoProcessTestReport infoProcessTestReport = new InfoProcessTestReport();
+                    //设置信息流程返回报文信息
+                    infoProcessTestReport.setTaskId(taskId);
+                    infoProcessTestReport.setId(UUID.randomUUID().toString());
+                    infoProcessTestReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
+                    infoProcessTestReport.setDisabled(false);
+                    infoProcessTestReport.setTargetId(targetId);
+                    infoProcessTestReport.setTargetType(map.get(key).getTargetTypeId());
+                    long[] times = new long[]{map.get(key).getTime(),map.get(key).getTime(),map.get(key).getTime()};
+                    infoProcessTestReport.setTime(MathUtils.findMinByCollections(times));
+                    //2.判断信息流程信息第二个条件
+                    if (meetTestCycleHelper(times,threshold)) {
+                        infoProcessTestReport.setStatus(true);
+                    }else{
+                        infoProcessTestReport.setStatus(false);
+                    }
+                    infoProcessTestReportService.insert(infoProcessTestReport);
                 }
-                infoProcessTestReportService.insert(infoProcessTestReport);
-
             }
         }
 
@@ -792,6 +779,9 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
         if (beStart(taskId, pipeTest)) {
             return;
         }
+
+        ArrayList<String> a = new ArrayList<>();
+
 
         String key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, DateParserUtils.getTime());
 
@@ -1146,7 +1136,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService{
      */
     public boolean meetTestCycleHelper(long[] timeVec, Double pipeTestCycleThreshold) {
         return MathUtils.findMaxByCollections(timeVec) - MathUtils.findMinByCollections(timeVec) <
-                pipeTestCycleThreshold * 1000;
+                pipeTestCycleThreshold;
     }
 
 
