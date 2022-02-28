@@ -101,7 +101,7 @@ public class WeaponTestConstant {
             ).collect(Collectors.toList())},
             { "13",Stream.of(
                     new PropertyItem("airReactionTime","对空防御作战反应时间阈值(s)",20D),
-                    new PropertyItem("waterReactionTime","对空防御作战反应时间阈值(s)",30D)
+                    new PropertyItem("waterReactionTime","水下防御作战反应时间阈值(s)",30D)
             ).collect(Collectors.toList())},
             { "14",Stream.of(
                     new PropertyItem("launcher_rotation_time_threshold","发射架调转时间阈值(s)",5D),

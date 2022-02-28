@@ -27,9 +27,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import com.soul.weapon.config.Constant;
@@ -96,7 +94,7 @@ public class PumpController {
             }break;
             //map 武器发射
             //key:[weapon:pump:equipment_launch_status:yyyymmdd]
-            //value:[Map(targetId,Map(equipmentId,EquipmentLaunchStatus))]
+            //value:[Map(targetId,Map(equipmentId,List<EquipmentLaunchStatus>))]
             case "EquipmentLaunchStatus": {
                 //对报文数据进行反序列化
                 EquipmentLaunchStatus equipmentLaunchStatus = JsonUtils.deserialize(JsonUtils.serialize(msg), EquipmentLaunchStatus.class);
@@ -104,26 +102,7 @@ public class PumpController {
                 equipmentLaunchStatus.setTime(100L);
                 //拼接redis中当天的武器发射dds的key
                 String key = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY,getTime());
-                //判断是否存在key
-                if (RedisUtils.getService(config.getPumpDataBase()).exists(key)) {
-                    //获取对应目标的武器发射报文
-                    Map<String,EquipmentLaunchStatus> map = RedisUtils.getService(config.getPumpDataBase()).extrasForHash().hgetall(key, Map.class).get(equipmentLaunchStatus.getTargetId());
-
-                    if (map == null) {
-                        map = new HashMap<>();
-                    }
-                    //更新或添加对应目标的武器发射报文
-                    map.put(equipmentLaunchStatus.getEquipmentId(),equipmentLaunchStatus);
-
-                    //更新redis缓存
-                    RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key).put(equipmentLaunchStatus.getTargetId(),JsonUtils.serialize(map));
-                }else{
-                    //如果不存在创建对应结构进行存储
-                    Map<String,EquipmentLaunchStatus> map = new HashMap<>();
-                    map.put(equipmentLaunchStatus.getEquipmentId(),equipmentLaunchStatus);
-                    RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key).put(equipmentLaunchStatus.getTargetId(),JsonUtils.serialize(map));
-                    RedisUtils.getService(config.getPumpDataBase()).expire(key,ONE_DAY);
-                }
+                structureGeneration(equipmentLaunchStatus,key,equipmentLaunchStatus.getTargetId(),equipmentLaunchStatus.getEquipmentId());
             }break;
             //map 装备状态
             //key:[weapon:pump:equipment_status:yyyymmdd]
@@ -150,35 +129,18 @@ public class PumpController {
             }break;
             //map 发射架调转
             //key:[weapon:pump:launcher_rotation_info:yyyymmdd]
-            //value:[Map(targetId,Map(launcherId,LauncherRotationInfo))]
+            //value:[Map(targetId,Map(launcherId,List<LauncherRotationInfo>))]
             case "LauncherRotationInfo": {
                 //反序列化
                 LauncherRotationInfo launcherRotationInfo =JsonUtils.deserialize(JsonUtils.serialize(msg),LauncherRotationInfo.class);
                 //拼接redis中当天的key
                 String key =String.format("%s:%s",Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY,getTime());
-                //判断redis中是否存在key
-                if (RedisUtils.getService(config.getPumpDataBase()).exists(key)) {
-                    //获取对应目标的发射架调转报文
-                    Map<String,LauncherRotationInfo> map = RedisUtils.getService(config.getPumpDataBase()).extrasForHash().hgetall(key, Map.class).get(launcherRotationInfo.getTargetId());
-                    if (map == null) {
-                        map = new HashMap<>();
-                    }
-                    //新增或更新
-                    map.put(launcherRotationInfo.getLauncherId(),launcherRotationInfo);
-                    //更新redis
-                    RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key).put(launcherRotationInfo.getTargetId(),JsonUtils.serialize(map));
-                }else{
-                    //如果不存在创建对应结构进行存储
-                    Map<String,LauncherRotationInfo> map = new HashMap<>();
-                    map.put(launcherRotationInfo.getLauncherId(),launcherRotationInfo);
-                    RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key).put(launcherRotationInfo.getTargetId(),JsonUtils.serialize(map));
-                    RedisUtils.getService(config.getPumpDataBase()).expire(key,ONE_DAY);
-                }
 
+                structureGeneration(launcherRotationInfo,key,launcherRotationInfo.getTargetId(),launcherRotationInfo.getLauncherId());
             }break;
             //map 目标火控
             //key:[weapon:pump:target_fire_control_info:yyyymmdd]
-            //value:[Map(targetId,Map(fireControlSystemId,TargetFireControlInfo))]
+            //value:[Map(targetId,Map(fireControlSystemId,List<TargetFireControlInfo>))]
             case "TargetFireControlInfo": {
                 //反序列化
                 TargetFireControlInfo tmpTargetFireControlInfo = JsonUtils.deserialize(JsonUtils.serialize(msg),TargetFireControlInfo.class);
@@ -186,25 +148,7 @@ public class PumpController {
                 tmpTargetFireControlInfo.setTime(102L);
                 //拼接redis中当天的key
                 String key=String.format("%s:%s",Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY,getTime());
-                //判断redis中是否存在key
-                if (RedisUtils.getService(config.getPumpDataBase()).exists(key)) {
-                    //获取对应目标的发射架调转报文
-                    Map<String,TargetFireControlInfo> map = RedisUtils.getService(config.getPumpDataBase()).extrasForHash().hgetall(key, Map.class).get(tmpTargetFireControlInfo.getTargetId());
-                    if (map == null) {
-                        map = new HashMap<>();
-                    }
-                    //新增或更新
-                    map.put(tmpTargetFireControlInfo.getFireControlSystemId(),tmpTargetFireControlInfo);
-                    //更新redis
-                    RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key).put(tmpTargetFireControlInfo.getTargetId(),JsonUtils.serialize(map));
-                }else{
-                    //如果不存在创建对应结构进行存储
-                    Map<String,TargetFireControlInfo> map = new HashMap<>();
-                    map.put(tmpTargetFireControlInfo.getFireControlSystemId(),tmpTargetFireControlInfo);
-                    RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key).put(tmpTargetFireControlInfo.getTargetId(),JsonUtils.serialize(map));
-                    RedisUtils.getService(config.getPumpDataBase()).expire(key,ONE_DAY);
-                }
-
+                structureGeneration(tmpTargetFireControlInfo,key,tmpTargetFireControlInfo.getTargetId(),tmpTargetFireControlInfo.getFireControlSystemId());
             }break;
             //map 目标信息
             //key:[weapon:pump:target_info:yyyymmdd]
@@ -233,35 +177,18 @@ public class PumpController {
             }break;
             //map 目标指示
             //key:[weapon:pump:target_instructions_info:yyyymmdd]
-            //value:[Map(targetId,Map(equipmentId,TargetInstructionsInfo))]
+            //value:[Map(targetId,Map<equipmentId,List<TargetInstructionsInfo>>)]
             case "TargetInstructionsInfo": {
                 //反序列化
                 TargetInstructionsInfo targetInstructionsInfo = JsonUtils.deserialize(JsonUtils.serialize(msg),
                         TargetInstructionsInfo.class);
-                targetInstructionsInfo.setMsgTime(System.currentTimeMillis());
                 targetInstructionsInfo.setTime(101L);
 
                 // 目标指示历史报文
                 String key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY,getTime());
 
                 //判断redis中是否存在key
-                if (RedisUtils.getService(config.getPumpDataBase()).exists(key)) {
-                    //获取对应目标的发射架调转报文
-                    Map<String,TargetInstructionsInfo> map = RedisUtils.getService(config.getPumpDataBase()).extrasForHash().hgetall(key, Map.class).get(targetInstructionsInfo.getTargetId());
-                    if (map == null) {
-                        map = new HashMap<>();
-                    }
-                    //新增或更新
-                    map.put(targetInstructionsInfo.getEquipmentId(),targetInstructionsInfo);
-                    //更新redis
-                    RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key).put(targetInstructionsInfo.getTargetId(),JsonUtils.serialize(map));
-                }else{
-                    //如果不存在创建对应结构进行存储
-                    Map<String,TargetInstructionsInfo> map = new HashMap<>();
-                    map.put(targetInstructionsInfo.getEquipmentId(),targetInstructionsInfo);
-                    RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key).put(targetInstructionsInfo.getTargetId(),JsonUtils.serialize(map));
-                    RedisUtils.getService(config.getPumpDataBase()).expire(key,ONE_DAY);
-                }
+                structureGeneration(targetInstructionsInfo, key,targetInstructionsInfo.getTargetId(),targetInstructionsInfo.getEquipmentId());
 
             }break;
             case "Report":{
@@ -583,11 +510,42 @@ public class PumpController {
         return "";
     }
 
-
-
     private String getTime(){
         DateFormat df = new SimpleDateFormat("yyyyMMdd");
         return df.format(System.currentTimeMillis());
+    }
+    //生成Map<String,Map<String,List>>结构
+    //element:存储的元素,key:redis中的key,id1:外层key,id2:里层key
+    private void structureGeneration(Object element,String key,String id1,String id2) {
+        if (RedisUtils.getService(config.getPumpDataBase()).exists(key)) {
+            //获取对应目标的发射架调转报文
+            Map<String,List> map = RedisUtils.getService(config.getPumpDataBase()).extrasForHash().hgetall(key, Map.class).get(id1);
+            if (map == null) {
+                map = new HashMap<>();
+                List list = new ArrayList<>();
+                list.add(element);
+                map.put(id2,list);
+            }else{
+                //新增或更新
+                if(map.get(id2) == null){
+                    List list = new ArrayList<>();
+                    list.add(element);
+                    map.put(id2,list);
+                }else{
+                    map.get(id2).add(element);
+                }
+            }
+            //更新redis
+            RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key).put(id1,JsonUtils.serialize(map));
+        }else{
+            //如果不存在创建对应结构进行存储
+            Map<String,List> map = new HashMap<>();
+            List list = new ArrayList<>();
+            list.add(element);
+            map.put(id2,list);
+            RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key).put(id1,JsonUtils.serialize(map));
+            RedisUtils.getService(config.getPumpDataBase()).expire(key,ONE_DAY);
+        }
     }
 }
 
