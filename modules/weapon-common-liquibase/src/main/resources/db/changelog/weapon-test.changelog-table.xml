@@ -306,7 +306,6 @@
             <column name="pitchAccuracy" remarks="目标方位角指示处理精度" type="FLOAT"/>
             <column name="azimuthAccuracy" remarks="目标俯仰角指示处理精度" type="FLOAT"/>
             <column name="depthAccuracy" remarks="目标深度指示处理精度" type="FLOAT"/>
-            <column name="status" remarks="信息流程状态" type="VARCHAR(2)"/>
             <column name="createTime" remarks="创建时间" type="datetime"/>
             <column name="modifyTime" remarks="修改时间" type="datetime"/>
             <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
@@ -378,12 +377,8 @@
             <column name="time" remarks="测试时间" type="VARCHAR(50)"/>
             <column name="targetId" remarks="目标标识" type="VARCHAR(50)"/>
             <column name="targetType" remarks="目标类型" type="VARCHAR(2)"/>
-            <column name="sensorId" remarks="传感器标识" type="VARCHAR(50)"/>
-            <column name="sensorType" remarks="传感器类型" type="VARCHAR(2)"/>
-            <column name="showedTargetDistance" remarks="雷达显示目标距离" type="FLOAT"/>
-            <column name="actualTargetDistance" remarks="目标距离真值" type="FLOAT"/>
-            <column name="showedTargetPitch" remarks="雷达显示目标方位角" type="FLOAT"/>
-            <column name="actualTargetPitch" remarks="目标方位角真值" type="FLOAT"/>
+            <column name="interceptionTime" remarks="目标拦截时间" type="BIGINT"/>
+            <column name="interceptionAccount" remarks="目标拦截数量" type="INT"/>
             <column name="createTime" remarks="创建时间" type="datetime"/>
             <column name="modifyTime" remarks="修改时间" type="datetime"/>
             <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
@@ -406,8 +401,12 @@
             <column name="time" remarks="测试时间" type="VARCHAR(50)"/>
             <column name="targetId" remarks="目标标识" type="VARCHAR(50)"/>
             <column name="targetType" remarks="目标类型" type="VARCHAR(2)"/>
-            <column name="interceptionTime" remarks="目标拦截时间" type="BIGINT"/>
-            <column name="interceptionAccount" remarks="目标拦截数量" type="INT"/>
+            <column name="sensorId" remarks="传感器标识" type="VARCHAR(50)"/>
+            <column name="sensorType" remarks="传感器类型" type="VARCHAR(2)"/>
+            <column name="showedTargetDistance" remarks="雷达显示目标距离" type="FLOAT"/>
+            <column name="actualTargetDistance" remarks="目标距离真值" type="FLOAT"/>
+            <column name="showedTargetPitch" remarks="雷达显示目标方位角" type="FLOAT"/>
+            <column name="actualTargetPitch" remarks="目标方位角真值" type="FLOAT"/>
             <column name="createTime" remarks="创建时间" type="datetime"/>
             <column name="modifyTime" remarks="修改时间" type="datetime"/>
             <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
