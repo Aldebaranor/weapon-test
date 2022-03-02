@@ -906,15 +906,11 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
 
                                     Boolean status = false;
 
-                                    if (fireControlSystemTypeId.equals(Constant.SHIP_TO_AIR_MISSILE_FIRE_CONTROL_DEVICE)) {
-                                        status = TargetDistance > threshold2 || TargetPitch > threshold3 || TargetAzimuth > threshold4;
-                                    } else if (fireControlSystemTypeId.equals(Constant.ANTI_MISSILE_NAVAL_GUN_FIRE_CONTROL_DEVICE)) {
+                                    if (fireControlSystemTypeId.equals(Constant.SHIP_TO_AIR_MISSILE_FIRE_CONTROL_DEVICE) ||
+                                            fireControlSystemTypeId.equals(Constant.ANTI_MISSILE_NAVAL_GUN_FIRE_CONTROL_DEVICE) ||
+                                            fireControlSystemTypeId.equals(Constant.FIRE_CONTROL_DEVICE_OF_ELECTRONIC_COUNTERMEASURE_WEAPON)) {
                                         status = TargetDistance > threshold2 || TargetPitch > threshold3 || TargetAzimuth > threshold4;
                                     } else if (fireControlSystemTypeId.equals(Constant.TORPEDO_DEFENSE_WEAPON_FIRE_CONTROL_DEVICE)) {
-                                        status = TargetDistance > threshold2 || TargetPitch > threshold3 || TargetDepth > threshold5;
-                                    } else if (fireControlSystemTypeId.equals(Constant.FIRE_CONTROL_DEVICE_OF_ELECTRONIC_COUNTERMEASURE_WEAPON)) {
-                                        status = TargetDistance > threshold2 || TargetPitch > threshold3 || TargetAzimuth > threshold4;
-                                    } else {
                                         status = TargetDistance > threshold2 || TargetPitch > threshold3 || TargetDepth > threshold5;
                                     }
 
