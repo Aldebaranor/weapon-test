@@ -27,7 +27,7 @@ public class AlgorithmScheduleJob  {
     @Autowired
     public AllAlgorithmServiceImpl allAlgorithm;
 
-    @Scheduled(fixedDelay = 1000)
+    @Scheduled(fixedDelay = 5000)
     public void execute() {
         try {
             String currentTask = getCurrentTask();

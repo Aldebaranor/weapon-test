@@ -42,10 +42,10 @@ import com.soul.weapon.config.Constant;
 @RequestMapping("/free/pump")
 @RequiredArgsConstructor
 public class PumpController {
+
     private final RestTemplate restTemplate;
     private final CommonConfig config;
     private final int ONE_DAY = 24 * 3600;
-
 
     @Api
     @PostMapping(value = "/{structName}")
@@ -100,8 +100,6 @@ public class PumpController {
             case "EquipmentLaunchStatus": {
                 //对报文数据进行反序列化
                 EquipmentLaunchStatus equipmentLaunchStatus = JsonUtils.deserialize(JsonUtils.serialize(msg), EquipmentLaunchStatus.class);
-                equipmentLaunchStatus.setMsgTime(System.currentTimeMillis());
-                equipmentLaunchStatus.setTime(100L);
                 //拼接redis中当天的武器发射dds的key
                 String key = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, getTime());
                 structureGeneration(equipmentLaunchStatus, key, equipmentLaunchStatus.getTargetId(), equipmentLaunchStatus.getEquipmentId());
@@ -144,13 +142,12 @@ public class PumpController {
             }
             break;
             //map 目标火控
+            //list:
             //key:[weapon:pump:target_fire_control_info:yyyymmdd]
             //value:[Map(targetId,Map(fireControlSystemId,List<TargetFireControlInfo>))]
             case "TargetFireControlInfo": {
                 //反序列化
                 TargetFireControlInfo tmpTargetFireControlInfo = JsonUtils.deserialize(JsonUtils.serialize(msg), TargetFireControlInfo.class);
-                tmpTargetFireControlInfo.setMsgTime(System.currentTimeMillis());
-                tmpTargetFireControlInfo.setTime(102L);
                 //拼接redis中当天的key
                 String key = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, getTime());
                 structureGeneration(tmpTargetFireControlInfo, key, tmpTargetFireControlInfo.getTargetId(), tmpTargetFireControlInfo.getFireControlSystemId());
@@ -187,16 +184,11 @@ public class PumpController {
             //value:[Map(targetId,Map<equipmentId,List<TargetInstructionsInfo>>)]
             case "TargetInstructionsInfo": {
                 //反序列化
-                TargetInstructionsInfo targetInstructionsInfo = JsonUtils.deserialize(JsonUtils.serialize(msg),
-                        TargetInstructionsInfo.class);
-                targetInstructionsInfo.setTime(101L);
-
-                // 目标指示历史报文
+                TargetInstructionsInfo targetInstructionsInfo = JsonUtils.deserialize(JsonUtils.serialize(msg), TargetInstructionsInfo.class);
+                //目标指示历史报文
                 String key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, getTime());
-
                 //判断redis中是否存在key
                 structureGeneration(targetInstructionsInfo, key, targetInstructionsInfo.getTargetId(), targetInstructionsInfo.getEquipmentId());
-
             }
             break;
             case "Report": {
@@ -218,7 +210,6 @@ public class PumpController {
                 log.error("unrecognized struct name for http telegram to redis");
             }
         }
-
         return true;
     }
 
@@ -523,7 +514,6 @@ public class PumpController {
         DateFormat df = new SimpleDateFormat("yyyyMMdd");
         return df.format(System.currentTimeMillis());
     }
-
     //生成Map<String,Map<String,List>>结构
     //element:存储的元素,key:redis中的key,id1:外层key,id2:里层key
     private void structureGeneration(Object element, String key, String id1, String id2) {

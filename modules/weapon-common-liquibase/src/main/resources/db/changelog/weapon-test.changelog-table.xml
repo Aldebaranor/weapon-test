@@ -433,6 +433,7 @@
             <column name="sensorType" remarks="传感器类型" type="VARCHAR(2)"/>
             <column name="weaponId" remarks="武器标识" type="VARCHAR(50)"/>
             <column name="weaponType" remarks="武器类型" type="VARCHAR(2)"/>
+            <column name="reactionTime" remarks="反应时间" type="BIGINT"/>
             <column name="createTime" remarks="创建时间" type="datetime"/>
             <column name="modifyTime" remarks="修改时间" type="datetime"/>
             <column name="creator" remarks="创建人" type="VARCHAR(50)"/>

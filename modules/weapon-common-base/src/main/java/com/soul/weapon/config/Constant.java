@@ -81,4 +81,21 @@ public class Constant {
     //多目标拦截能力测试
     public static String MULTI_TARGET_INTERCEPTION="test15";
 
+    //空中目标
+    public static String AIRTYPE = "1";
+    //水下目标
+    public static String WATERTYPE = "2";
+
+    //舰空导弹火控装置
+    public static String SHIP_TO_AIR_MISSILE_FIRE_CONTROL_DEVICE = "003";
+    //反导舰炮火控装置
+    public static String ANTI_MISSILE_NAVAL_GUN_FIRE_CONTROL_DEVICE = "013";
+    //鱼雷防御武器火控装置
+    public static String TORPEDO_DEFENSE_WEAPON_FIRE_CONTROL_DEVICE = "018";
+    //电子对抗武器火控装置
+    public static String FIRE_CONTROL_DEVICE_OF_ELECTRONIC_COUNTERMEASURE_WEAPON = "022";
+    //水声对抗武器火控装置
+    public static String WATER_ACOUSTIC_COUNTERMEASURE_WEAPON_FIRE_CONTROL_DEVICE = "028";
+
+
 }

@@ -53,10 +53,6 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
     private final MultiTargetInterceptionReportService multiTargetInterceptionReportService;
 
 
-    public static final String AIRTYPE = "对空目标";
-    public static final String WATERTYPE = "水下目标";
-
-
     /**
      * 获取阈值，如果 pipeTest.getThreshold()为空则使用默认的阈值
      *
@@ -92,7 +88,6 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
             return Double.valueOf(s);
         }
     }
-
 
     /**
      * 航空导弹-1
@@ -183,7 +178,6 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
         shipToAirMissileTestReportService.insert(tmpReport);
 
     }
-
 
     /**
      * 反导舰炮算法-2
@@ -479,14 +473,16 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
         //判断信息流程信息第一个条件
         for (String targetId : allEquipmentLaunchs.keySet()) {
             if (allTargetInstructions.containsKey(targetId) && allTargetFireControlInfos.containsKey(targetId)) {
+                //通过第一条件
                 for (Object equipmentLaunchsList : allEquipmentLaunchs.get(targetId).values()) {
-                    List<EquipmentLaunchStatus> list = JsonUtils.deserializeList(JsonUtils.serialize(equipmentLaunchsList),EquipmentLaunchStatus.class);
+                    //同一目标，同一装备，形成的不同的信息流程报文
+                    List<EquipmentLaunchStatus> list = JsonUtils.deserializeList(JsonUtils.serialize(equipmentLaunchsList), EquipmentLaunchStatus.class);
                     for (EquipmentLaunchStatus equipmentLaunchStatus : list) {
                         for (Object targetInstructionsList : allTargetInstructions.get(targetId).values()) {
-                            List<TargetInstructionsInfo> list1 = JsonUtils.deserializeList(JsonUtils.serialize(targetInstructionsList),TargetInstructionsInfo.class);
+                            List<TargetInstructionsInfo> list1 = JsonUtils.deserializeList(JsonUtils.serialize(targetInstructionsList), TargetInstructionsInfo.class);
                             for (TargetInstructionsInfo targetInstructionsInfo : list1) {
                                 for (Object targetFireControlInfosList : allTargetFireControlInfos.get(targetId).values()) {
-                                    List<TargetFireControlInfo> list2 = JsonUtils.deserializeList(JsonUtils.serialize(targetFireControlInfosList),TargetFireControlInfo.class);
+                                    List<TargetFireControlInfo> list2 = JsonUtils.deserializeList(JsonUtils.serialize(targetFireControlInfosList), TargetFireControlInfo.class);
                                     for (TargetFireControlInfo targetFireControlInfo : list2) {
                                         //创建测试结果报文
                                         InfoProcessTestReport infoProcessTestReport = new InfoProcessTestReport();
@@ -497,7 +493,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
                                         infoProcessTestReport.setDisabled(false);
                                         infoProcessTestReport.setTargetId(targetId);
                                         infoProcessTestReport.setTargetType(equipmentLaunchStatus.getTargetTypeId());
-                                        long[] times = new long[]{equipmentLaunchStatus.getTime(),targetInstructionsInfo.getTime(), targetFireControlInfo.getTime()};
+                                        long[] times = new long[]{equipmentLaunchStatus.getTime(), targetInstructionsInfo.getTime(), targetFireControlInfo.getTime()};
                                         infoProcessTestReport.setTime(MathUtils.findMinByCollections(times));
                                         //2.判断信息流程信息第二个条件
                                         if (meetTestCycleHelper(times, threshold)) {
@@ -533,39 +529,43 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
             log.error("条件无法满足威胁判断算法的要求！");
             return;
         }
+
         Map<String, Map> allTargetInstructions = redisService.extrasForHash().hgetall(instructionsKey, Map.class);
         Map<String, TargetInfo> allTargetInfos = redisService.extrasForHash().hgetall(targetKey, TargetInfo.class);
 
-        Double threshold = getThreshold(pipeTest, "detector_time_threshold");
+        Double threshold1 = getThreshold(pipeTest, "detector_time_threshold");
+        Double threshold2 = getThreshold(pipeTest, "distanceOffset");
+        Double threshold3 = getThreshold(pipeTest, "speedOffset");
+        Double threshold4 = getThreshold(pipeTest, "pitchOffset");
 
 
         //进行算法判断第一个条件  a.A1==B1
         for (String targetId : allTargetInstructions.keySet()) {
             if (allTargetInfos.containsKey(targetId)) {
                 for (Object targetInstructionsList : allTargetInstructions.get(targetId).values()) {
-                    List<TargetInstructionsInfo> list = JsonUtils.deserializeList(JsonUtils.serialize(targetInstructionsList),TargetInstructionsInfo.class);
+                    List<TargetInstructionsInfo> list = JsonUtils.deserializeList(JsonUtils.serialize(targetInstructionsList), TargetInstructionsInfo.class);
                     for (TargetInstructionsInfo targetInstructionsInfo : list) {
                         //进行算法判断第二个条件 b.|A3-B3| < 传感器探测时间阀值
-                        if (Math.abs(targetInstructionsInfo.getTime() - allTargetInfos.get(targetId).getTime()) < threshold) {
-                            //装填测试报文
-                            ThreatenReport threatenReport = new ThreatenReport();
+                        if (Math.abs(targetInstructionsInfo.getTime() - allTargetInfos.get(targetId).getTime()) < threshold1) {
                             TargetInfo targetInfo = allTargetInfos.get(targetId);
-                            threatenReport.setTime(targetInstructionsInfo.getTime());
-                            threatenReport.setTargetId(targetId);
-                            threatenReport.setTargetType(targetInstructionsInfo.getTargetTypeId());
-                            threatenReport.setDistanceOffset(
-                                    Math.abs(targetInstructionsInfo.getDistance() - targetInfo.getDistance())
-                            );
-                            threatenReport.setSpeedOffset(
-                                    Math.abs(targetInstructionsInfo.getSpeed() - targetInfo.getSpeed())
-                            );
-                            threatenReport.setPitchOffset(
-                                    Math.abs(targetInstructionsInfo.getPitchAngle() - targetInfo.getPitchAngle())
-                            );
-                            threatenReport.setDisabled(false);
-                            threatenReport.setId(UUID.randomUUID().toString());
-                            threatenReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                            threatenReportService.insert(threatenReport);
+                            float distanceOffset = Math.abs(targetInstructionsInfo.getDistance() - targetInfo.getDistance());
+                            float speedOffset = Math.abs(targetInstructionsInfo.getSpeed() - targetInfo.getSpeed());
+                            float pitchOffset = Math.abs(targetInstructionsInfo.getPitchAngle() - targetInfo.getPitchAngle());
+
+                            if (distanceOffset > threshold2 || speedOffset > threshold3 || pitchOffset > threshold4) {
+                                //装填测试报文
+                                ThreatenReport threatenReport = new ThreatenReport();
+                                threatenReport.setTime(targetInstructionsInfo.getTime());
+                                threatenReport.setTargetId(targetId);
+                                threatenReport.setTargetType(targetInstructionsInfo.getTargetTypeId());
+                                threatenReport.setDistanceOffset(distanceOffset);
+                                threatenReport.setSpeedOffset(speedOffset);
+                                threatenReport.setPitchOffset(pitchOffset);
+                                threatenReport.setDisabled(false);
+                                threatenReport.setId(UUID.randomUUID().toString());
+                                threatenReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
+                                threatenReportService.insert(threatenReport);
+                            }
                         }
                     }
                 }
@@ -597,39 +597,46 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
         Map<String, TargetInfo> allTargetInfos = redisService.extrasForHash().hgetall(targetKey, TargetInfo.class);
 
 
-        Double threshold = getThreshold(pipeTest, "instruction_time_threshold");
+        Double threshold1 = getThreshold(pipeTest, "instruction_time_threshold");
+        Double threshold2 = getThreshold(pipeTest, "distanceAccuracy");
+        Double threshold3 = getThreshold(pipeTest, "pitchAccuracy");
+        Double threshold4 = getThreshold(pipeTest, "azimuthAccuracy");
+        Double threshold5 = getThreshold(pipeTest, "depthAccuracy");
 
         //进行算法判断第一个条件  a.A1==B1
         for (String targetId : allTargetInstructions.keySet()) {
             if (allTargetInfos.containsKey(targetId)) {
                 for (Object targetInstructionsList : allTargetInstructions.get(targetId).values()) {
-                    List<TargetInstructionsInfo> list = JsonUtils.deserializeList(JsonUtils.serialize(targetInstructionsList),TargetInstructionsInfo.class);
+                    List<TargetInstructionsInfo> list = JsonUtils.deserializeList(JsonUtils.serialize(targetInstructionsList), TargetInstructionsInfo.class);
                     for (TargetInstructionsInfo targetInstructionsInfo : list) {
                         TargetInfo targetInfo = allTargetInfos.get(targetId);
                         //进行算法判断第二个条件 b.|A5-B3| < 指示处理时间阀值
-                        if (Math.abs(targetInstructionsInfo.getTime() - targetInfo.getTime()) < threshold) {
-                            //装填报文
-                            InstructionAccuracyReport instructionAccuracyReport = new InstructionAccuracyReport();
-                            instructionAccuracyReport.setTime(targetInstructionsInfo.getTime());
-                            instructionAccuracyReport.setTargetId(targetInstructionsInfo.getTargetId());
-                            instructionAccuracyReport.setTargetType(targetInstructionsInfo.getTargetTypeId());
-                            instructionAccuracyReport.setSensorId(targetInstructionsInfo.getEquipmentId());
-                            instructionAccuracyReport.setSensorType(targetInstructionsInfo.getEquipmentTypeId());
+                        if (Math.abs(targetInstructionsInfo.getTime() - targetInfo.getTime()) < threshold1) {
 
-                            instructionAccuracyReport.setDistanceAccuracy(
-                                    Math.abs(targetInstructionsInfo.getDistance() - targetInfo.getDistance()));
-                            instructionAccuracyReport.setAzimuthAccuracy(
-                                    Math.abs(targetInstructionsInfo.getAzimuth() - targetInfo.getAzimuth()));
-                            instructionAccuracyReport.setDepthAccuracy(
-                                    Math.abs(targetInstructionsInfo.getDepth() - targetInfo.getDepth()));
-                            instructionAccuracyReport.setPitchAccuracy(
-                                    Math.abs(targetInstructionsInfo.getPitchAngle() - targetInfo.getPitchAngle()));
-
-                            instructionAccuracyReport.setTaskId(taskId);
-                            instructionAccuracyReport.setId(UUID.randomUUID().toString());
-                            instructionAccuracyReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                            instructionAccuracyReport.setDisabled(false);
-                            instructionAccuracyReportService.insert(instructionAccuracyReport);
+                            float distanceAccuracy = Math.abs(targetInstructionsInfo.getDistance() - targetInfo.getDistance());
+                            float pitchAccuracy = Math.abs(targetInstructionsInfo.getPitchAngle() - targetInfo.getPitchAngle());
+                            float azimuthAccuracy = Math.abs(targetInstructionsInfo.getAzimuth() - targetInfo.getAzimuth());
+                            float depthAccuracy = Math.abs(targetInstructionsInfo.getDepth() - targetInfo.getDepth());
+                            if (targetInstructionsInfo.getTargetTypeId().equals(Constant.AIRTYPE) ?
+                                    distanceAccuracy > threshold2 || pitchAccuracy > threshold3 || azimuthAccuracy > threshold4 :
+                                    distanceAccuracy > threshold2 || pitchAccuracy > threshold3 || depthAccuracy > threshold5) {
+                                //装填报文
+                                InstructionAccuracyReport instructionAccuracyReport = new InstructionAccuracyReport();
+                                instructionAccuracyReport.setTime(targetInstructionsInfo.getTime());
+                                instructionAccuracyReport.setTargetId(targetInstructionsInfo.getTargetId());
+                                instructionAccuracyReport.setTargetType(targetInstructionsInfo.getTargetTypeId());
+                                instructionAccuracyReport.setSensorId(targetInstructionsInfo.getEquipmentId());
+                                instructionAccuracyReport.setSensorType(targetInstructionsInfo.getEquipmentTypeId());
+                                instructionAccuracyReport.setDistanceAccuracy(distanceAccuracy);
+                                instructionAccuracyReport.setPitchAccuracy(pitchAccuracy);
+                                instructionAccuracyReport.setAzimuthAccuracy(azimuthAccuracy);
+                                instructionAccuracyReport.setDepthAccuracy(depthAccuracy);
+                                instructionAccuracyReport.setTaskId(taskId);
+                                instructionAccuracyReport.setId(UUID.randomUUID().toString());
+                                instructionAccuracyReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
+                                instructionAccuracyReport.setDisabled(false);
+                                instructionAccuracyReportService.insert(instructionAccuracyReport);
+                            }
                         }
                     }
                 }
@@ -676,17 +683,17 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
             if (allTargetInstructions.containsKey(targetId) && allTargetFireControlInfos.containsKey(targetId)) {
                 //通过第一条件
                 for (Object equipemntLaunchsList : allEquipmentLaunchs.get(targetId).values()) {
-                    List<EquipmentLaunchStatus> list = JsonUtils.deserializeList(JsonUtils.serialize(equipemntLaunchsList),EquipmentLaunchStatus.class);
+                    List<EquipmentLaunchStatus> list = JsonUtils.deserializeList(JsonUtils.serialize(equipemntLaunchsList), EquipmentLaunchStatus.class);
                     for (EquipmentLaunchStatus equipmentLaunchStatus : list) {
                         //1.获取武器发射时间
                         equipmentLaunchTime = equipmentLaunchStatus.getTime();
                         for (Object targetInstructionsInfoList : allTargetInstructions.get(targetId).values()) {
-                            List<TargetInstructionsInfo> list1 = JsonUtils.deserializeList(JsonUtils.serialize(targetInstructionsInfoList),TargetInstructionsInfo.class);
+                            List<TargetInstructionsInfo> list1 = JsonUtils.deserializeList(JsonUtils.serialize(targetInstructionsInfoList), TargetInstructionsInfo.class);
                             for (TargetInstructionsInfo targetInstructionsInfo : list1) {
                                 //2.获取探测目标时间
                                 targetInstructionsTime = targetInstructionsInfo.getTime();
                                 for (Object targetFireControlInfosList : allTargetFireControlInfos.get(targetId).values()) {
-                                    List<TargetFireControlInfo> list2 = JsonUtils.deserializeList(JsonUtils.serialize(targetFireControlInfosList),TargetFireControlInfo.class);
+                                    List<TargetFireControlInfo> list2 = JsonUtils.deserializeList(JsonUtils.serialize(targetFireControlInfosList), TargetFireControlInfo.class);
                                     for (TargetFireControlInfo targetFireControlInfo : list2) {
                                         //2.获取诸元时间
                                         targetFireControlInfoTime = targetFireControlInfo.getTime();
@@ -749,35 +756,39 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
         Map<String, Map> allTargetInstructins = redisService.extrasForHash().hgetall(instructionsKey, Map.class);
         Map<String, TargetInfo> allTargetInfo = redisService.extrasForHash().hgetall(targetKey, TargetInfo.class);
 
-        Double threshold = getThreshold(pipeTest, "radar_path_time_threshold");
+        Double threshold1 = getThreshold(pipeTest, "radar_path_time_threshold");
+        Double threshold2 = getThreshold(pipeTest, "targetDistance");
+        Double threshold3 = getThreshold(pipeTest, "targetPitch");
 
         //判断第一个条件 A1==B1
         for (String targetId : allTargetInstructins.keySet()) {
             if (allTargetInfo.containsKey(targetId)) {
                 TargetInfo targetInfo = allTargetInfo.get(targetId);
                 for (Object targetInstructionsList : allTargetInstructins.get(targetId).values()) {
-                    List<TargetInstructionsInfo> list = JsonUtils.deserializeList(JsonUtils.serialize(targetInstructionsList),TargetInstructionsInfo.class);
+                    List<TargetInstructionsInfo> list = JsonUtils.deserializeList(JsonUtils.serialize(targetInstructionsList), TargetInstructionsInfo.class);
                     for (TargetInstructionsInfo targetInstructionsInfo : list) {
                         //判断第二个条件 A2==B2==对空目标
-                        if (targetInstructionsInfo.getTargetTypeId().equals(targetInfo.getTargetTypeId()) && targetInfo.getTargetTypeId().equals(AIRTYPE)) {
+                        if (targetInstructionsInfo.getTargetTypeId().equals(targetInfo.getTargetTypeId()) && targetInfo.getTargetTypeId().equals(Constant.AIRTYPE)) {
                             //判断第三个条件 0<（A5－B3）< 雷达航迹测试时间阈值
-                            if ((targetInstructionsInfo.getTime() - targetInfo.getTime()) > 0 && (targetInstructionsInfo.getTime() - targetInfo.getTime()) < threshold) {
-                                //封装报文数据
-                                RadarPathReport radarPathReport = new RadarPathReport();
-                                radarPathReport.setTime(targetInstructionsInfo.getTime());
-                                radarPathReport.setTargetId(targetInstructionsInfo.getTargetId());
-                                radarPathReport.setTargetType(targetInstructionsInfo.getTargetTypeId());
-                                radarPathReport.setSensorId(targetInstructionsInfo.getEquipmentId());
-                                radarPathReport.setSensorType(targetInstructionsInfo.getEquipmentTypeId());
-                                radarPathReport.setActualTargetPitch(targetInfo.getPitchAngle());
-                                radarPathReport.setActualTargetDistance(targetInfo.getDistance());
-                                radarPathReport.setShowedTargetDistance(targetInstructionsInfo.getDistance());
-                                radarPathReport.setShowedTargetPitch(targetInstructionsInfo.getPitchAngle());
-                                radarPathReport.setTaskId(taskId);
-                                radarPathReport.setId(UUID.randomUUID().toString());
-                                radarPathReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                                radarPathReport.setDisabled(false);
-                                radarPathReportService.insert(radarPathReport);
+                            if ((targetInstructionsInfo.getTime() - targetInfo.getTime()) > 0 && (targetInstructionsInfo.getTime() - targetInfo.getTime()) < threshold1) {
+                                if (Math.abs(targetInstructionsInfo.getDistance() - targetInfo.getDistance()) > threshold2 || Math.abs(targetInstructionsInfo.getPitchAngle() - targetInfo.getPitchAngle()) > threshold3) {
+                                    //封装报文数据
+                                    RadarPathReport radarPathReport = new RadarPathReport();
+                                    radarPathReport.setTime(targetInstructionsInfo.getTime());
+                                    radarPathReport.setTargetId(targetInstructionsInfo.getTargetId());
+                                    radarPathReport.setTargetType(targetInstructionsInfo.getTargetTypeId());
+                                    radarPathReport.setSensorId(targetInstructionsInfo.getEquipmentId());
+                                    radarPathReport.setSensorType(targetInstructionsInfo.getEquipmentTypeId());
+                                    radarPathReport.setActualTargetPitch(targetInfo.getPitchAngle());
+                                    radarPathReport.setActualTargetDistance(targetInfo.getDistance());
+                                    radarPathReport.setShowedTargetDistance(targetInstructionsInfo.getDistance());
+                                    radarPathReport.setShowedTargetPitch(targetInstructionsInfo.getPitchAngle());
+                                    radarPathReport.setTaskId(taskId);
+                                    radarPathReport.setId(UUID.randomUUID().toString());
+                                    radarPathReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
+                                    radarPathReport.setDisabled(false);
+                                    radarPathReportService.insert(radarPathReport);
+                                }
                             }
                         }
                     }
@@ -798,7 +809,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
         }
         String key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, DateParserUtils.getTime());
 
-        if (!RedisUtils.getService(config.getPumpDataBase()).exists(key)){
+        if (!RedisUtils.getService(config.getPumpDataBase()).exists(key)) {
             log.error("redis中报文信息不满足拦截距离测试！");
             return;
         }
@@ -817,7 +828,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
             //同一传感器
             for (List list : map.values()) {
                 for (Object targetInstructions : list) {
-                    TargetInstructionsInfo targetInstructionsInfo = JsonUtils.deserialize(JsonUtils.serialize(targetInstructions),TargetInstructionsInfo.class);
+                    TargetInstructionsInfo targetInstructionsInfo = JsonUtils.deserialize(JsonUtils.serialize(targetInstructions), TargetInstructionsInfo.class);
                     //获取最大探测目标时间
                     maxTime = targetInstructionsInfo.getTime() > maxTime ? targetInstructionsInfo.getTime() : maxTime;
                     //获取最小探测目标距离
@@ -830,16 +841,18 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
             if (minDistance == Float.MAX_VALUE || maxTime == Long.MIN_VALUE || minDistance < 50) {
                 continue;
             }
-            InterceptDistanceReport interceptDistanceReport = new InterceptDistanceReport();
-            interceptDistanceReport.setInterceptDistance(minDistance);
-            interceptDistanceReport.setTime(maxTime);
-            interceptDistanceReport.setTargetType(targetId);
-            interceptDistanceReport.setTargetId(targetTypeId);
-            interceptDistanceReport.setTaskId(taskId);
-            interceptDistanceReport.setId(UUID.randomUUID().toString());
-            interceptDistanceReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
-            interceptDistanceReport.setDisabled(false);
-            interceptDistanceReportService.insert(interceptDistanceReport);
+            if (targetTypeId.equals(Constant.AIRTYPE) ? minDistance < getThreshold(pipeTest, "air_interception_distance") : minDistance < getThreshold(pipeTest, "water_interception_distance")) {
+                InterceptDistanceReport interceptDistanceReport = new InterceptDistanceReport();
+                interceptDistanceReport.setInterceptDistance(minDistance);
+                interceptDistanceReport.setTime(maxTime);
+                interceptDistanceReport.setTargetType(targetId);
+                interceptDistanceReport.setTargetId(targetTypeId);
+                interceptDistanceReport.setTaskId(taskId);
+                interceptDistanceReport.setId(UUID.randomUUID().toString());
+                interceptDistanceReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
+                interceptDistanceReport.setDisabled(false);
+                interceptDistanceReportService.insert(interceptDistanceReport);
+            }
         }
     }
 
@@ -865,7 +878,11 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
         Map<String, Map> targetInstructionsAll = RedisUtils.getService(config.getPumpDataBase()).extrasForHash().hgetall(targetInstructionsKey, Map.class);
 
         //获取火控解算时间阈值
-        Double threshold = getThreshold(pipeTest, "fire_control_time_threshold");
+        Double threshold1 = getThreshold(pipeTest, "fire_control_time_threshold");
+        Double threshold2 = getThreshold(pipeTest, "targetDistance");
+        Double threshold3 = getThreshold(pipeTest, "targetPitch");
+        Double threshold4 = getThreshold(pipeTest, "targetAzimuth");
+        Double threshold5 = getThreshold(pipeTest, "targetDepth");
 
         //判断第一个条件 A1==B1
         for (String targetId : targetFireAll.keySet()) {
@@ -873,32 +890,52 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
                 //通过第一个条件，判断第二条件 |B5 - A5| < 火控解算时间阈值
                 for (Object targetFireList : targetFireAll.get(targetId).values()) {
                     for (Object targetInstructionsList : targetInstructionsAll.get(targetId).values()) {
-                        List<TargetFireControlInfo> list = JsonUtils.deserializeList(JsonUtils.serialize(targetFireList),TargetFireControlInfo.class);
-                        List<TargetInstructionsInfo> list1 = JsonUtils.deserializeList(JsonUtils.serialize(targetInstructionsList),TargetInstructionsInfo.class);
+                        List<TargetFireControlInfo> list = JsonUtils.deserializeList(JsonUtils.serialize(targetFireList), TargetFireControlInfo.class);
+                        List<TargetInstructionsInfo> list1 = JsonUtils.deserializeList(JsonUtils.serialize(targetInstructionsList), TargetInstructionsInfo.class);
                         for (TargetInstructionsInfo targetInstructionsInfo : list1) {
                             for (TargetFireControlInfo targetFireControlInfo : list) {
                                 //判断第二条件 |B5 - A5| < 火控解算时间阈值
-                                if (Math.abs(targetFireControlInfo.getTime() - targetInstructionsInfo.getTime()) < threshold) {
-                                    //封装报文信息
-                                    FireControlReport fireControlReport = new FireControlReport();
-                                    fireControlReport.setTargetId(targetInstructionsInfo.getTargetId());
-                                    fireControlReport.setTargetType(targetInstructionsInfo.getTargetTypeId());
-                                    fireControlReport.setFireControlId(targetFireControlInfo.getFireControlSystemId());
-                                    fireControlReport.setFireControlType(targetFireControlInfo.getFireControlSystemTypeId());
-                                    fireControlReport.setTime(targetFireControlInfo.getTime());
-                                    fireControlReport.setTargetDistance(
-                                            Math.abs(targetFireControlInfo.getDistance() - targetInstructionsInfo.getDistance()));
-                                    fireControlReport.setTargetPitch(
-                                            Math.abs(targetFireControlInfo.getPitchAngle() - targetInstructionsInfo.getPitchAngle()));
-                                    fireControlReport.setTargetDepth(
-                                            Math.abs(targetFireControlInfo.getDepth() - targetInstructionsInfo.getDepth()));
-                                    fireControlReport.setTargetAzimuth(
-                                            Math.abs(targetFireControlInfo.getAzimuth() - targetInstructionsInfo.getAzimuth()));
-                                    fireControlReport.setTaskId(taskId);
-                                    fireControlReport.setId(UUID.randomUUID().toString());
-                                    fireControlReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                                    fireControlReport.setDisabled(false);
-                                    fireControlReportService.insert(fireControlReport);
+                                if (Math.abs(targetFireControlInfo.getTime() - targetInstructionsInfo.getTime()) < threshold1) {
+
+                                    float TargetDistance = Math.abs(targetFireControlInfo.getDistance() - targetInstructionsInfo.getDistance());
+                                    float TargetPitch = Math.abs(targetFireControlInfo.getPitchAngle() - targetInstructionsInfo.getPitchAngle());
+                                    float TargetAzimuth = Math.abs(targetFireControlInfo.getAzimuth() - targetInstructionsInfo.getAzimuth());
+                                    float TargetDepth = Math.abs(targetFireControlInfo.getDepth() - targetInstructionsInfo.getDepth());
+
+                                    String fireControlSystemTypeId = targetFireControlInfo.getFireControlSystemTypeId();
+
+                                    Boolean status = false;
+
+                                    if (fireControlSystemTypeId.equals(Constant.SHIP_TO_AIR_MISSILE_FIRE_CONTROL_DEVICE)) {
+                                        status = TargetDistance > threshold2 || TargetPitch > threshold3 || TargetAzimuth > threshold4;
+                                    } else if (fireControlSystemTypeId.equals(Constant.ANTI_MISSILE_NAVAL_GUN_FIRE_CONTROL_DEVICE)) {
+                                        status = TargetDistance > threshold2 || TargetPitch > threshold3 || TargetAzimuth > threshold4;
+                                    } else if (fireControlSystemTypeId.equals(Constant.TORPEDO_DEFENSE_WEAPON_FIRE_CONTROL_DEVICE)) {
+                                        status = TargetDistance > threshold2 || TargetPitch > threshold3 || TargetDepth > threshold5;
+                                    } else if (fireControlSystemTypeId.equals(Constant.FIRE_CONTROL_DEVICE_OF_ELECTRONIC_COUNTERMEASURE_WEAPON)) {
+                                        status = TargetDistance > threshold2 || TargetPitch > threshold3 || TargetAzimuth > threshold4;
+                                    } else {
+                                        status = TargetDistance > threshold2 || TargetPitch > threshold3 || TargetDepth > threshold5;
+                                    }
+
+                                    if (status) {
+                                        //封装报文信息
+                                        FireControlReport fireControlReport = new FireControlReport();
+                                        fireControlReport.setTargetId(targetInstructionsInfo.getTargetId());
+                                        fireControlReport.setTargetType(targetInstructionsInfo.getTargetTypeId());
+                                        fireControlReport.setFireControlId(targetFireControlInfo.getFireControlSystemId());
+                                        fireControlReport.setFireControlType(fireControlSystemTypeId);
+                                        fireControlReport.setTime(targetFireControlInfo.getTime());
+                                        fireControlReport.setTargetDistance(TargetDistance);
+                                        fireControlReport.setTargetPitch(TargetPitch);
+                                        fireControlReport.setTargetAzimuth(TargetAzimuth);
+                                        fireControlReport.setTargetDepth(TargetDepth);
+                                        fireControlReport.setTaskId(taskId);
+                                        fireControlReport.setId(UUID.randomUUID().toString());
+                                        fireControlReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
+                                        fireControlReport.setDisabled(false);
+                                        fireControlReportService.insert(fireControlReport);
+                                    }
                                 }
                             }
                         }
@@ -935,10 +972,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
             if (allTargetInstructions.containsKey(targetId)) {
                 //目标指示和武器发射目标一致,循环报文，获取最小探测时间和最小武器发射时间
                 for (Object equipmentList : allEquipmentLaunchStatus.get(targetId).values()) {
-                    List<EquipmentLaunchStatus> list = JsonUtils.deserializeList(JsonUtils.serialize(equipmentList),EquipmentLaunchStatus.class);
-                    if (list.size() < 2) {
-                        continue;
-                    }
+                    List<EquipmentLaunchStatus> list = JsonUtils.deserializeList(JsonUtils.serialize(equipmentList), EquipmentLaunchStatus.class);
                     String equipmentId = "";
                     String equipmentTypeId = "";
                     for (EquipmentLaunchStatus equipmentLaunchStatus : list) {
@@ -950,10 +984,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
                         continue;
                     }
                     for (Object targetList : allTargetInstructions.get(targetId).values()) {
-                        List<TargetInstructionsInfo> list1 = JsonUtils.deserializeList(JsonUtils.serialize(targetList),TargetInstructionsInfo.class);
-                        if (list1.size() < 2) {
-                            continue;
-                        }
+                        List<TargetInstructionsInfo> list1 = JsonUtils.deserializeList(JsonUtils.serialize(targetList), TargetInstructionsInfo.class);
                         String targetTypeId = "";
                         String targetEquipmentId = "";
                         String targetEquipmentTypeId = "";
@@ -966,21 +997,23 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
                         if (minTargetTime == Long.MAX_VALUE) {
                             continue;
                         }
-                        ReactionReport reactionReport = new ReactionReport();
-                        reactionReport.setTime(minEquipmentTime);
-                        reactionReport.setReactionTime(minEquipmentTime - minTargetTime);
-                        reactionReport.setTargetId(targetId);
-                        reactionReport.setTargetType(targetTypeId);
-                        reactionReport.setSensorId(targetEquipmentId);
-                        reactionReport.setSensorType(targetEquipmentTypeId);
-                        reactionReport.setWeaponId(equipmentId);
-                        reactionReport.setWeaponType(equipmentTypeId);
-                        reactionReport.setTaskId(taskId);
-                        reactionReport.setId(UUID.randomUUID().toString());
-                        reactionReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                        reactionReport.setDisabled(false);
-                        reactionReportService.insert(reactionReport);
-
+                        Long reactionTime = minEquipmentTime - minTargetTime;
+                        if (targetTypeId.equals(Constant.AIRTYPE) ? reactionTime > getThreshold(pipeTest, "airReactionTime") : reactionTime > getThreshold(pipeTest, "waterReactionTime")) {
+                            ReactionReport reactionReport = new ReactionReport();
+                            reactionReport.setTime(minEquipmentTime);
+                            reactionReport.setReactionTime(reactionTime);
+                            reactionReport.setTargetId(targetId);
+                            reactionReport.setTargetType(targetTypeId);
+                            reactionReport.setSensorId(targetEquipmentId);
+                            reactionReport.setSensorType(targetEquipmentTypeId);
+                            reactionReport.setWeaponId(equipmentId);
+                            reactionReport.setWeaponType(equipmentTypeId);
+                            reactionReport.setTaskId(taskId);
+                            reactionReport.setId(UUID.randomUUID().toString());
+                            reactionReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
+                            reactionReport.setDisabled(false);
+                            reactionReportService.insert(reactionReport);
+                        }
                     }
 
                 }
@@ -1012,38 +1045,40 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
         Map<String, Map> allEquipmentLaunchStatus = RedisUtils.getService(config.getPumpDataBase()).extrasForHash().hgetall(equipmentKey, Map.class);
 
 
-        Double threshold = getThreshold(pipeTest, "launcher_rotation_time_threshold");
+        Double threshold1 = getThreshold(pipeTest, "launcher_rotation_time_threshold");
+        Double threshold2 = getThreshold(pipeTest, "targetDistance");
+        Double threshold3 = getThreshold(pipeTest, "targetPitch");
 
         //判断第一条件，目标id一致
         for (String targetId : allEquipmentLaunchStatus.keySet()) {
             if (allFireControlInfos.containsKey(targetId)) {
                 for (Object equipmentLaunchStatusList : allEquipmentLaunchStatus.get(targetId).values()) {
-                    List<EquipmentLaunchStatus> list = JsonUtils.deserializeList(JsonUtils.serialize(equipmentLaunchStatusList),EquipmentLaunchStatus.class);
+                    List<EquipmentLaunchStatus> list = JsonUtils.deserializeList(JsonUtils.serialize(equipmentLaunchStatusList), EquipmentLaunchStatus.class);
                     for (EquipmentLaunchStatus equipmentLaunchStatus : list) {
                         for (Object targetFireControInfosList : allFireControlInfos.get(targetId).values()) {
-                            List<TargetFireControlInfo> list1 = JsonUtils.deserializeList(JsonUtils.serialize(targetFireControInfosList),TargetFireControlInfo.class);
+                            List<TargetFireControlInfo> list1 = JsonUtils.deserializeList(JsonUtils.serialize(targetFireControInfosList), TargetFireControlInfo.class);
                             for (TargetFireControlInfo targetFireControlInfo : list1) {
                                 Long time = equipmentLaunchStatus.getTime() - targetFireControlInfo.getTime();
                                 //判断第二条件
-                                if (time > 0 && time < threshold) {
-                                    //封装报文
-                                    LauncherRotationReport launcherRotationReport = new LauncherRotationReport();
-                                    launcherRotationReport.setTargetId(equipmentLaunchStatus.getTargetId());
-                                    launcherRotationReport.setTargetType(equipmentLaunchStatus.getTargetTypeId());
-                                    launcherRotationReport.setWeaponId(equipmentLaunchStatus.getEquipmentId());
-                                    launcherRotationReport.setWeaponType(equipmentLaunchStatus.getEquipmentTypeId());
-                                    launcherRotationReport.setTime(equipmentLaunchStatus.getTime());
-                                    launcherRotationReport.setLauncherPitchAccuracy(Math.abs(
-                                            equipmentLaunchStatus.getLaunchAzimuth() - targetFireControlInfo.getAzimuth()
-                                    ));
-                                    launcherRotationReport.setLauncherAzimuthAccuracy(Math.abs(
-                                            equipmentLaunchStatus.getLaunchPitchAngle() - targetFireControlInfo.getPitchAngle()
-                                    ));
-                                    launcherRotationReport.setTargetId(taskId);
-                                    launcherRotationReport.setId(UUID.randomUUID().toString());
-                                    launcherRotationReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
-                                    launcherRotationReport.setDisabled(false);
-                                    launcherRotationReportService.insert(launcherRotationReport);
+                                if (time > 0 && time < threshold1) {
+                                    float launcherPitchAccuracy = Math.abs(equipmentLaunchStatus.getLaunchAzimuth() - targetFireControlInfo.getAzimuth());
+                                    float launcherAzimuthAccuracy = Math.abs(equipmentLaunchStatus.getLaunchPitchAngle() - targetFireControlInfo.getPitchAngle());
+                                    if (launcherPitchAccuracy > threshold2 || launcherAzimuthAccuracy > threshold3) {
+                                        //封装报文
+                                        LauncherRotationReport launcherRotationReport = new LauncherRotationReport();
+                                        launcherRotationReport.setTargetId(equipmentLaunchStatus.getTargetId());
+                                        launcherRotationReport.setTargetType(equipmentLaunchStatus.getTargetTypeId());
+                                        launcherRotationReport.setWeaponId(equipmentLaunchStatus.getEquipmentId());
+                                        launcherRotationReport.setWeaponType(equipmentLaunchStatus.getEquipmentTypeId());
+                                        launcherRotationReport.setTime(equipmentLaunchStatus.getTime());
+                                        launcherRotationReport.setLauncherPitchAccuracy(launcherPitchAccuracy);
+                                        launcherRotationReport.setLauncherAzimuthAccuracy(launcherAzimuthAccuracy);
+                                        launcherRotationReport.setTargetId(taskId);
+                                        launcherRotationReport.setId(UUID.randomUUID().toString());
+                                        launcherRotationReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
+                                        launcherRotationReport.setDisabled(false);
+                                        launcherRotationReportService.insert(launcherRotationReport);
+                                    }
                                 }
                             }
                         }
@@ -1086,7 +1121,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
             //同一传感器
             for (List list : map.values()) {
                 for (Object targetInstructions : list) {
-                    TargetInstructionsInfo targetInstructionsInfo = JsonUtils.deserialize(JsonUtils.serialize(targetInstructions),TargetInstructionsInfo.class);
+                    TargetInstructionsInfo targetInstructionsInfo = JsonUtils.deserialize(JsonUtils.serialize(targetInstructions), TargetInstructionsInfo.class);
                     //获取最大探测目标时间
                     maxTime = targetInstructionsInfo.getTime() > maxTime ? targetInstructionsInfo.getTime() : maxTime;
                     //获取最小探测目标距离
@@ -1405,4 +1440,5 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
         }
         return stateAnalysisTimeReportList;
     }
+
 }
