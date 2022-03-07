@@ -9,6 +9,7 @@ import lombok.Data;
  * 装备状态信息报文
  */
 @Data
+@Display("装备状态")
 public class EquipmentStatus {
 
     @Display("发送方编号")

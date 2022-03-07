@@ -10,23 +10,29 @@ public class Constant {
      * http 报文存入redis方法
      */
     //作战方案
-    public static String COMBAT_SCENARIOS_INFO_HTTP_KEY = "weapon:pump:combat_scenarios_info";
+    public static String COMBAT_SCENARIOS_INFO_HTTP_KEY = "weapon:combat_scenarios_info";
     //战场环境
-    public static String ENVIRONMENT_INFO_HTTP_KEY = "weapon:pump:environment_info";
+    public static String ENVIRONMENT_INFO_HTTP_KEY = "weapon:environment_info";
     //武器发射
-    public static String EQUIPMENT_LAUNCH_STATUS_HTTP_KEY = "weapon:pump:equipment_launch_status";
+    public static String EQUIPMENT_LAUNCH_STATUS_HTTP_KEY = "weapon:equipment_launch_status:targetId";
     //设备状态
-    public static String EQUIPMENT_STATUS_HTTP_KEY = "weapon:pump:equipment_status";
+    public static String EQUIPMENT_STATUS_HTTP_KEY = "weapon:equipment_status";
     //发射器架跳转
-    public static String LAUNCHER_ROTATION_INFO_HTTP_KEY = "weapon:pump:launcher_rotation_info";
+    public static String LAUNCHER_ROTATION_INFO_HTTP_KEY = "weapon:launcher_rotation_info:equipmentId";
     //目标火控
-    public static String TARGET_FIRE_CONTROL_INFO_HTTP_KEY = "weapon:pump:target_fire_control_info";
+    public static String TARGET_FIRE_CONTROL_INFO_HTTP_KEY = "weapon:target_fire_control_info:targetId";
+    //目标火控2
+    public static String TARGET_FIRE_CONTROL_INFO_HTTP_KEY_2 = "weapon:target_fire_control_info:equipmentId";
     //目标信息
-    public static String TARGET_INFO_HTTP_KEY = "weapon:pump:target_info";
+    public static String TARGET_INFO_HTTP_KEY = "weapon:target_info";
     //目标指示
-    public static String TARGET_INSTRUCTIONS_INFO_HTTP_KEY = "weapon:pump:target_instructions_info";
+    public static String TARGET_INSTRUCTIONS_INFO_HTTP_KEY = "weapon:target_instructions_info:targetId";
+    //目标指示2
+    public static String TARGET_INSTRUCTIONS_INFO_HTTP_KEY_2 = "weapon:target_instructions_info";
 
+    //目标Id
     public static String TARGET_ID = ":targetId";
+    //武器Id
     public static String EQUIPMENT_ID = ":equipmentId";
 
     /**

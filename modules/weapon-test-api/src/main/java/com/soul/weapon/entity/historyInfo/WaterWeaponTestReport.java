@@ -20,7 +20,7 @@ import java.sql.Timestamp;
 @Data
 @Entity
 @Table(name = "his_water_weapon_report")
-@Display("鱼雷防御武器通道测试-5")
+@Display("水声对抗武器通道测试-5")
 @EqualsAndHashCode(callSuper = true)
 public class WaterWeaponTestReport extends BaseEntity {
 

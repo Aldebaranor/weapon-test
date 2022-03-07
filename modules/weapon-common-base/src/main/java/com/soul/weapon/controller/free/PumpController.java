@@ -51,6 +51,8 @@ public class PumpController {
     @PostMapping(value = "/{structName}")
     public Boolean pumpByStruct(@PathVariable String structName, @RequestBody Map<String, Object> msg) {
 
+        RedisService redisService = RedisUtils.getService(config.getPumpDataBase());
+
         if (StringUtils.isBlank(structName)) {
             throw ExceptionUtils.api("structName can not be null");
         }
@@ -95,18 +97,18 @@ public class PumpController {
             }
             break;
             //map 武器发射
-            //key:[weapon:pump:equipment_launch_status:yyyymmdd]
-            //value:[Map(targetId,Map(equipmentId,List<EquipmentLaunchStatus>))]
+            //key:[weapon:equipment_launch_status:targetId:yyyymmdd:{targetId}]
+            //value:[Zset<time,EquipmentLaunchStatus>]
             case "EquipmentLaunchStatus": {
                 //对报文数据进行反序列化
                 EquipmentLaunchStatus equipmentLaunchStatus = JsonUtils.deserialize(JsonUtils.serialize(msg), EquipmentLaunchStatus.class);
                 //拼接redis中当天的武器发射dds的key
-                String key = String.format("%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, getTime());
-                structureGeneration(equipmentLaunchStatus, key, equipmentLaunchStatus.getTargetId(), equipmentLaunchStatus.getEquipmentId());
+                String key = String.format("%s:%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, getTime(),equipmentLaunchStatus.getTargetId());
+                redisService.getTemplate().opsForZSet().add(key,JsonUtils.serialize(equipmentLaunchStatus), equipmentLaunchStatus.getTime());
             }
             break;
             //map 装备状态
-            //key:[weapon:pump:equipment_status:yyyymmdd]
+            //key:[weapon:equipment_status:yyyymmdd]
             //value:[Map(equipmentId,EquipmentStatus)
             case "EquipmentStatus": {
                 //反序列化
@@ -130,65 +132,55 @@ public class PumpController {
             }
             break;
             //map 发射架调转
-            //key:[weapon:pump:launcher_rotation_info:yyyymmdd]
-            //value:[Map(targetId,Map(launcherId,List<LauncherRotationInfo>))]
+            //key:[weapon:launcher_rotation_info:equipmentId:yyyymmdd:{equipmentId}]
+            //value:[Map<targetId,LauncherRotationInfo>]
             case "LauncherRotationInfo": {
                 //反序列化
                 LauncherRotationInfo launcherRotationInfo = JsonUtils.deserialize(JsonUtils.serialize(msg), LauncherRotationInfo.class);
                 //拼接redis中当天的key
-                String key = String.format("%s:%s", Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY, getTime());
-
-                structureGeneration(launcherRotationInfo, key, launcherRotationInfo.getTargetId(), launcherRotationInfo.getLauncherId());
+                String key = String.format("%s:%s:%s", Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY, getTime(),launcherRotationInfo.getLauncherId());
+                redisService.boundHashOps(key).put(launcherRotationInfo.getTargetId(),JsonUtils.serialize(launcherRotationInfo));
             }
             break;
             //map 目标火控
-            //list:
-            //key:[weapon:pump:target_fire_control_info:yyyymmdd]
-            //value:[Map(targetId,Map(fireControlSystemId,List<TargetFireControlInfo>))]
+            //key:[weapon:target_fire_control_info:targetId:yyyymmdd:{targetId}]
+            //value:[Zset<time,TargetFireControlInfo>]
+            //key2:[weapon:target_fire_control_info:equipmentId:yyyymmdd:{equipmentId}](12算法)
+            //value2:[Map<targetId,TargetFireControlInfo>]
             case "TargetFireControlInfo": {
                 //反序列化
                 TargetFireControlInfo tmpTargetFireControlInfo = JsonUtils.deserialize(JsonUtils.serialize(msg), TargetFireControlInfo.class);
                 //拼接redis中当天的key
-                String key = String.format("%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, getTime());
-                structureGeneration(tmpTargetFireControlInfo, key, tmpTargetFireControlInfo.getTargetId(), tmpTargetFireControlInfo.getFireControlSystemId());
+                String key = String.format("%s:%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, getTime(),tmpTargetFireControlInfo.getTargetId());
+                String key2 = String.format("%s:%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY_2, getTime(),tmpTargetFireControlInfo.getFireControlSystemId());
+                redisService.getTemplate().opsForZSet().add(key,JsonUtils.serialize(tmpTargetFireControlInfo), tmpTargetFireControlInfo.getTime());
+                redisService.boundHashOps(key2).put(tmpTargetFireControlInfo.getTargetId(),JsonUtils.serialize(tmpTargetFireControlInfo));
             }
             break;
             //map 目标信息
-            //key:[weapon:pump:target_info:yyyymmdd]
-            //value:[Map(targetId,TargetInfo)]
+            //key:[weapon:target_info:targetId:yyyymmdd:{targetId}]
+            //value:[Zset<time,TargetInfo>]
             case "TargetInfo": {
                 //反序列化
                 TargetInfo tmpTargetInfo = JsonUtils.deserialize(JsonUtils.serialize(msg), TargetInfo.class);
-
                 // 拼接redis中当天的key
-                String key = String.format("%s:%s", Constant.TARGET_INFO_HTTP_KEY, getTime());
-
-                //判断是否存在key
-                if (RedisUtils.getService(config.getPumpDataBase()).exists(key)) {
-                    //如果存在进行添加或者更新
-                    RedisUtils.getService(config.getPumpDataBase()).
-                            boundHashOps(key).put(
-                                    tmpTargetInfo.getTargetId(), JsonUtils.serialize(tmpTargetInfo));
-                } else {
-                    //如果不存在存入对应结构并设置过期时间
-                    RedisUtils.getService(config.getPumpDataBase()).
-                            boundHashOps(key).put(
-                                    tmpTargetInfo.getTargetId(), JsonUtils.serialize(tmpTargetInfo));
-                    RedisUtils.getService(config.getPumpDataBase()).expire(key, ONE_DAY);
-                }
-
+                String key = String.format("%s:%s:%s", Constant.TARGET_INFO_HTTP_KEY, getTime(),tmpTargetInfo.getTargetId());
+                redisService.getTemplate().opsForZSet().add(key,JsonUtils.serialize(tmpTargetInfo), tmpTargetInfo.getTime());
             }
             break;
             //map 目标指示
-            //key:[weapon:pump:target_instructions_info:yyyymmdd]
-            //value:[Map(targetId,Map<equipmentId,List<TargetInstructionsInfo>>)]
+            //key:[weapon:target_instructions_info:targetId:yyyymmdd:{targetId}]
+            //value:[Zset<time,TargetInstructionsInfo>]
+            //key2:[weapon:target_instructions_info:yyyymmdd](7.8.10算法)
+            //value2:[Map<targetId,TargetInstructionsInfo>]
             case "TargetInstructionsInfo": {
                 //反序列化
                 TargetInstructionsInfo targetInstructionsInfo = JsonUtils.deserialize(JsonUtils.serialize(msg), TargetInstructionsInfo.class);
                 //目标指示历史报文
-                String key = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, getTime());
-                //判断redis中是否存在key
-                structureGeneration(targetInstructionsInfo, key, targetInstructionsInfo.getTargetId(), targetInstructionsInfo.getEquipmentId());
+                String key = String.format("%s:%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY, getTime(),targetInstructionsInfo.getTargetId());
+                String key2 = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY_2, getTime());
+                redisService.getTemplate().opsForZSet().add(key,JsonUtils.serialize(targetInstructionsInfo), targetInstructionsInfo.getTime());
+                redisService.boundHashOps(key2).put(targetInstructionsInfo.getTargetId(),JsonUtils.serialize(targetInstructionsInfo));
             }
             break;
             case "Report": {

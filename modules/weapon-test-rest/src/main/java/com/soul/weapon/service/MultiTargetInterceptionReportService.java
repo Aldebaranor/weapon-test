@@ -2,9 +2,7 @@ package com.soul.weapon.service;
 
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
-import com.soul.weapon.condition.ElectronicWeaponTestReportCondition;
 import com.soul.weapon.condition.MultiTargetInterceptionReportCondition;
-import com.soul.weapon.entity.historyInfo.ElectronicWeaponTestReport;
 import com.soul.weapon.entity.historyInfo.MultiTargetInterceptionReport;
 
 import java.util.List;
@@ -30,5 +28,7 @@ public interface MultiTargetInterceptionReportService {
     String insert(MultiTargetInterceptionReport entity);
 
     void update(MultiTargetInterceptionReport entity);
+
+
 
 }
