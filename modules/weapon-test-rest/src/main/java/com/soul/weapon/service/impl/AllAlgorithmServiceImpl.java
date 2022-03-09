@@ -52,7 +52,6 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
     private final LauncherRotationReportService launcherRotationReportService;
     private final MultiTargetInterceptionReportService multiTargetInterceptionReportService;
 
-
     /**
      * 获取阈值，如果 pipeTest.getThreshold()为空则使用默认的阈值
      *
@@ -365,7 +364,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
                 PipeWeaponIndices.UnderwaterAcousticCountermeasureControl.getValue(),
                 PipeWeaponIndices.UnderwaterAcousticCountermeasure.getValue(),
                 PipeWeaponIndices.MultiUsageLaunch.getValue(),
-                PipeWeaponIndices.Sonar.getValue()
+                PipeWeaponIndices.TowedSonar.getValue()
         })) {
             log.error("redis报文信息不满足水声对抗武器测试");
             return;
@@ -373,8 +372,8 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
 
         WaterWeaponTestReport tmpReport = new WaterWeaponTestReport();
         tmpReport.setTime(System.currentTimeMillis());
-        tmpReport.setSonarId(PipeWeaponIndices.Sonar.getValue());
-        tmpReport.setSonarSelfCheck(allEquipmentStatus.get(PipeWeaponIndices.Sonar.getValue()).getCheckStatus());
+        tmpReport.setSonarId(PipeWeaponIndices.TowedSonar.getValue());
+        tmpReport.setSonarSelfCheck(allEquipmentStatus.get(PipeWeaponIndices.TowedSonar.getValue()).getCheckStatus());
         tmpReport.setFireControlId(PipeWeaponIndices.UnderwaterAcousticCountermeasureControl.getValue());
         tmpReport.setFireControlSelfCheck(allEquipmentStatus.get(PipeWeaponIndices.UnderwaterAcousticCountermeasureControl.getValue()).getCheckStatus());
         tmpReport.setLauncherId(PipeWeaponIndices.MultiUsageLaunch.getValue());
@@ -383,7 +382,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
         tmpReport.setWaterWeaponSelfCheck(allEquipmentStatus.get(PipeWeaponIndices.UnderwaterAcousticCountermeasure.getValue()).getCheckStatus());
 
         long[] timeVec = {
-                allEquipmentStatus.get(PipeWeaponIndices.Sonar.getValue()).getTime(),
+                allEquipmentStatus.get(PipeWeaponIndices.TowedSonar.getValue()).getTime(),
                 allEquipmentStatus.get(PipeWeaponIndices.UnderwaterAcousticCountermeasureControl.getValue()).getTime(),
                 allEquipmentStatus.get(PipeWeaponIndices.MultiUsageLaunch.getValue()).getTime(),
                 allEquipmentStatus.get(PipeWeaponIndices.UnderwaterAcousticCountermeasure.getValue()).getTime()
@@ -499,7 +498,8 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
             Double threshold1sm = threshold1 * 1000;
 
             //获取满足阈值要求的，并且时间最靠近的一个目标信息
-            Set<String> targetInfoSet = redisService.getTemplate().opsForZSet().reverseRangeByScore(targetKey, targetInstructionInfo.getTime() - threshold1sm.longValue(), targetInstructionInfo.getTime(), 0, 0);
+            Set<String> targetInfoSet = redisService.getTemplate().opsForZSet().reverseRangeByScore(targetKey, targetInstructionInfo.getTime() - threshold1sm.longValue(), targetInstructionInfo.getTime(), 0, 1
+            );
 
             if (targetInfoSet == null || targetInfoSet.size() <= 0) {
                 continue;
@@ -582,7 +582,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
             Double threshold1sm = threshold1 * 1000;
 
             //获取满足阈值要求的，并且时间最靠近的一个目标信息
-            Set<String> targetInfoSet = redisService.getTemplate().opsForZSet().reverseRangeByScore(targetKey, targetInstructionsInfo.getTime() - threshold1sm.longValue(), targetInstructionsInfo.getTime(), 0, 0);
+            Set<String> targetInfoSet = redisService.getTemplate().opsForZSet().reverseRangeByScore(targetKey, targetInstructionsInfo.getTime() - threshold1sm.longValue(), targetInstructionsInfo.getTime(), 0, 1);
 
             if (targetInfoSet == null || targetInfoSet.size() <= 0) {
                 continue;
@@ -868,7 +868,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
                 TargetFireControlInfo targetFireControlInfo = map.get(targetId);
                 Long time = targetFireControlInfo.getTime() - threshold1.longValue();
                 //获取最接近阈值的一条目标指示
-                Set<String> targetInstructionsSet = redisService.getTemplate().opsForZSet().reverseRangeByScore(targetInstructionsKey, time + 1, map.get(targetId).getTime() - 1, 0, 0);
+                Set<String> targetInstructionsSet = redisService.getTemplate().opsForZSet().reverseRangeByScore(targetInstructionsKey, time + 1, map.get(targetId).getTime() - 1, 0, 1);
 
                 if (targetInstructionsSet == null || targetInstructionsSet.size() == 0) {
                     continue;
@@ -1014,7 +1014,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
                 LauncherRotationInfo launcherRotationInfo = map.get(targetId);
                 Long time = launcherRotationInfo.getTime() - threshold1.longValue();
                 //获取最近接阈值的一条目标火控
-                Set<String> targetFireControlInfoSet = redisService.getTemplate().opsForZSet().reverseRangeByScore(targetKey, time + 1, launcherRotationInfo.getTime() - 1, 0, 0);
+                Set<String> targetFireControlInfoSet = redisService.getTemplate().opsForZSet().reverseRangeByScore(targetKey, time + 1, launcherRotationInfo.getTime() - 1, 0, 1);
                 if (targetFireControlInfoSet == null || targetFireControlInfoSet.size() == 0) {
                     continue;
                 }

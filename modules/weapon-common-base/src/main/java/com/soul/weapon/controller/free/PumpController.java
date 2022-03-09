@@ -134,12 +134,17 @@ public class PumpController {
             //map 发射架调转
             //key:[weapon:launcher_rotation_info:equipmentId:yyyymmdd:{equipmentId}]
             //value:[Map<targetId,LauncherRotationInfo>]
+            //key:[weapon:launcher_rotation_info:targetId:yyyymmdd:{targetId}]
+            //value:[Zset<time,LauncherRotationInfo>]
             case "LauncherRotationInfo": {
                 //反序列化
                 LauncherRotationInfo launcherRotationInfo = JsonUtils.deserialize(JsonUtils.serialize(msg), LauncherRotationInfo.class);
                 //拼接redis中当天的key
                 String key = String.format("%s:%s:%s", Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY, getTime(),launcherRotationInfo.getLauncherId());
                 redisService.boundHashOps(key).put(launcherRotationInfo.getTargetId(),JsonUtils.serialize(launcherRotationInfo));
+                //拼接redis中当天的key
+                String key1 = String.format("%s:%s:%s", Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY_2, getTime(),launcherRotationInfo.getTargetId());
+                redisService.getTemplate().opsForZSet().add(key1,JsonUtils.serialize(launcherRotationInfo), launcherRotationInfo.getTime());
             }
             break;
             //map 目标火控

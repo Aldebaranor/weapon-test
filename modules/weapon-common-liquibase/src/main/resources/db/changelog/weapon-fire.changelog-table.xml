@@ -143,8 +143,6 @@
             <column name="conflictType" value="水声兼容"></column>
             <column name="conflictPriority" value="2"></column>
         </insert>
-
-
     </changeSet>
     <changeSet author="nemo" id = "1630288315483-8">
         <insert tableName="com_dictionary_group">
@@ -162,6 +160,10 @@
 
     <changeSet id="1630288315485-11" author="nemo">
         <sqlFile path="fire_priority.sql"/>
+    </changeSet>
+
+    <changeSet id="1630288315486-12" author="sz">
+        <sqlFile path="fire_threshold.sql"/>
     </changeSet>
 
 </databaseChangeLog>

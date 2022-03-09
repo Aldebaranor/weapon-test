@@ -17,14 +17,16 @@ public class Constant {
     public static String EQUIPMENT_LAUNCH_STATUS_HTTP_KEY = "weapon:equipment_launch_status:targetId";
     //设备状态
     public static String EQUIPMENT_STATUS_HTTP_KEY = "weapon:equipment_status";
-    //发射器架跳转
+    //发射器架调转
     public static String LAUNCHER_ROTATION_INFO_HTTP_KEY = "weapon:launcher_rotation_info:equipmentId";
+    //发射器调转2
+    public static String LAUNCHER_ROTATION_INFO_HTTP_KEY_2 = "weapon:launcher_rotation_info:targetId";
     //目标火控
     public static String TARGET_FIRE_CONTROL_INFO_HTTP_KEY = "weapon:target_fire_control_info:targetId";
     //目标火控2
     public static String TARGET_FIRE_CONTROL_INFO_HTTP_KEY_2 = "weapon:target_fire_control_info:equipmentId";
     //目标信息
-    public static String TARGET_INFO_HTTP_KEY = "weapon:target_info";
+    public static String TARGET_INFO_HTTP_KEY = "weapon:target_info:targetId";
     //目标指示
     public static String TARGET_INSTRUCTIONS_INFO_HTTP_KEY = "weapon:target_instructions_info:targetId";
     //目标指示2

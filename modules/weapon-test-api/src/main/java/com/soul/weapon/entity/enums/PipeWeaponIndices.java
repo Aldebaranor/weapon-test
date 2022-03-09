@@ -40,6 +40,7 @@ public enum PipeWeaponIndices implements PropertyDescriptor {
     InBoardElectronicCountermeasure(26, "舷内电子对抗武器"),
 
     /** 水声对抗武器测试 **/
+    TowedSonar(16,"拖曳声纳"),
     UnderwaterAcousticCountermeasureControl(27, "水声对抗武器火控装置"),
     UnderwaterAcousticCountermeasure(28, "水声对抗武器");
 

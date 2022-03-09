@@ -29,10 +29,11 @@ public class WeaponTestConstant {
             new SimpleEntry<>(PipeWeaponIndices.AntiMissileShipGunControl.getValue(), "反导舰炮火控装置"),
             new SimpleEntry<>(PipeWeaponIndices.AntiMissileShipGun.getValue(), "反导舰炮"),
             new SimpleEntry<>(PipeWeaponIndices.Sonar.getValue(), "舰壳声纳"),
+            new SimpleEntry<>(PipeWeaponIndices.TowedSonar.getValue(), "拖曳声纳"),
             new SimpleEntry<>(PipeWeaponIndices.TorpedoFireControl.getValue(), "鱼雷防御武器火控装置"),
             new SimpleEntry<>(PipeWeaponIndices.TorpedoLauncher.getValue(), "鱼雷防御武器发射装置"),
             new SimpleEntry<>(PipeWeaponIndices.Torpedo.getValue(), "鱼雷防御武器"),
-            // new SimpleEntry<>(PipeWeaponIndices.ElectronicDetection.getValue(), ""), 不参与显示
+            new SimpleEntry<>(PipeWeaponIndices.ElectronicDetection.getValue(), "电子侦察设备"),
             new SimpleEntry<>(PipeWeaponIndices.ElectronicCountermeasure.getValue(), "电子对抗武器火控装置"),
             new SimpleEntry<>(PipeWeaponIndices.MultiUsageLaunch.getValue(), "舷外干扰发射系统"),
             new SimpleEntry<>(PipeWeaponIndices.OutBoardElectronicCountermeasure.getValue(), "舷外电子对抗武器"),

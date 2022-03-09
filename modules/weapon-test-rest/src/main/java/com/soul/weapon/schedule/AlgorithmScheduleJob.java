@@ -1,6 +1,7 @@
 package com.soul.weapon.schedule;
 
 import com.egova.redis.RedisUtils;
+import com.soul.weapon.model.dds.EquipmentStatus;
 import com.soul.weapon.service.impl.AllAlgorithmServiceImpl;
 import com.soul.weapon.config.CommonConfig;
 import com.soul.weapon.config.Constant;
@@ -9,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
@@ -23,6 +25,9 @@ public class AlgorithmScheduleJob  {
 
     @Autowired
     public CommonConfig config;
+
+    @Autowired
+    public RestTemplate restTemplate;
 
     @Autowired
     public AllAlgorithmServiceImpl allAlgorithm;
@@ -53,6 +58,8 @@ public class AlgorithmScheduleJob  {
             log.error("定时轮询所有算法失败！", e);
         }
     }
+
+
 
 
     private  Map<String, PipeTest> getCurrentPipeTest(){
