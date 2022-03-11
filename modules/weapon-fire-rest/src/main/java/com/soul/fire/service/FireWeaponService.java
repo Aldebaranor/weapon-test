@@ -2,7 +2,6 @@ package com.soul.fire.service;
 
 import com.soul.fire.condition.FireWeaponCondition;
 import com.soul.fire.entity.FireWeapon;
-import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 

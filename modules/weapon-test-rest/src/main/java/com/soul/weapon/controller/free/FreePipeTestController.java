@@ -64,16 +64,5 @@ public class FreePipeTestController {
         return pipeTestService.deleteById(id);
     }
 
-    @Api
-    @PostMapping(value = "/defend/{type}")
-    public List<StateAnalysisTimeReport> getDefendInfo(@PathVariable String type){
-        if(StringUtils.equals("underWater",type)){
-            return allAlgorithm.getUnderWaterDefendInfo();
-        }else if(StringUtils.equals("toAir",type)){
-            return allAlgorithm.getAirDefendInfo();
-        }else {
-            return null;
-        }
-    }
 
 }

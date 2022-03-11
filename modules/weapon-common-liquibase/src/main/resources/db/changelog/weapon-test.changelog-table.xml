@@ -49,30 +49,6 @@
             <column name="taskId" remarks="外键-任务id" type="VARCHAR(50)"/>
         </createTable>
     </changeSet>
-    <changeSet author="nash5 (generated)" id="1630566618258-4">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="pipe_self_check"/>
-            </not>
-        </preConditions>
-        <createTable tableName="pipe_self_check">
-            <column name="id" remarks="主键" type="VARCHAR(50)">
-                <constraints nullable="false" primaryKey="true"/>
-            </column>
-            <column name="name" remarks="装备名称" type="VARCHAR(50)">
-                <constraints unique="true"/>
-            </column>
-            <column name="showName" remarks="显示名称, 供前端调用" type="VARCHAR(50)"/>
-            <column name="code" remarks="装备编号" type="VARCHAR(10)"/>
-            <column name="hasErr" remarks="该装备对应的显示名称是否有Err" type="TINYINT(3)"/>
-            <column name="createTime" remarks="创建时间" type="datetime"/>
-            <column name="modifyTime" remarks="修改时间" type="datetime"/>
-            <column name="creator" remarks="创建人" type="VARCHAR(50)"/>
-            <column name="sortKey" remarks="排序字段" type="INT"/>
-            <column name="disabled" remarks="废弃字段" type="TINYINT(3)"/>
-            <column name="taskId" remarks="外键-任务id" type="VARCHAR(50)"/>
-        </createTable>
-    </changeSet>
     <changeSet author="nash5 (generated)" id="1630566618258-5">
         <preConditions onFail="MARK_RAN">
             <not>

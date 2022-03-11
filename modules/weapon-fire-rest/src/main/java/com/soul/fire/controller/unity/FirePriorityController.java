@@ -22,14 +22,7 @@ public class FirePriorityController {
     @PutMapping()
     public void updateTask(@RequestBody FirePriority modPriority) {
         firePriorityService.update(modPriority);
-        // firePriorityService.updatePriorityByPair(modPriority);
     }
-
-    // @Api
-    // @GetMapping("/{type}")
-    // public List<FirePriority> getPriorityByType(@PathVariable("type") String type) {
-    //     return firePriorityService.getPriorityByType(type);
-    // }
 
     @Api
     @PostMapping("/list")

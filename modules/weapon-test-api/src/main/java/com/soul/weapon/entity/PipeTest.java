@@ -45,9 +45,9 @@ public class PipeTest extends BaseEntity {
     @Column(name = "type")
     private PipeTestType type;
 
-    //JSON [{"name":"","text":"","value":0}]
     @Display("测试阈值")
     @Column(name = "threshold")
+    //JSON格式：[{"name":"","text":"","value":0}]
     private String threshold;
 
     @Display("创建时间")

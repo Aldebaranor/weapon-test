@@ -24,11 +24,6 @@ public class FireTaskController {
         return fireTaskService.getCurTask();
     }
 
-    // @Api
-    // @PatchMapping("/cur-task/{running-status}")
-    // public void updateTask(@PathVariable("running-status") boolean running) {
-    //    fireTaskService.updateTask(running);
-    // }
 
     @Api
     @PutMapping("/current")

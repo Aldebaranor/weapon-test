@@ -35,6 +35,7 @@ public class StatusAnalysisEvaluationServiceImpl implements StatusAnalysisEvalua
 
     @Override
     public Map<String, List<StatusAnalysisEvaluation>> getStatusAnglysisAll() {
+
         RedisService redisTemplate = RedisUtils.getService(config.getPumpDataBase());
 
         Map<String, List<StatusAnalysisEvaluation>> resultMap = new HashMap<>();

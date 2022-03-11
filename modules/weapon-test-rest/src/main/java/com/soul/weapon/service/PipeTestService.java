@@ -47,13 +47,6 @@ public interface PipeTestService {
     int deleteById(String id);
 
     /**
-     * query by taskId
-     * @param taskId
-     * @return
-     */
-    List<PipeTest> getByTaskId(String taskId);
-
-    /**
      * 查询
      * @param pipeTestCondition
      * @return
@@ -87,4 +80,7 @@ public interface PipeTestService {
     List<DictionaryItem> getPipeTestTree();
 
     List<DictionaryItem> getCurrentTaskTestItems(String taskId);
+
+
+    List<PipeTest> getByTaskId(String takeId);
 }

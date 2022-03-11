@@ -89,7 +89,6 @@ public class PipeTaskController {
     @Api
     @GetMapping(value = "/start/{takeId}")
     public void startTest(@PathVariable String takeId) {
-
         List<PipeTest> list = pipeTestService.getByTaskId(takeId);
         pipeTaskService.startTest(takeId, list);
     }
@@ -151,10 +150,6 @@ public class PipeTaskController {
             throw ExceptionUtils.api("获取阈值失败", new Object[0]);
         }
     }
-
-
-
-
 
 
 }

@@ -28,7 +28,4 @@ public class FireConflictPriorityServiceImpl extends TemplateService<FireConflic
         return fireConflictPriorityRepository;
     }
 
-
-
-
 }
