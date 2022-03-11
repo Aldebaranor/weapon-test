@@ -67,7 +67,6 @@ public class AlgorithmScheduleJob  {
     }
 
 
-
     private String  getCurrentTask(){
         return RedisUtils.getService(config.getPumpDataBase()).extrasForValue().get(Constant.WEAPON_CURRENT_TASK);
     }

@@ -46,6 +46,7 @@ public class PumpController {
     private final RestTemplate restTemplate;
     private final CommonConfig config;
     private final int ONE_DAY = 24 * 3600;
+    public static boolean start = false;
 
     @Api
     @PostMapping(value = "/{structName}")
@@ -212,7 +213,8 @@ public class PumpController {
 
     @Api
     @GetMapping(value = "/demo/{structName}")
-    public String pumpTest(@PathVariable String structName) {
+    public String pumpTest(@PathVariable(required = true,value = "structName") String structName) {
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -507,42 +509,28 @@ public class PumpController {
         return "";
     }
 
+    @Api
+    @GetMapping("/startDDS/{status}")
+    public String startDDS(@PathVariable String status){
+        //去空
+        status = status.trim();
+
+        if (status.equals("true")) {
+            start = true;
+            return "发送报文开启成功";
+        }
+
+        if (status.equals("false")){
+            start = false;
+            return "发送报文关闭成功";
+        }
+
+        return "请输入正确开启参数“true”或者“false”";
+    }
+
     private String getTime() {
         DateFormat df = new SimpleDateFormat("yyyyMMdd");
         return df.format(System.currentTimeMillis());
-    }
-    //生成Map<String,Map<String,List>>结构
-    //element:存储的元素,key:redis中的key,id1:外层key,id2:里层key
-    private void structureGeneration(Object element, String key, String id1, String id2) {
-        if (RedisUtils.getService(config.getPumpDataBase()).exists(key)) {
-            //获取对应目标的发射架调转报文
-            Map<String, List> map = RedisUtils.getService(config.getPumpDataBase()).extrasForHash().hgetall(key, Map.class).get(id1);
-            if (map == null) {
-                map = new HashMap<>();
-                List list = new ArrayList<>();
-                list.add(element);
-                map.put(id2, list);
-            } else {
-                //新增或更新
-                if (map.get(id2) == null) {
-                    List list = new ArrayList<>();
-                    list.add(element);
-                    map.put(id2, list);
-                } else {
-                    map.get(id2).add(element);
-                }
-            }
-            //更新redis
-            RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key).put(id1, JsonUtils.serialize(map));
-        } else {
-            //如果不存在创建对应结构进行存储
-            Map<String, List> map = new HashMap<>();
-            List list = new ArrayList<>();
-            list.add(element);
-            map.put(id2, list);
-            RedisUtils.getService(config.getPumpDataBase()).boundHashOps(key).put(id1, JsonUtils.serialize(map));
-            RedisUtils.getService(config.getPumpDataBase()).expire(key, ONE_DAY);
-        }
     }
 }
 
