@@ -4,6 +4,10 @@ import com.google.common.collect.Lists;
 import com.soul.weapon.controller.free.PumpController;
 import com.soul.weapon.model.dds.*;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.DisallowConcurrentExecution;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -24,27 +28,21 @@ import java.util.Random;
  **/
 
 @Slf4j
-@Component
-public class DDSMessageSending {
+@Component("DDSMessageSendingJob")
+@com.egova.quartz.annotation.Job(name="DDSMessageSendingJob",group = "weapon",cron = "1000")
+@DisallowConcurrentExecution
+public class DDSMessageSending implements Job {
 
     @Autowired
     private RestTemplate restTemplate;
 
-    /**
-     * @Author: Shizuan
-     * @Date: 2022/3/11 11:00
-     * @Description: 每隔1s发送一次报文
-     * @params:[]
-     * @return:void
-     **/
-    @Scheduled(fixedDelay = 1000)
-    public void execute(){
+
+    @Override
+    public void execute(JobExecutionContext context) {
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         Random random = new Random();
-
-        if (PumpController.start) {
 
             //武器状态
             EquipmentStatus equipmentStatus = new EquipmentStatus();
@@ -72,25 +70,6 @@ public class DDSMessageSending {
             HttpEntity<Object> combatScenariosInfoRequest = new HttpEntity<>(combatScenariosInfo, headers);
 
             restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", combatScenariosInfoRequest, String.class);*/
-            //----------------------------舰空导弹武器通道测试---------------------------
-            //武器状态报文发送1
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("1");
-            equipmentStatus.setEquipmentTypeId("3");
-            equipmentStatus.setEquipmentMode("舰载雷达传感器");
-            //设置武器自检状态
-            equipmentStatus.setCheckStatus(true);
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
             //武器状态报文发送2
             equipmentStatus.setSender("自动生成");
             equipmentStatus.setMsgTime(System.currentTimeMillis());
@@ -474,6 +453,7 @@ public class DDSMessageSending {
             equipmentStatus.setMinFrequency(random.nextFloat()*100);
             equipmentStatus.setMaxFrequency(random.nextFloat()*100);
             restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-        }
+
     }
+
 }
