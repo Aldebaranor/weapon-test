@@ -1,459 +1,282 @@
 package com.soul.weapon.schedule;
 
+import com.egova.json.utils.JsonUtils;
+import com.egova.redis.RedisService;
+import com.egova.redis.RedisUtils;
 import com.google.common.collect.Lists;
-import com.soul.weapon.controller.free.PumpController;
+import com.soul.weapon.config.CommonConfig;
+import com.soul.weapon.config.Constant;
+import com.soul.weapon.config.WeaponTestConstant;
 import com.soul.weapon.model.dds.*;
+import com.soul.weapon.utils.DateParserUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.quartz.DisallowConcurrentExecution;
-import org.quartz.Job;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
-/**
- * @ClassName DDSMessageSending
- * @Description 定时发送dds报文
- * @Author ShiZuan
- * @Date 2022/3/11 10:56
- * @Version
- **/
 
-@Slf4j
+/*@Slf4j
 @Component("DDSMessageSendingJob")
-@com.egova.quartz.annotation.Job(name="DDSMessageSendingJob",group = "weapon",cron = "1000")
-@DisallowConcurrentExecution
-public class DDSMessageSending implements Job {
+@com.egova.quartz.annotation.Job(name = "DDSMessageSendingJob", group = "weapon", cron = "1000")
+@DisallowConcurrentExecution*/
+@Slf4j
+@Component
+public class DDSMessageSending {
 
-    @Autowired
-    private RestTemplate restTemplate;
+
+    //测试1to5任务
+    public static class taskTest1to5 implements Runnable {
+
+        private HttpHeaders headers;
+
+        private List<EquipmentStatus> equipemntStatusList;
+
+        private RestTemplate restTemplate;
 
 
-    @Override
-    public void execute(JobExecutionContext context) {
+        private static Random random = new Random();
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        Random random = new Random();
+        public taskTest1to5(HttpHeaders headers, List<EquipmentStatus> equipemntStatusList,RestTemplate restTemplate) {
 
-            //武器状态
-            EquipmentStatus equipmentStatus = new EquipmentStatus();
-            //武器发射
-            EquipmentLaunchStatus equipmentLaunchStatus = new EquipmentLaunchStatus();
-            //发射架调转
-            LauncherRotationInfo launcherRotationInfo = new LauncherRotationInfo();
-            //火控装置
-            TargetFireControlInfo targetFireControlInfo = new TargetFireControlInfo();
-            //目标指示
-            TargetInstructionsInfo targetInstructionsInfo = new TargetInstructionsInfo();
-            //目标信息
-            TargetInfo targetInfo = new TargetInfo();
-            //战场环境
-            EnvironmentInfo environmentInfo = new EnvironmentInfo();
-            //作战方案
-            CombatScenariosInfo combatScenariosInfo = new CombatScenariosInfo();
+            this.headers = headers;
+            this.equipemntStatusList = equipemntStatusList;
+            this.restTemplate = restTemplate;
+        }
 
-            //作战方案报文暂不发送
-/*            combatScenariosInfo.setSender("");
-            combatScenariosInfo.setMsgTime(0L);
-            combatScenariosInfo.setTime(0L);
-            combatScenariosInfo.setScenarios("[{\"equipmentId\":\"1\",\"equipmentTypeId\":\"1\",\"equipmentMode\":\"1\",\"beginTime\":1636581,\"duration\":5,\"launchAzimuth\":0.1,\"launchPitchAngle\":0.1,\"electromagneticFrequency\":0.1,\"minHydroacousticFrequency\":0.1,\"maxHydroacousticFrequency\":0.1}]");
-            combatScenariosInfo.setScenariosList(Lists.newArrayList());
-            HttpEntity<Object> combatScenariosInfoRequest = new HttpEntity<>(combatScenariosInfo, headers);
+        @Override
+        public void run() {
 
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", combatScenariosInfoRequest, String.class);*/
-            //武器状态报文发送2
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("2");
-            equipmentStatus.setEquipmentTypeId("1");
-            equipmentStatus.setEquipmentMode("舰空导弹火控装置");
-            //设置武器自检状态
-            equipmentStatus.setCheckStatus(true);
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-            //武器状态报文发送3
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("3");
-            equipmentStatus.setEquipmentTypeId("1");
-            equipmentStatus.setEquipmentMode("舰空导弹发射装置");
-            //设置武器自检状态
-            equipmentStatus.setCheckStatus(true);
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-            //武器状态报文发送4
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("4");
-            equipmentStatus.setEquipmentTypeId("1");
-            equipmentStatus.setEquipmentMode("近程防空导弹");
-            //设置武器自检状态
-            equipmentStatus.setCheckStatus(true);
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-            //武器状态报文发送5
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("5");
-            equipmentStatus.setEquipmentTypeId("1");
-            equipmentStatus.setEquipmentMode("中程防空导弹");
-            //设置武器自检状态
-            equipmentStatus.setCheckStatus(true);
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-            //武器状态报文发送6
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("6");
-            equipmentStatus.setEquipmentTypeId("1");
-            equipmentStatus.setEquipmentMode("远程防空导弹");
-            //设置武器自检状态(随机生成远程防空导弹自检状态)
-            equipmentStatus.setCheckStatus(random.nextBoolean());
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-            //----------------------------反导舰炮武器通道测试---------------------------
-            //武器状态报文发送7
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("11");
-            equipmentStatus.setEquipmentTypeId("3");
-            equipmentStatus.setEquipmentMode("反导舰炮跟踪雷达");
-            //设置武器自检状态
-            equipmentStatus.setCheckStatus(true);
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-            //武器状态报文发送8
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("12");
-            equipmentStatus.setEquipmentTypeId("1");
-            equipmentStatus.setEquipmentMode("反导舰炮火控装置");
-            //设置武器自检状态
-            equipmentStatus.setCheckStatus(true);
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-            //武器状态报文发送9
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("13");
-            equipmentStatus.setEquipmentTypeId("1");
-            equipmentStatus.setEquipmentMode("反导舰炮");
-            //设置武器自检状态(获取随机的自检)
-            equipmentStatus.setCheckStatus(random.nextBoolean());
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-            //----------------------------鱼雷防御武器通道测试---------------------------
-            //武器状态报文发送10
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("15");
-            equipmentStatus.setEquipmentTypeId("3");
-            equipmentStatus.setEquipmentMode("舰壳声纳");
-            //设置武器自检状态
-            equipmentStatus.setCheckStatus(true);
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-            //武器状态报文发送11
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("17");
-            equipmentStatus.setEquipmentTypeId("1");
-            equipmentStatus.setEquipmentMode("鱼雷防御武器火控装置");
-            //设置武器自检状态
-            equipmentStatus.setCheckStatus(true);
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-            //武器状态报文发送12
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("18");
-            equipmentStatus.setEquipmentTypeId("1");
-            equipmentStatus.setEquipmentMode("鱼雷防御武器发射装置");
-            //设置武器自检状态
-            equipmentStatus.setCheckStatus(true);
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-            //武器状态报文发送13
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("19");
-            equipmentStatus.setEquipmentTypeId("1");
-            equipmentStatus.setEquipmentMode("鱼雷防御武器");
-            //设置武器自检状态(随机自检)
-            equipmentStatus.setCheckStatus(random.nextBoolean());
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-            //----------------------------电子对抗武器通道测试---------------------------
-            //武器状态报文发送14
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("20");
-            equipmentStatus.setEquipmentTypeId("2");
-            equipmentStatus.setEquipmentMode("电子侦察设备");
-            //设置武器自检状态
-            equipmentStatus.setCheckStatus(true);
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-            //----------------------------电子对抗武器通道测试---------------------------
-            //武器状态报文发送15
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("20");
-            equipmentStatus.setEquipmentTypeId("2");
-            equipmentStatus.setEquipmentMode("电子侦察设备");
-            //设置武器自检状态
-            equipmentStatus.setCheckStatus(true);
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-            //武器状态报文发送16
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("21");
-            equipmentStatus.setEquipmentTypeId("2");
-            equipmentStatus.setEquipmentMode("电子对抗武器火控装置");
-            //设置武器自检状态
-            equipmentStatus.setCheckStatus(true);
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-            //武器状态报文发送17
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("22");
-            equipmentStatus.setEquipmentTypeId("2");
-            equipmentStatus.setEquipmentMode("舷外干扰发射装置");
-            //设置武器自检状态
-            equipmentStatus.setCheckStatus(random.nextBoolean());
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-            //武器状态报文发送18
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("23");
-            equipmentStatus.setEquipmentTypeId("2");
-            equipmentStatus.setEquipmentMode("舷外电子对抗武器");
-            //设置武器自检状态
-            equipmentStatus.setCheckStatus(true);
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-            //武器状态报文发送19
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("25");
-            equipmentStatus.setEquipmentTypeId("2");
-            equipmentStatus.setEquipmentMode("舷内电子对抗武器");
-            //设置武器自检状态(随机自检)
-            equipmentStatus.setCheckStatus(true);
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-            //----------------------------水声对抗武器通道测试---------------------------
-            //武器状态报文发送20
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("16");
-            equipmentStatus.setEquipmentTypeId("3");
-            equipmentStatus.setEquipmentMode("拖曳声纳");
-            //设置武器自检状态
-            equipmentStatus.setCheckStatus(true);
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-            //武器状态报文发送21
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("27");
-            equipmentStatus.setEquipmentTypeId("2");
-            equipmentStatus.setEquipmentMode("水声对抗武器火控装置");
-            //设置武器自检状态
-            equipmentStatus.setCheckStatus(true);
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-            //武器状态报文发送22
-            equipmentStatus.setSender("自动生成");
-            equipmentStatus.setMsgTime(System.currentTimeMillis());
-            equipmentStatus.setEquipmentId("28");
-            equipmentStatus.setEquipmentTypeId("2");
-            equipmentStatus.setEquipmentMode("水声对抗武器");
-            //设置武器自检状态
-            equipmentStatus.setCheckStatus(true);
-            //设置武器发射时间
-            equipmentStatus.setTime(System.currentTimeMillis());
-            //设置武器开机状态
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(random.nextFloat()*100);
-            equipmentStatus.setLaunchPitchAngle(random.nextFloat()*100);
-            equipmentStatus.setElectromagneticFrequency(random.nextFloat()*100);
-            equipmentStatus.setMinFrequency(random.nextFloat()*100);
-            equipmentStatus.setMaxFrequency(random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers),String.class);
-
+            for (EquipmentStatus equipmentStatus : equipemntStatusList) {
+                equipmentStatus.setMsgTime(System.currentTimeMillis());
+                if (!equipmentStatus.getCheckStatus()) {
+                    equipmentStatus.setCheckStatus(random.nextBoolean());
+                }
+                equipmentStatus.setTime(System.currentTimeMillis());
+                equipmentStatus.setLaunchAzimuth(random.nextFloat() * 100);
+                equipmentStatus.setLaunchPitchAngle(random.nextFloat() * 100);
+                equipmentStatus.setElectromagneticFrequency(random.nextFloat() * 100);
+                equipmentStatus.setMinFrequency(random.nextFloat() * 100);
+                equipmentStatus.setMaxFrequency(random.nextFloat() * 100);
+                restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers), String.class);
+            }
+        }
     }
+    //目标信息报文
+    public static class taskTargetInfoDDS implements Runnable {
+
+        private HttpHeaders headers;
+
+        private RestTemplate restTemplate;
+
+        public taskTargetInfoDDS(HttpHeaders headers,RestTemplate restTemplate) {
+            this.headers = headers;
+            this.restTemplate = restTemplate;
+        }
+
+        @Override
+        public void run() {
+            TargetInfo targetInfo = new TargetInfo();
+            targetInfo.setSender("自动发送");
+            targetInfo.setMsgTime(System.currentTimeMillis());
+            targetInfo.setTime(System.currentTimeMillis());
+            targetInfo.setTargetId(String.valueOf(taskTest1to5.random.nextInt(6) + 1));
+            targetInfo.setTargetTypeId(String.valueOf(taskTest1to5.random.nextInt(2) + 1));
+            targetInfo.setDistance(taskTest1to5.random.nextFloat() * 100);
+            targetInfo.setSpeed(taskTest1to5.random.nextFloat() * 100);
+            targetInfo.setAzimuth(taskTest1to5.random.nextFloat() * 100);
+            targetInfo.setPitchAngle(taskTest1to5.random.nextFloat() * 100);
+            targetInfo.setDepth(taskTest1to5.random.nextFloat() * 100);
+            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/TargetInfo", new HttpEntity<>(targetInfo, headers), String.class);
+        }
+    }
+    //目标指示报文
+    public static class taskTargetInstructionsInfoDDS implements Runnable {
+
+
+        private HttpHeaders headers;
+
+        private RedisService redisService;
+
+        private RestTemplate restTemplate;
+
+        public taskTargetInstructionsInfoDDS(HttpHeaders headers, RedisService redisService,RestTemplate restTemplate) {
+            this.headers = headers;
+            this.redisService = redisService;
+            this.restTemplate = restTemplate;
+        }
+
+        //传感器ID数组
+        private String[] sensorIdS = {"1", "10", "11", "15", "16"};
+
+
+        @Override
+        public void run() {
+
+            String targetId = String.valueOf(taskTest1to5.random.nextInt(6) + 1);
+            String key = String.format("%s:%s:%s", Constant.TARGET_INFO_HTTP_KEY, DateParserUtils.getTime(), targetId);
+            String json = redisService.getTemplate().opsForZSet().reverseRange(key, 0, 0).iterator().next();
+
+            if (json == null || json.length() == 0) {
+                log.info("目标指示-没找到targetId为%s的目标信息", targetId);
+                return;
+            }
+
+            TargetInfo targetInfo = JsonUtils.deserialize(json, TargetInfo.class);
+            TargetInstructionsInfo targetInstructionsInfo = new TargetInstructionsInfo();
+            targetInstructionsInfo.setSender("自动生成");
+            targetInstructionsInfo.setMsgTime(System.currentTimeMillis());
+            targetInstructionsInfo.setTime(System.currentTimeMillis());
+            targetInstructionsInfo.setTargetId(targetInfo.getTargetId());
+            targetInstructionsInfo.setTargetTypeId(targetInfo.getTargetTypeId());
+            targetInstructionsInfo.setEquipmentId(sensorIdS[taskTest1to5.random.nextInt(sensorIdS.length)]);
+            targetInstructionsInfo.setEquipmentTypeId("3");
+            targetInstructionsInfo.setDistance(taskTest1to5.random.nextFloat() * 100);
+            targetInstructionsInfo.setSpeed(taskTest1to5.random.nextFloat() * 100);
+            targetInstructionsInfo.setAzimuth(taskTest1to5.random.nextFloat() * 100);
+            targetInstructionsInfo.setPitchAngle(taskTest1to5.random.nextFloat() * 100);
+            targetInstructionsInfo.setDepth(taskTest1to5.random.nextFloat() * 100);
+            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/TargetInstructionsInfo", new HttpEntity<>(targetInstructionsInfo, headers), String.class);
+        }
+    }
+    //目标火控报文
+    public static class taskTargetFireControlInfoDDS implements Runnable{
+
+        private HttpHeaders headers;
+
+        private RedisService redisService;
+
+        private RestTemplate restTemplate;
+
+        public taskTargetFireControlInfoDDS(HttpHeaders headers, RedisService redisService,RestTemplate restTemplate) {
+            this.headers = headers;
+            this.redisService = redisService;
+            this.restTemplate = restTemplate;
+        }
+
+        //火控ID数组
+        private String[] fireControlSystemIds = {"2", "12", "17", "21", "27"};
+
+        @Override
+        public void run() {
+
+            String targetId = String.valueOf(taskTest1to5.random.nextInt(6) + 1);
+            String key = String.format("%s:%s:%s", Constant.TARGET_INFO_HTTP_KEY, DateParserUtils.getTime(), targetId);
+            String json = redisService.getTemplate().opsForZSet().reverseRange(key, 0, 0).iterator().next();
+
+            if (json == null || json.length() == 0) {
+                log.info("目标火控-没找到targetId为%s的目标信息", targetId);
+                return;
+            }
+            TargetInfo targetInfo = JsonUtils.deserialize(json, TargetInfo.class);
+            TargetFireControlInfo targetFireControlInfo = new TargetFireControlInfo();
+            targetFireControlInfo.setSender("自动发送");
+            targetFireControlInfo.setMsgTime(System.currentTimeMillis());
+            targetFireControlInfo.setTime(System.currentTimeMillis());
+            targetFireControlInfo.setTargetId(targetInfo.getTargetId());
+            targetFireControlInfo.setTargetTypeId(targetInfo.getTargetTypeId());
+            targetFireControlInfo.setFireControlSystemId(fireControlSystemIds[taskTest1to5.random.nextInt(fireControlSystemIds.length)]);
+            targetFireControlInfo.setFireControlSystemTypeId("1");
+            targetFireControlInfo.setDistance(taskTest1to5.random.nextFloat()*100);
+            targetFireControlInfo.setSpeed(taskTest1to5.random.nextFloat()*100);
+            targetFireControlInfo.setAzimuth(taskTest1to5.random.nextFloat()*100);
+            targetFireControlInfo.setPitchAngle(taskTest1to5.random.nextFloat()*100);
+            targetFireControlInfo.setDepth(taskTest1to5.random.nextFloat()*100);
+            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/TargetInstructionsInfo", new HttpEntity<>(targetFireControlInfo, headers), String.class);
+        }
+    }
+    //发射架调转
+    public static class taskLauncherRotationInfoDDS implements Runnable{
+
+        private HttpHeaders headers;
+
+        private RedisService redisService;
+
+        private RestTemplate restTemplate;
+
+        public taskLauncherRotationInfoDDS(HttpHeaders headers, RedisService redisService,RestTemplate restTemplate) {
+            this.headers = headers;
+            this.redisService = redisService;
+            this.restTemplate = restTemplate;
+        }
+
+        private String[] targetTypeIds = {"3","18","22"};
+
+        @Override
+        public void run() {
+            String targetId = String.valueOf(taskTest1to5.random.nextInt(6) + 1);
+            String key = String.format("%s:%s:%s", Constant.TARGET_INFO_HTTP_KEY, DateParserUtils.getTime(), targetId);
+            String json = redisService.getTemplate().opsForZSet().reverseRange(key, 0, 0).iterator().next();
+
+            if (json == null || json.length() == 0) {
+                log.info("发射架-没找到targetId为%s的目标信息", targetId);
+                return;
+            }
+            TargetInfo targetInfo = JsonUtils.deserialize(json, TargetInfo.class);
+            LauncherRotationInfo launcherRotationInfo = new LauncherRotationInfo();
+            launcherRotationInfo.setSender("自动生成");
+            launcherRotationInfo.setMsgTime(System.currentTimeMillis());
+            launcherRotationInfo.setTime(System.currentTimeMillis());
+            launcherRotationInfo.setTargetId(targetInfo.getTargetId());
+            launcherRotationInfo.setTargetTypeId(targetInfo.getTargetTypeId());
+            launcherRotationInfo.setLauncherId(targetTypeIds[taskTest1to5.random.nextInt(targetTypeIds.length)]);
+            launcherRotationInfo.setLauncherTypeId("1");
+            launcherRotationInfo.setAzimuth(taskTest1to5.random.nextFloat()*100);
+            launcherRotationInfo.setPitchAngle(taskTest1to5.random.nextFloat()*100);
+            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/LauncherRotationInfo", new HttpEntity<>(launcherRotationInfo, headers), String.class);
+        }
+    }
+    //武器发射
+    public static class taskEquipmentLaunchStatusDDS implements Runnable{
+
+        private HttpHeaders headers;
+
+        private RedisService redisService;
+
+        private RestTemplate restTemplate;
+
+        public taskEquipmentLaunchStatusDDS(HttpHeaders headers, RedisService redisService,RestTemplate restTemplate) {
+            this.headers = headers;
+            this.redisService = redisService;
+            this.restTemplate = restTemplate;
+        }
+
+        //武器ID数组
+        private String[] equipmentIds = {"9", "4", "5", "19", "6","7", "14", "13", "8", "28","26", "25", "24", "23", "20"};
+
+        @Override
+        public void run() {
+            String targetId = String.valueOf(taskTest1to5.random.nextInt(6) + 1);
+            String key = String.format("%s:%s:%s", Constant.TARGET_INFO_HTTP_KEY, DateParserUtils.getTime(), targetId);
+            String json = redisService.getTemplate().opsForZSet().reverseRange(key, 0, 0).iterator().next();
+
+            if (json == null || json.length() == 0) {
+                log.info("武器发射-没找到targetId为%s的目标信息", targetId);
+                return;
+            }
+            TargetInfo targetInfo = JsonUtils.deserialize(json, TargetInfo.class);
+            EquipmentLaunchStatus equipmentLaunchStatus = new EquipmentLaunchStatus();
+            equipmentLaunchStatus.setSender("自动生成");
+            equipmentLaunchStatus.setMsgTime(System.currentTimeMillis());
+            equipmentLaunchStatus.setTime(System.currentTimeMillis());
+            equipmentLaunchStatus.setEquipmentId(equipmentIds[taskTest1to5.random.nextInt(equipmentIds.length)]);
+            equipmentLaunchStatus.setEquipmentTypeId("1");
+            equipmentLaunchStatus.setEquipmentMode("根据武器id去看");
+            equipmentLaunchStatus.setTargetId(targetInfo.getTargetId());
+            equipmentLaunchStatus.setTargetTypeId(targetInfo.getTargetTypeId());
+            equipmentLaunchStatus.setLaunchAzimuth(taskTest1to5.random.nextFloat()*100);
+            equipmentLaunchStatus.setLaunchPitchAngle(taskTest1to5.random.nextFloat()*100);
+            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentLaunchStatus", new HttpEntity<>(equipmentLaunchStatus, headers), String.class);
+        }
+    }
+
 
 }

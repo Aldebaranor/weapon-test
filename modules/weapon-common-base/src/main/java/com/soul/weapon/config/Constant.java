@@ -1,5 +1,9 @@
 package com.soul.weapon.config;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ScheduledFuture;
+
 /**
  * @author: nash5
  * @date: 2021-11-11 9:14
@@ -37,6 +41,9 @@ public class Constant {
     //武器Id
     public static String EQUIPMENT_ID = ":equipmentId";
 
+
+    //线程存储器
+    public static ConcurrentHashMap<String, ScheduledFuture> threadMap = new ConcurrentHashMap<String,ScheduledFuture>();
     /**
      * 目标信息(雷达探测到的目标信息)于influxdb中的表名
      */

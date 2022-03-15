@@ -46,7 +46,6 @@ public class PumpController {
     private final RestTemplate restTemplate;
     private final CommonConfig config;
     private final int ONE_DAY = 24 * 3600;
-    public static boolean start = false;
 
     @Api
     @PostMapping(value = "/{structName}")
@@ -106,6 +105,7 @@ public class PumpController {
                 //拼接redis中当天的武器发射dds的key
                 String key = String.format("%s:%s:%s", Constant.EQUIPMENT_LAUNCH_STATUS_HTTP_KEY, getTime(),equipmentLaunchStatus.getTargetId());
                 redisService.getTemplate().opsForZSet().add(key,JsonUtils.serialize(equipmentLaunchStatus), equipmentLaunchStatus.getTime());
+                redisService.expire(key,ONE_DAY);
             }
             break;
             //map 装备状态
@@ -146,6 +146,8 @@ public class PumpController {
                 //拼接redis中当天的key
                 String key1 = String.format("%s:%s:%s", Constant.LAUNCHER_ROTATION_INFO_HTTP_KEY_2, getTime(),launcherRotationInfo.getTargetId());
                 redisService.getTemplate().opsForZSet().add(key1,JsonUtils.serialize(launcherRotationInfo), launcherRotationInfo.getTime());
+                redisService.expire(key,ONE_DAY);
+                redisService.expire(key1,ONE_DAY);
             }
             break;
             //map 目标火控
@@ -161,6 +163,8 @@ public class PumpController {
                 String key2 = String.format("%s:%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY_2, getTime(),tmpTargetFireControlInfo.getFireControlSystemId());
                 redisService.getTemplate().opsForZSet().add(key,JsonUtils.serialize(tmpTargetFireControlInfo), tmpTargetFireControlInfo.getTime());
                 redisService.boundHashOps(key2).put(tmpTargetFireControlInfo.getTargetId(),JsonUtils.serialize(tmpTargetFireControlInfo));
+                redisService.expire(key,ONE_DAY);
+                redisService.expire(key2,ONE_DAY);
             }
             break;
             //map 目标信息
@@ -172,6 +176,7 @@ public class PumpController {
                 // 拼接redis中当天的key
                 String key = String.format("%s:%s:%s", Constant.TARGET_INFO_HTTP_KEY, getTime(),tmpTargetInfo.getTargetId());
                 redisService.getTemplate().opsForZSet().add(key,JsonUtils.serialize(tmpTargetInfo), tmpTargetInfo.getTime());
+                redisService.expire(key,ONE_DAY);
             }
             break;
             //map 目标指示
@@ -187,6 +192,8 @@ public class PumpController {
                 String key2 = String.format("%s:%s", Constant.TARGET_INSTRUCTIONS_INFO_HTTP_KEY_2, getTime());
                 redisService.getTemplate().opsForZSet().add(key,JsonUtils.serialize(targetInstructionsInfo), targetInstructionsInfo.getTime());
                 redisService.boundHashOps(key2).put(targetInstructionsInfo.getTargetId(),JsonUtils.serialize(targetInstructionsInfo));
+                redisService.expire(key,ONE_DAY);
+                redisService.expire(key2,ONE_DAY);
             }
             break;
             case "Report": {
@@ -507,25 +514,6 @@ public class PumpController {
             }
         }
         return "";
-    }
-
-    @Api
-    @GetMapping("/startDDS/{status}")
-    public String startDDS(@PathVariable String status){
-        //去空
-        status = status.trim();
-
-        if (status.equals("true")) {
-            start = true;
-            return "发送报文开启成功";
-        }
-
-        if (status.equals("false")){
-            start = false;
-            return "发送报文关闭成功";
-        }
-
-        return "请输入正确开启参数“true”或者“false”";
     }
 
     private String getTime() {

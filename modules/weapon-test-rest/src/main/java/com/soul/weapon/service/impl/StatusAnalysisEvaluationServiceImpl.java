@@ -103,7 +103,7 @@ public class StatusAnalysisEvaluationServiceImpl implements StatusAnalysisEvalua
                 continue;
             }
 
-            EquipmentLaunchStatus equipmentLaunchStatusInfo = JsonUtils.deserialize(set3.iterator().next(), EquipmentLaunchStatus.class);
+            EquipmentLaunchStatus equipmentLaunchStatusInfo = JsonUtils.deserialize(set4.iterator().next(), EquipmentLaunchStatus.class);
 
             resultMap.get(targetInfo.getTargetTypeId()).add(new StatusAnalysisEvaluation(
                     targetInfo.getTargetId(),
