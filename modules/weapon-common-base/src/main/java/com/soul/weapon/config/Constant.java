@@ -102,15 +102,18 @@ public class Constant {
     public static String WATERTYPE = "2";
 
     //舰空导弹火控装置
-    public static String SHIP_TO_AIR_MISSILE_FIRE_CONTROL_DEVICE = "003";
+    public static String SHIP_TO_AIR_MISSILE_FIRE_CONTROL_DEVICE = "2";
     //反导舰炮火控装置
-    public static String ANTI_MISSILE_NAVAL_GUN_FIRE_CONTROL_DEVICE = "013";
+    public static String ANTI_MISSILE_NAVAL_GUN_FIRE_CONTROL_DEVICE = "12";
     //鱼雷防御武器火控装置
-    public static String TORPEDO_DEFENSE_WEAPON_FIRE_CONTROL_DEVICE = "018";
+    public static String TORPEDO_DEFENSE_WEAPON_FIRE_CONTROL_DEVICE = "17";
     //电子对抗武器火控装置
-    public static String FIRE_CONTROL_DEVICE_OF_ELECTRONIC_COUNTERMEASURE_WEAPON = "022";
+    public static String FIRE_CONTROL_DEVICE_OF_ELECTRONIC_COUNTERMEASURE_WEAPON = "21";
     //水声对抗武器火控装置
-    public static String WATER_ACOUSTIC_COUNTERMEASURE_WEAPON_FIRE_CONTROL_DEVICE = "028";
+    public static String WATER_ACOUSTIC_COUNTERMEASURE_WEAPON_FIRE_CONTROL_DEVICE = "27";
+
+    //dds报文发送路径
+    public static String DDS_URL = "http://127.0.0.1:8016/free/pump/";
 
 
 }

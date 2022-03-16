@@ -69,7 +69,10 @@ public class StatusAnalysisEvaluationServiceImpl implements StatusAnalysisEvalua
             String targetControlInfoKey = String.format("%s:%s:%s", Constant.TARGET_FIRE_CONTROL_INFO_HTTP_KEY, DateParserUtils.getTime(), targetInfo.getTargetId());
             Set<String> set1 = redisTemplate.getTemplate().opsForZSet().reverseRangeByScore(targetControlInfoKey, targetInstructionsInfo.getTime(), Long.MAX_VALUE, 0, 1);
             if (set1 == null || set1.size() == 0) {
-                resultMap.get(targetInfo.getTargetTypeId()).add(new StatusAnalysisEvaluation(targetInfo.getTargetId(), targetInstructionsInfo.getEquipmentId(), targetInstructionsInfo.getTime()));
+                resultMap.get(targetInfo.getTargetTypeId()).add(new StatusAnalysisEvaluation(
+                        targetInfo.getTargetId(),
+                        WeaponTestConstant.MAP_ID_TO_SHOW.get(targetInstructionsInfo.getEquipmentId()),
+                        targetInstructionsInfo.getTime()));
                 continue;
             }
             TargetFireControlInfo targetControlInfo = JsonUtils.deserialize(set1.iterator().next(), TargetFireControlInfo.class);

@@ -340,7 +340,6 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
         electronicWeaponTestReportService.insert(tmpReport);
     }
 
-
     /**
      * 水声对抗武器测试 -5
      */
@@ -881,15 +880,15 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
                 float TargetAzimuth = Math.abs(targetFireControlInfo.getAzimuth() - targetInstructionsInfo.getAzimuth());
                 float TargetDepth = Math.abs(targetFireControlInfo.getDepth() - targetInstructionsInfo.getDepth());
 
-                String fireControlSystemTypeId = targetFireControlInfo.getFireControlSystemTypeId();
+                String fireControlSystemId = targetFireControlInfo.getFireControlSystemId();
 
                 Boolean status = false;
 
-                if (fireControlSystemTypeId.equals(Constant.SHIP_TO_AIR_MISSILE_FIRE_CONTROL_DEVICE) ||
-                        fireControlSystemTypeId.equals(Constant.ANTI_MISSILE_NAVAL_GUN_FIRE_CONTROL_DEVICE) ||
-                        fireControlSystemTypeId.equals(Constant.FIRE_CONTROL_DEVICE_OF_ELECTRONIC_COUNTERMEASURE_WEAPON)) {
+                if (fireControlSystemId.equals(Constant.SHIP_TO_AIR_MISSILE_FIRE_CONTROL_DEVICE) ||
+                        fireControlSystemId.equals(Constant.ANTI_MISSILE_NAVAL_GUN_FIRE_CONTROL_DEVICE) ||
+                        fireControlSystemId.equals(Constant.FIRE_CONTROL_DEVICE_OF_ELECTRONIC_COUNTERMEASURE_WEAPON)) {
                     status = TargetDistance > threshold2 || TargetPitch > threshold3 || TargetAzimuth > threshold4;
-                } else if (fireControlSystemTypeId.equals(Constant.TORPEDO_DEFENSE_WEAPON_FIRE_CONTROL_DEVICE)) {
+                } else if (fireControlSystemId.equals(Constant.TORPEDO_DEFENSE_WEAPON_FIRE_CONTROL_DEVICE)) {
                     status = TargetDistance > threshold2 || TargetPitch > threshold3 || TargetDepth > threshold5;
                 }
                 if (status) {
@@ -898,7 +897,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
                     fireControlReport.setTargetId(targetInstructionsInfo.getTargetId());
                     fireControlReport.setTargetType(targetInstructionsInfo.getTargetTypeId());
                     fireControlReport.setFireControlId(targetFireControlInfo.getFireControlSystemId());
-                    fireControlReport.setFireControlType(fireControlSystemTypeId);
+                    fireControlReport.setFireControlType(targetFireControlInfo.getFireControlSystemTypeId());
                     fireControlReport.setTime(targetFireControlInfo.getTime());
                     fireControlReport.setTargetDistance(TargetDistance);
                     fireControlReport.setTargetPitch(TargetPitch);

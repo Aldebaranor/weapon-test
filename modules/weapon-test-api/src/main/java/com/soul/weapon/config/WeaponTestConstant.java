@@ -25,9 +25,14 @@ public class WeaponTestConstant {
             new SimpleEntry<>(PipeWeaponIndices.AirMissileShortRange.getValue(), "近程防空导弹"),
             new SimpleEntry<>(PipeWeaponIndices.AirMissileMediumRange.getValue(), "中程防空导弹"),
             new SimpleEntry<>(PipeWeaponIndices.AirMissileLongRange.getValue(), "远程防空导弹"),
+            new SimpleEntry<>(PipeWeaponIndices.AntiShipMissile.getValue(), "反舰导弹"),
+            new SimpleEntry<>(PipeWeaponIndices.AntiSubmarineMissile.getValue(), "反潜导弹"),
+            new SimpleEntry<>(PipeWeaponIndices.MainGun.getValue(), "主炮"),
+            new SimpleEntry<>(PipeWeaponIndices.MainGunTrackingRadar.getValue(), "主炮跟踪雷达"),
             new SimpleEntry<>(PipeWeaponIndices.AntiMissileShipGunRadar.getValue(), "反导舰炮跟踪雷达"),
             new SimpleEntry<>(PipeWeaponIndices.AntiMissileShipGunControl.getValue(), "反导舰炮火控装置"),
             new SimpleEntry<>(PipeWeaponIndices.AntiMissileShipGun.getValue(), "反导舰炮"),
+            new SimpleEntry<>(PipeWeaponIndices.CarrierAircraft.getValue(), "舰载机"),
             new SimpleEntry<>(PipeWeaponIndices.Sonar.getValue(), "舰壳声纳"),
             new SimpleEntry<>(PipeWeaponIndices.TowedSonar.getValue(), "拖曳声纳"),
             new SimpleEntry<>(PipeWeaponIndices.TorpedoFireControl.getValue(), "鱼雷防御武器火控装置"),
@@ -37,11 +42,11 @@ public class WeaponTestConstant {
             new SimpleEntry<>(PipeWeaponIndices.ElectronicCountermeasure.getValue(), "电子对抗武器火控装置"),
             new SimpleEntry<>(PipeWeaponIndices.MultiUsageLaunch.getValue(), "舷外干扰发射系统"),
             new SimpleEntry<>(PipeWeaponIndices.OutBoardElectronicCountermeasure.getValue(), "舷外电子对抗武器"),
+            new SimpleEntry<>(PipeWeaponIndices.OutboardPassiveElectronicJammingBomb.getValue(), "舷外无源电子干扰弹"),
             new SimpleEntry<>(PipeWeaponIndices.InBoardElectronicCountermeasure.getValue(), "舷内电子对抗武器"),
+            new SimpleEntry<>(PipeWeaponIndices.ShipborneElectronicReconnaissanceEquipment.getValue(), "舰载电子侦察设备"),
             new SimpleEntry<>(PipeWeaponIndices.UnderwaterAcousticCountermeasureControl.getValue(), "水声对抗武器火控装置"),
             new SimpleEntry<>(PipeWeaponIndices.UnderwaterAcousticCountermeasure.getValue(), "水声对抗武器")
-            // TODO:
-            // 搜索雷达和拖曳声呐单独从dds总线采集，等真实报文，将其存入redis，而后修改getPipeShow即可
     ).collect(Collectors.toMap(SimpleEntry::getKey, SimpleEntry::getValue));
 
     Map<Integer, String> map = Stream.of(new Object[][]{

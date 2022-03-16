@@ -19,28 +19,26 @@ public enum PipeWeaponIndices implements PropertyDescriptor {
     AirMissileShortRange(4,  "近程防空导弹"),
     AirMissileMediumRange(5,  "中程防空导弹"),
     AirMissileLongRange(6,  "远程防空导弹"),
-
-
-    /** 反导舰炮武器测试 **/
+    AntiShipMissile(7,"反舰导弹"),
+    AntiSubmarineMissile(8,"反潜导弹"),
+    MainGun(9,"主炮"),
+    MainGunTrackingRadar(10,"主炮跟踪雷达"),
     AntiMissileShipGunRadar(11, "反导舰炮跟踪雷达"),
     AntiMissileShipGunControl(12, "反导舰炮火控装置"),
     AntiMissileShipGun(13, "反导舰炮"),
-
-    /** 鱼雷防御武器测试 **/
+    CarrierAircraft(14, "舰载机"),
     Sonar(15, "舰壳声纳"),
+    TowedSonar(16,"拖曳声纳"),
     TorpedoFireControl(17, "鱼雷防御武器火控装置"),
     TorpedoLauncher(18, "鱼雷防御武器发射装置"),
     Torpedo(19, "鱼雷防御武器"),
-
-    /** 电子对抗武器测试 **/
     ElectronicDetection(20, "电子侦察设备"),
     ElectronicCountermeasure(21, "电子对抗武器火控装置"),
     MultiUsageLaunch(22, "舷外干扰发射系统"),
-    OutBoardElectronicCountermeasure(24, "舷外电子对抗武器"),
-    InBoardElectronicCountermeasure(26, "舷内电子对抗武器"),
-
-    /** 水声对抗武器测试 **/
-    TowedSonar(16,"拖曳声纳"),
+    OutBoardElectronicCountermeasure(23, "舷外电子对抗武器"),
+    OutboardPassiveElectronicJammingBomb(24, "舷外无源电子干扰弹"),
+    InBoardElectronicCountermeasure(25, "舷内电子对抗武器"),
+    ShipborneElectronicReconnaissanceEquipment(26, "舰载电子侦察设备"),
     UnderwaterAcousticCountermeasureControl(27, "水声对抗武器火控装置"),
     UnderwaterAcousticCountermeasure(28, "水声对抗武器");
 

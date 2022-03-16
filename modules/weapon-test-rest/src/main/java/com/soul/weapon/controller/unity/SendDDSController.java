@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @Date 2022/3/14 14:39
  * @Version
  **/
+
 @Slf4j
 @RestController
 @RequestMapping("/unity/sendDDS")
@@ -24,15 +25,14 @@ public class SendDDSController {
     @Autowired
     private SendDDSService sendDDSService;
 
-
     @Api
-    @GetMapping("/start/{testCode}")
+    @GetMapping(value = "/start/{testCode}")
     public String sendDDSBytestCode(@PathVariable("testCode") String testCode){
         return sendDDSService.sendDDSBytestCode(testCode);
     }
 
     @Api
-    @GetMapping("/stop/{testCode}")
+    @GetMapping(value = "/stop/{testCode}")
     public String stopSendDDSBytestCode(@PathVariable("testCode") String testCode){
         return sendDDSService.stopSendDDSBytestCode(testCode);
     }

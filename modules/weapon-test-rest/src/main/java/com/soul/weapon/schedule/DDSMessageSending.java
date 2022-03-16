@@ -22,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 
 /*@Slf4j
@@ -66,7 +67,7 @@ public class DDSMessageSending {
                 equipmentStatus.setElectromagneticFrequency(random.nextFloat() * 100);
                 equipmentStatus.setMinFrequency(random.nextFloat() * 100);
                 equipmentStatus.setMaxFrequency(random.nextFloat() * 100);
-                restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentStatus", new HttpEntity<>(equipmentStatus, headers), String.class);
+                restTemplate.postForEntity(Constant.DDS_URL+"EquipmentStatus", new HttpEntity<>(equipmentStatus, headers), String.class);
             }
         }
     }
@@ -87,15 +88,15 @@ public class DDSMessageSending {
             TargetInfo targetInfo = new TargetInfo();
             targetInfo.setSender("自动发送");
             targetInfo.setMsgTime(System.currentTimeMillis());
-            targetInfo.setTime(System.currentTimeMillis());
-            targetInfo.setTargetId(String.valueOf(taskTest1to5.random.nextInt(6) + 1));
+            targetInfo.setTime(System.currentTimeMillis()-(15*1000));
+            targetInfo.setTargetId(String.valueOf(taskTest1to5.random.nextInt(10) + 1));
             targetInfo.setTargetTypeId(String.valueOf(taskTest1to5.random.nextInt(2) + 1));
             targetInfo.setDistance(taskTest1to5.random.nextFloat() * 100);
             targetInfo.setSpeed(taskTest1to5.random.nextFloat() * 100);
             targetInfo.setAzimuth(taskTest1to5.random.nextFloat() * 100);
             targetInfo.setPitchAngle(taskTest1to5.random.nextFloat() * 100);
             targetInfo.setDepth(taskTest1to5.random.nextFloat() * 100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/TargetInfo", new HttpEntity<>(targetInfo, headers), String.class);
+            restTemplate.postForEntity(Constant.DDS_URL+"TargetInfo", new HttpEntity<>(targetInfo, headers), String.class);
         }
     }
     //目标指示报文
@@ -121,20 +122,24 @@ public class DDSMessageSending {
         @Override
         public void run() {
 
-            String targetId = String.valueOf(taskTest1to5.random.nextInt(6) + 1);
-            String key = String.format("%s:%s:%s", Constant.TARGET_INFO_HTTP_KEY, DateParserUtils.getTime(), targetId);
-            String json = redisService.getTemplate().opsForZSet().reverseRange(key, 0, 0).iterator().next();
+            String targetId = String.valueOf(taskTest1to5.random.nextInt(10) + 1);
 
-            if (json == null || json.length() == 0) {
+            String key = String.format("%s:%s:%s", Constant.TARGET_INFO_HTTP_KEY, DateParserUtils.getTime(), targetId);
+
+            Set<String> set = redisService.getTemplate().opsForZSet().reverseRange(key, 0, 0);
+
+            if (set == null || set.size() == 0) {
                 log.info("目标指示-没找到targetId为%s的目标信息", targetId);
                 return;
             }
+
+            String json = set.iterator().next();
 
             TargetInfo targetInfo = JsonUtils.deserialize(json, TargetInfo.class);
             TargetInstructionsInfo targetInstructionsInfo = new TargetInstructionsInfo();
             targetInstructionsInfo.setSender("自动生成");
             targetInstructionsInfo.setMsgTime(System.currentTimeMillis());
-            targetInstructionsInfo.setTime(System.currentTimeMillis());
+            targetInstructionsInfo.setTime(System.currentTimeMillis()-(13*1000));
             targetInstructionsInfo.setTargetId(targetInfo.getTargetId());
             targetInstructionsInfo.setTargetTypeId(targetInfo.getTargetTypeId());
             targetInstructionsInfo.setEquipmentId(sensorIdS[taskTest1to5.random.nextInt(sensorIdS.length)]);
@@ -144,7 +149,7 @@ public class DDSMessageSending {
             targetInstructionsInfo.setAzimuth(taskTest1to5.random.nextFloat() * 100);
             targetInstructionsInfo.setPitchAngle(taskTest1to5.random.nextFloat() * 100);
             targetInstructionsInfo.setDepth(taskTest1to5.random.nextFloat() * 100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/TargetInstructionsInfo", new HttpEntity<>(targetInstructionsInfo, headers), String.class);
+            restTemplate.postForEntity(Constant.DDS_URL+"TargetInstructionsInfo", new HttpEntity<>(targetInstructionsInfo, headers), String.class);
         }
     }
     //目标火控报文
@@ -165,22 +170,23 @@ public class DDSMessageSending {
         //火控ID数组
         private String[] fireControlSystemIds = {"2", "12", "17", "21", "27"};
 
+
         @Override
         public void run() {
 
-            String targetId = String.valueOf(taskTest1to5.random.nextInt(6) + 1);
+            String targetId = String.valueOf(taskTest1to5.random.nextInt(10) + 1);
             String key = String.format("%s:%s:%s", Constant.TARGET_INFO_HTTP_KEY, DateParserUtils.getTime(), targetId);
-            String json = redisService.getTemplate().opsForZSet().reverseRange(key, 0, 0).iterator().next();
-
-            if (json == null || json.length() == 0) {
+            Set<String> set = redisService.getTemplate().opsForZSet().reverseRange(key, 0, 0);
+            if (set == null || set.size() == 0) {
                 log.info("目标火控-没找到targetId为%s的目标信息", targetId);
                 return;
             }
+            String json = set.iterator().next();
             TargetInfo targetInfo = JsonUtils.deserialize(json, TargetInfo.class);
             TargetFireControlInfo targetFireControlInfo = new TargetFireControlInfo();
             targetFireControlInfo.setSender("自动发送");
             targetFireControlInfo.setMsgTime(System.currentTimeMillis());
-            targetFireControlInfo.setTime(System.currentTimeMillis());
+            targetFireControlInfo.setTime(System.currentTimeMillis()-(10*1000));
             targetFireControlInfo.setTargetId(targetInfo.getTargetId());
             targetFireControlInfo.setTargetTypeId(targetInfo.getTargetTypeId());
             targetFireControlInfo.setFireControlSystemId(fireControlSystemIds[taskTest1to5.random.nextInt(fireControlSystemIds.length)]);
@@ -190,7 +196,7 @@ public class DDSMessageSending {
             targetFireControlInfo.setAzimuth(taskTest1to5.random.nextFloat()*100);
             targetFireControlInfo.setPitchAngle(taskTest1to5.random.nextFloat()*100);
             targetFireControlInfo.setDepth(taskTest1to5.random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/TargetInstructionsInfo", new HttpEntity<>(targetFireControlInfo, headers), String.class);
+            restTemplate.postForEntity(Constant.DDS_URL+"TargetFireControlInfo", new HttpEntity<>(targetFireControlInfo, headers), String.class);
         }
     }
     //发射架调转
@@ -212,26 +218,26 @@ public class DDSMessageSending {
 
         @Override
         public void run() {
-            String targetId = String.valueOf(taskTest1to5.random.nextInt(6) + 1);
+            String targetId = String.valueOf(taskTest1to5.random.nextInt(10) + 1);
             String key = String.format("%s:%s:%s", Constant.TARGET_INFO_HTTP_KEY, DateParserUtils.getTime(), targetId);
-            String json = redisService.getTemplate().opsForZSet().reverseRange(key, 0, 0).iterator().next();
-
-            if (json == null || json.length() == 0) {
+            Set<String> set = redisService.getTemplate().opsForZSet().reverseRange(key, 0, 0);
+            if (set == null || set.size() == 0) {
                 log.info("发射架-没找到targetId为%s的目标信息", targetId);
                 return;
             }
+            String json = set.iterator().next();
             TargetInfo targetInfo = JsonUtils.deserialize(json, TargetInfo.class);
             LauncherRotationInfo launcherRotationInfo = new LauncherRotationInfo();
             launcherRotationInfo.setSender("自动生成");
             launcherRotationInfo.setMsgTime(System.currentTimeMillis());
-            launcherRotationInfo.setTime(System.currentTimeMillis());
+            launcherRotationInfo.setTime(System.currentTimeMillis() - (7*1000));
             launcherRotationInfo.setTargetId(targetInfo.getTargetId());
             launcherRotationInfo.setTargetTypeId(targetInfo.getTargetTypeId());
             launcherRotationInfo.setLauncherId(targetTypeIds[taskTest1to5.random.nextInt(targetTypeIds.length)]);
             launcherRotationInfo.setLauncherTypeId("1");
             launcherRotationInfo.setAzimuth(taskTest1to5.random.nextFloat()*100);
             launcherRotationInfo.setPitchAngle(taskTest1to5.random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/LauncherRotationInfo", new HttpEntity<>(launcherRotationInfo, headers), String.class);
+            restTemplate.postForEntity(Constant.DDS_URL+"LauncherRotationInfo", new HttpEntity<>(launcherRotationInfo, headers), String.class);
         }
     }
     //武器发射
@@ -254,14 +260,14 @@ public class DDSMessageSending {
 
         @Override
         public void run() {
-            String targetId = String.valueOf(taskTest1to5.random.nextInt(6) + 1);
+            String targetId = String.valueOf(taskTest1to5.random.nextInt(10) + 1);
             String key = String.format("%s:%s:%s", Constant.TARGET_INFO_HTTP_KEY, DateParserUtils.getTime(), targetId);
-            String json = redisService.getTemplate().opsForZSet().reverseRange(key, 0, 0).iterator().next();
-
-            if (json == null || json.length() == 0) {
+            Set<String> set = redisService.getTemplate().opsForZSet().reverseRange(key, 0, 0);
+            if (set == null || set.size() == 0) {
                 log.info("武器发射-没找到targetId为%s的目标信息", targetId);
                 return;
             }
+            String json = set.iterator().next();
             TargetInfo targetInfo = JsonUtils.deserialize(json, TargetInfo.class);
             EquipmentLaunchStatus equipmentLaunchStatus = new EquipmentLaunchStatus();
             equipmentLaunchStatus.setSender("自动生成");
@@ -274,7 +280,7 @@ public class DDSMessageSending {
             equipmentLaunchStatus.setTargetTypeId(targetInfo.getTargetTypeId());
             equipmentLaunchStatus.setLaunchAzimuth(taskTest1to5.random.nextFloat()*100);
             equipmentLaunchStatus.setLaunchPitchAngle(taskTest1to5.random.nextFloat()*100);
-            restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/EquipmentLaunchStatus", new HttpEntity<>(equipmentLaunchStatus, headers), String.class);
+            restTemplate.postForEntity(Constant.DDS_URL+"EquipmentLaunchStatus", new HttpEntity<>(equipmentLaunchStatus, headers), String.class);
         }
     }
 

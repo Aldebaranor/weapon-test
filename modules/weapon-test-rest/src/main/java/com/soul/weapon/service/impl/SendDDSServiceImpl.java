@@ -7,14 +7,11 @@ import com.egova.utils.FileUtils;
 import com.soul.weapon.config.CommonConfig;
 import com.soul.weapon.config.Constant;
 import com.soul.weapon.model.dds.EquipmentStatus;
-import com.soul.weapon.model.dds.TargetInstructionsInfo;
 import com.soul.weapon.schedule.DDSMessageSending;
 import com.soul.weapon.service.SendDDSService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tools.ant.taskdefs.condition.Http;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpEntity;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
@@ -22,9 +19,9 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.security.RunAs;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ScheduledFuture;
 import java.util.stream.Collectors;
 
@@ -39,7 +36,6 @@ import java.util.stream.Collectors;
 @Service
 public class SendDDSServiceImpl implements SendDDSService {
 
-
     @Autowired
     private ThreadPoolTaskScheduler threadPoolTaskScheduler;
 
@@ -49,17 +45,19 @@ public class SendDDSServiceImpl implements SendDDSService {
     @Autowired
     private RestTemplate restTemplate;
 
-    private ScheduledFuture future;
 
 
     @Override
-    public String sendDDSBytestCode(String testCode) {
+    public String sendDDSBytestCode(String testCode)    {
 
-        Map map = JSONArray.parseObject(FileUtils.readFile(SendDDSServiceImpl.class.getClassLoader().getResource("DDSTest.json").getPath()), Map.class);
+        ClassPathResource classPathResource = new ClassPathResource("DDSTest.json");
+
+        Map map = JSONArray.parseObject(FileUtils.readFile(classPathResource), Map.class);
 
         if (map.get(testCode) == null) {
             return "请输入正确任务编号";
         }
+        ScheduledFuture future = null;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -69,7 +67,7 @@ public class SendDDSServiceImpl implements SendDDSService {
             if (Constant.threadMap.get(testCode) != null) {
                 return "当前测试报文任务已开启，请先停止";
             }
-            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskTest1to5(headers, JsonUtils.deserializeList(json, EquipmentStatus.class), restTemplate), new CronTrigger("0/1 * * * * ?"));
+            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskTest1to5(headers, JsonUtils.deserializeList(json, EquipmentStatus.class), restTemplate), new CronTrigger("0/3 * * * * ?"));
             Constant.threadMap.put(testCode, future);
         }
 
@@ -78,7 +76,7 @@ public class SendDDSServiceImpl implements SendDDSService {
             if (Constant.threadMap.get(testCode) != null) {
                 return "当前测试报文任务已开启，请先停止";
             }
-            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskTargetInfoDDS(headers,restTemplate), new CronTrigger("0/1 * * * * ?"));
+            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskTargetInfoDDS(headers,restTemplate), new CronTrigger("0/3 * * * * ?"));
             Constant.threadMap.put(testCode, future);
         }
 
@@ -87,7 +85,7 @@ public class SendDDSServiceImpl implements SendDDSService {
             if (Constant.threadMap.get(testCode) != null) {
                 return "当前测试报文任务已开启，请先停止";
             }
-            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskTargetInstructionsInfoDDS(headers, RedisUtils.getService(config.getPumpDataBase()),restTemplate), new CronTrigger("0/1 * * * * ?"));
+            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskTargetInstructionsInfoDDS(headers, RedisUtils.getService(config.getPumpDataBase()),restTemplate), new CronTrigger("0/3 * * * * ?"));
             Constant.threadMap.put(testCode, future);
         }
 
@@ -96,7 +94,7 @@ public class SendDDSServiceImpl implements SendDDSService {
             if (Constant.threadMap.get(testCode) != null) {
                 return "当前测试报文任务已开启，请先停止";
             }
-            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskTargetFireControlInfoDDS(headers, RedisUtils.getService(config.getPumpDataBase()),restTemplate), new CronTrigger("0/1 * * * * ?"));
+            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskTargetFireControlInfoDDS(headers, RedisUtils.getService(config.getPumpDataBase()),restTemplate), new CronTrigger("0/3 * * * * ?"));
             Constant.threadMap.put(testCode, future);
         }
         //发射架调转
@@ -104,7 +102,7 @@ public class SendDDSServiceImpl implements SendDDSService {
             if (Constant.threadMap.get(testCode) != null) {
                 return "当前测试报文任务已开启，请先停止";
             }
-            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskLauncherRotationInfoDDS(headers, RedisUtils.getService(config.getPumpDataBase()),restTemplate), new CronTrigger("0/1 * * * * ?"));
+            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskLauncherRotationInfoDDS(headers, RedisUtils.getService(config.getPumpDataBase()),restTemplate), new CronTrigger("0/3 * * * * ?"));
             Constant.threadMap.put(testCode, future);
         }
 
@@ -113,7 +111,7 @@ public class SendDDSServiceImpl implements SendDDSService {
             if (Constant.threadMap.get(testCode) != null) {
                 return "当前测试报文任务已开启，请先停止";
             }
-            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskEquipmentLaunchStatusDDS(headers, RedisUtils.getService(config.getPumpDataBase()),restTemplate), new CronTrigger("0/1 * * * * ?"));
+            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskEquipmentLaunchStatusDDS(headers, RedisUtils.getService(config.getPumpDataBase()),restTemplate), new CronTrigger("0/3 * * * * ?"));
             Constant.threadMap.put(testCode, future);
         }
         return "DDS报文发送任务已启动，发送的任务编号为：" + testCode;
