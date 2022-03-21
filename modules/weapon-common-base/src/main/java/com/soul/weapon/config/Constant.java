@@ -115,5 +115,4 @@ public class Constant {
     //dds报文发送路径
     public static String DDS_URL = "http://127.0.0.1:8016/free/pump/";
 
-
 }

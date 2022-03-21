@@ -115,4 +115,7 @@ public class ShipToAirMissileTestReport extends BaseEntity {
     @Column(name = "taskId")
     private String taskId;
 
+    public boolean getDisabled() {
+        return disabled;
+    }
 }

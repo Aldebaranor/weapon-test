@@ -79,4 +79,9 @@ public class MultiTargetInterceptionReport extends BaseEntity {
     @Display("关联任务id,外键")
     @Column(name = "taskId")
     private String taskId;
+
+
+    public boolean getDisabled() {
+        return disabled;
+    }
 }

@@ -2,6 +2,7 @@ package com.soul.weapon.domain.historyInfo;
 
 
 import com.egova.data.service.AbstractRepositoryBase;
+import com.soul.weapon.config.Constant;
 import com.soul.weapon.entity.historyInfo.ShipToAirMissileTestReport;
 import org.springframework.cache.annotation.CacheConfig;
 

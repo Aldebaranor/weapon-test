@@ -100,4 +100,9 @@ public class WaterWeaponTestReport extends BaseEntity {
     @Column(name = "taskId")
     private String taskId;
 
+
+    public boolean getDisabled() {
+        return disabled;
+    }
+
 }
