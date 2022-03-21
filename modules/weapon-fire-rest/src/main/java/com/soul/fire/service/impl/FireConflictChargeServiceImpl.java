@@ -20,6 +20,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Priority;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -143,6 +145,7 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
                 chargeReport.setChargeType(1);
                 generateDetail(equipmentStatusA,equipmentStatusB);
                 FirePriority firePriority = firePriorityService.getPriorityByIds(equipmentStatusA.getEquipmentTypeId(),equipmentStatusB.getEquipmentTypeId());
+
                 if(firePriority.isABetterThanB()){
                     chargeReport.setFreeEquipId(equipmentStatusA.getEquipmentId());
                     chargeReport.setChargeEquipId(equipmentStatusB.getEquipmentId());
@@ -223,8 +226,11 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
             log.debug("从"+Constant.EQUIPMENT_STATUS_HTTP_KEY+"中获取装备状态信息失败！");
         }
 
+        String key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
+
         Map<String,String> equipmentStatus = RedisUtils.getService(config.
-                getPumpDataBase()).boundHashOps(Constant.EQUIPMENT_STATUS_HTTP_KEY).entries();
+                getPumpDataBase()).boundHashOps(key).entries();
+
         if(equipmentStatus==null) {
             return;
         }
@@ -236,9 +242,12 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
                 )
         );
 
+        int n = equipmentStatusMap.size();
+
         for(EquipmentStatus statusA:equipmentStatusMap.values()){
             for(EquipmentStatus statusB:equipmentStatusMap.values()){
-                if(!statusA.getEquipmentId().equals(statusB.getEquipmentId())){
+
+                if(!statusA.getEquipmentId().equals(statusB.getEquipmentId()) && Integer.valueOf(statusA.getEquipmentId())< Integer.valueOf(statusB.getEquipmentId())){
                     ChargeReport chargeReport = chargeReport(statusA,statusB);
 
                     if(chargeReport!=null) {
@@ -292,10 +301,15 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
     private void readThreshold( EquipmentStatus equipmentStatusA, EquipmentStatus equipmentStatusB){
 
         FireThreshold fireThreshold;
-        fireChargeTimeThreshold = ((fireThreshold=fireThresholdService.getById(TIME_ID))!=null)?Long.valueOf(fireThreshold.getThresholdValue()):3L;
+        fireThreshold=fireThresholdService.getById(TIME_ID);
+        fireChargeTimeThreshold = (fireThreshold!=null)?Long.valueOf(fireThreshold.getThresholdValue().substring(
+            0,fireThreshold.getThresholdValue().length()-1)):3L;
 
-        fireChargePitchAngleThreshold = ((fireThreshold=fireThresholdService.getById(PITCH_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):0.05F;
-        fireChargeAzimuthThreshold = ((fireThreshold=fireThresholdService.getById(AZIMUTH_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):0.05F;
+        fireThreshold=fireThresholdService.getById(PITCH_ID);
+        fireChargePitchAngleThreshold = (fireThreshold!=null)?Float.valueOf(fireThreshold.getThresholdValue().substring(0,fireThreshold.getThresholdValue().length()-3)):0.05F;
+
+        fireThreshold=fireThresholdService.getById(AZIMUTH_ID);
+        fireChargeAzimuthThreshold = (fireThreshold!=null)?Float.valueOf(fireThreshold.getThresholdValue().substring(0,fireThreshold.getThresholdValue().length()-3)):0.05F;
 
         FireWeapon fireWeapon = new FireWeapon();
         fireWeapon = fireWeaponService.getById(equipmentStatusA.getEquipmentId());
@@ -305,9 +319,17 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
         posBx =fireWeapon!=null?fireWeapon.getX():0.0f;
         posBy =fireWeapon!=null?fireWeapon.getY():0.0f;
 
-        electFrequencyThreshold = ((fireThreshold=fireThresholdService.getById(ELECTFREQUENCY_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):10.0F;
-        waterFrequencyThreshold = ((fireThreshold=fireThresholdService.getById(WATERFREQUENCY_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):5.0F;
+        fireThreshold=fireThresholdService.getById(ELECTFREQUENCY_ID);
+        electFrequencyThreshold = (fireThreshold!=null)?Float.valueOf(fireThreshold.getThresholdValue().substring(0,fireThreshold.getThresholdValue().length()-3)):10.0F;
 
+        fireThreshold=fireThresholdService.getById(WATERFREQUENCY_ID);
+        waterFrequencyThreshold = (fireThreshold!=null)?Float.valueOf(fireThreshold.getThresholdValue().substring(0,fireThreshold.getThresholdValue().length()-3)):5.0F;
+
+    }
+
+    private String getTime() {
+        DateFormat df = new SimpleDateFormat("yyyyMMdd");
+        return df.format(System.currentTimeMillis());
     }
 
 }

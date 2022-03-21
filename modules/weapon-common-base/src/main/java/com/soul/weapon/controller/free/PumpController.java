@@ -198,7 +198,7 @@ public class PumpController {
             break;
             case "Report": {
                 ConflictReport conflictReport = JsonUtils.deserialize(JsonUtils.serialize(msg),
-                        ChargeReport.class);
+                        ConflictReport.class);
 
                 if (RedisUtils.getService(config.getFireDataBase()).exists(Constant.PREDICT_KEY)) {
                     RedisUtils.getService(config.getFireDataBase()).boundHashOps(Constant.PREDICT_KEY).put(
@@ -246,6 +246,7 @@ public class PumpController {
                 return JsonUtils.serialize(new EnvironmentInfo());
             }
             case "EquipmentLaunchStatus": {
+
                 EquipmentLaunchStatus equipmentLaunchStatus1 = new EquipmentLaunchStatus();
                 equipmentLaunchStatus1.setSender("1");
                 equipmentLaunchStatus1.setMsgTime(System.currentTimeMillis());
@@ -286,25 +287,20 @@ public class PumpController {
                 equipmentStatus1.setCheckStatus(true);
                 equipmentStatus1.setTime(System.currentTimeMillis());
                 equipmentStatus1.setBeWork(true);
-                equipmentStatus1.setLaunchAzimuth(0.1F);
-                equipmentStatus1.setLaunchPitchAngle(0.1F);
-                equipmentStatus1.setElectromagneticFrequency(0.1F);
-                equipmentStatus1.setMinFrequency(0.1F);
-                equipmentStatus1.setMaxFrequency(0.1F);
+                equipmentStatus1.setElectromagneticFrequency(5.0F);
+
+
                 EquipmentStatus equipmentStatus2 = new EquipmentStatus();
                 equipmentStatus2.setSender("2");
-                equipmentStatus2.setMsgTime(System.currentTimeMillis());
+                equipmentStatus2.setMsgTime(System.currentTimeMillis()+1);
                 equipmentStatus2.setEquipmentId("2");
                 equipmentStatus2.setEquipmentTypeId("2");
                 equipmentStatus2.setEquipmentMode("反导舰炮武器火控系统");
                 equipmentStatus2.setCheckStatus(true);
-                equipmentStatus2.setTime(System.currentTimeMillis());
+                equipmentStatus2.setTime(System.currentTimeMillis()+1);
                 equipmentStatus2.setBeWork(true);
-                equipmentStatus2.setLaunchAzimuth(0.2F);
-                equipmentStatus2.setLaunchPitchAngle(0.2F);
-                equipmentStatus2.setElectromagneticFrequency(0.2F);
-                equipmentStatus2.setMinFrequency(0.2F);
-                equipmentStatus2.setMaxFrequency(0.2F);
+                equipmentStatus2.setElectromagneticFrequency(7F);
+
                 EquipmentStatus equipmentStatus3 = new EquipmentStatus();
                 equipmentStatus3.setSender("3");
                 equipmentStatus3.setMsgTime(System.currentTimeMillis());

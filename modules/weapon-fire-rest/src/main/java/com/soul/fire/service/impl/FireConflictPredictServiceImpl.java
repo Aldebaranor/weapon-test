@@ -2,6 +2,7 @@ package com.soul.fire.service.impl;
 
 import com.egova.json.utils.JsonUtils;
 import com.egova.redis.RedisUtils;
+import com.soul.fire.entity.FireWeapon;
 import com.soul.fire.service.FireConflictPredictService;
 import com.soul.fire.entity.FireThreshold;
 import com.soul.fire.service.FireThresholdService;
@@ -12,11 +13,14 @@ import com.soul.weapon.model.ConflictReport;
 import com.soul.weapon.model.ReportDetail;
 import com.soul.weapon.model.ScenariosInfo;
 import com.soul.weapon.model.dds.CombatScenariosInfo;
+import com.soul.weapon.model.dds.EquipmentStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Priority;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.UUID;
 
@@ -194,9 +198,10 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
             return;
         }
 
+        String key = String.format("%s:%s", Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY, getTime());
+
         CombatScenariosInfo combatScenariosInfo = JsonUtils.deserialize(RedisUtils.getService(
-                config.getPumpDataBase()).getTemplate().boundValueOps(
-                Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY).get(),CombatScenariosInfo.class);
+                config.getPumpDataBase()).getTemplate().boundValueOps(key).get(),CombatScenariosInfo.class);
 
         List<ScenariosInfo> scenariosInfos = combatScenariosInfo.getScenariosList();
         int n = scenariosInfos.size();
@@ -242,20 +247,36 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
      */
     private void readThreshold(ScenariosInfo scenariosA, ScenariosInfo scenariosB){
         FireThreshold fireThreshold;
-        fireConflictTimeThreshold = ((fireThreshold=fireThresholdService.getById(TIME_ID))!=null)?Long.valueOf(fireThreshold.getThresholdValue()):3L;
 
-        fireConflictPitchAngleThreshold = ((fireThreshold=fireThresholdService.getById(PITCH_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):0.05F;
-        fireConflictAzimuthThreshold = ((fireThreshold=fireThresholdService.getById(AZIMUTH_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):0.05F;
+        fireThreshold=fireThresholdService.getById(TIME_ID);
+        fireConflictTimeThreshold = (fireThreshold!=null)?Long.valueOf(fireThreshold.getThresholdValue().substring(
+            0,fireThreshold.getThresholdValue().length()-1)):3L;
+
+        fireThreshold=fireThresholdService.getById(PITCH_ID);
+        fireConflictPitchAngleThreshold = (fireThreshold!=null)?Float.valueOf(fireThreshold.getThresholdValue().substring(0,fireThreshold.getThresholdValue().length()-3)):0.05F;
+
+        fireThreshold=fireThresholdService.getById(AZIMUTH_ID);
+        fireConflictAzimuthThreshold = (fireThreshold!=null)?Float.valueOf(fireThreshold.getThresholdValue().substring(0,fireThreshold.getThresholdValue().length()-3)):0.05F;
+
 
         posAx = fireWeaponService.getById(scenariosA.getEquipmentId()).getX();
         posAy = fireWeaponService.getById(scenariosA.getEquipmentId()).getY();
         posBx = fireWeaponService.getById(scenariosB.getEquipmentId()).getX();
         posBy = fireWeaponService.getById(scenariosB.getEquipmentId()).getY();
 
-        electFrequency = ((fireThreshold=fireThresholdService.getById(ELECTFREQUENCY_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):10.0F;
-        waterFrequency = ((fireThreshold=fireThresholdService.getById(WATERFREQUENCY_ID))!=null)?Float.valueOf(fireThreshold.getThresholdValue()):5.0F;
+        fireThreshold=fireThresholdService.getById(ELECTFREQUENCY_ID);
+        electFrequency = (fireThreshold!=null)?Float.valueOf(fireThreshold.getThresholdValue().substring(0,fireThreshold.getThresholdValue().length()-3)):10.0F;
+
+        fireThreshold=fireThresholdService.getById(WATERFREQUENCY_ID);
+        waterFrequency = (fireThreshold!=null)?Float.valueOf(fireThreshold.getThresholdValue().substring(0,fireThreshold.getThresholdValue().length()-3)):5.0F;
+
+
     }
 
+    private String getTime() {
+        DateFormat df = new SimpleDateFormat("yyyyMMdd");
+        return df.format(System.currentTimeMillis());
+    }
 }
 
 
