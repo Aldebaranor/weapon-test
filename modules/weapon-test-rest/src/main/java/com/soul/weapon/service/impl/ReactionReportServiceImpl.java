@@ -45,4 +45,9 @@ public class ReactionReportServiceImpl extends TemplateService<ReactionReport,St
 
         return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
+
+    @Override
+    public List<ReactionReport> getNewreactionByTaskId(String taskId) {
+        return reactionReportRepository.getNewreactionByTaskId(taskId);
+    }
 }

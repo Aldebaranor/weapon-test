@@ -82,4 +82,5 @@ public interface PipeTaskService {
      */
     public Boolean stopTest(String takeId);
 
+    void copeTask(PipeTask pipeTask);
 }

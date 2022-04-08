@@ -30,4 +30,6 @@ public interface WaterWeaponTestReportService {
     String insert(WaterWeaponTestReport entity);
 
     void update(WaterWeaponTestReport entity);
+
+    WaterWeaponTestReport getNewwaterWeaponByTaskId(String taskId);
 }

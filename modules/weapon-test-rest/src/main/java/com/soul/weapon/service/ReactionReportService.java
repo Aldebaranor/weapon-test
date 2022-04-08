@@ -31,4 +31,6 @@ public interface ReactionReportService {
     String insert(ReactionReport entity);
 
     void update(ReactionReport entity);
+
+    List<ReactionReport> getNewreactionByTaskId(String taskId);
 }

@@ -418,6 +418,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
             log.error("dds报文信息不满足信息流程测试！");
             return;
         }
+
         //获取目标指示的报文所有的targetId
         Set<String> targetIds = redisService.boundHashOps(targetInstructionKey).keys();
         InfoProcessTestReport infoProcessTestReport = new InfoProcessTestReport();
@@ -1032,7 +1033,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
                     launcherRotationReport.setTime(launcherRotationInfo.getTime());
                     launcherRotationReport.setLauncherPitchAccuracy(launcherPitchAccuracy);
                     launcherRotationReport.setLauncherAzimuthAccuracy(launcherAzimuthAccuracy);
-                    launcherRotationReport.setTargetId(taskId);
+                    launcherRotationReport.setTaskId(taskId);
                     launcherRotationReport.setId(UUID.randomUUID().toString());
                     launcherRotationReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
                     launcherRotationReport.setDisabled(false);

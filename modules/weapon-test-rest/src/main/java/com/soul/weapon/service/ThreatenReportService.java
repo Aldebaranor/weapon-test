@@ -5,6 +5,7 @@ import com.egova.model.QueryModel;
 import com.soul.weapon.condition.ElectronicWeaponTestReportCondition;
 import com.soul.weapon.condition.ThreatenReportCondition;
 import com.soul.weapon.entity.historyInfo.ElectronicWeaponTestReport;
+import com.soul.weapon.entity.historyInfo.InstructionAccuracyReport;
 import com.soul.weapon.entity.historyInfo.ThreatenReport;
 
 import java.util.List;
@@ -30,4 +31,7 @@ public interface ThreatenReportService {
     String insert(ThreatenReport entity);
 
     void update(ThreatenReport entity);
+
+    List<ThreatenReport> getNewthreatenTestByTaskId(String taskId);
+
 }

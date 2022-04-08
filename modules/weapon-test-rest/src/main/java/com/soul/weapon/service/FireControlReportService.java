@@ -30,4 +30,6 @@ public interface FireControlReportService {
     String insert(FireControlReport entity);
 
     void update(FireControlReport entity);
+
+    List<FireControlReport> getNewfireControlByTaskId(String taskId);
 }

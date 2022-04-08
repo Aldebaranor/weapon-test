@@ -28,4 +28,6 @@ public interface ElectronicWeaponTestReportService {
     String insert(ElectronicWeaponTestReport entity);
 
     void update(ElectronicWeaponTestReport entity);
+
+    ElectronicWeaponTestReport getNewelectWeaponByTaskId(String taskId);
 }

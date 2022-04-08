@@ -4,6 +4,7 @@ import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
 import com.soul.weapon.condition.ExecutionStatusReportCondition;
 import com.soul.weapon.entity.historyInfo.ExecutionStatusReport;
+import com.soul.weapon.entity.historyInfo.InstructionAccuracyReport;
 
 import java.util.List;
 
@@ -29,4 +30,6 @@ public interface ExecutionStatusReportService {
     String insert(ExecutionStatusReport entity);
 
     void update(ExecutionStatusReport entity);
+
+    List<ExecutionStatusReport>  getNewexecStatusByTaskId(String taskId);
 }

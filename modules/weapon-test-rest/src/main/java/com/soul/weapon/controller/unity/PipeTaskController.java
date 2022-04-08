@@ -111,6 +111,13 @@ public class PipeTaskController {
         pipeTestService.insertList(pipeTests);
     }
 
+    //复制任务
+    @Api
+    @PostMapping("/cope")
+    public void copeTask(@RequestBody PipeTask pipeTask){
+        pipeTaskService.copeTask(pipeTask);
+    }
+
     /**
      * 停止任务
      * @param taskId

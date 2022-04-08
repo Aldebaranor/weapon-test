@@ -30,5 +30,5 @@ public interface MultiTargetInterceptionReportService {
     void update(MultiTargetInterceptionReport entity);
 
 
-
+    List<MultiTargetInterceptionReport> getNewmitByTaskId(String taskId);
 }

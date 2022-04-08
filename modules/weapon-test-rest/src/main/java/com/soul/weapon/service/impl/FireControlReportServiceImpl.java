@@ -53,4 +53,9 @@ public class FireControlReportServiceImpl extends TemplateService<FireControlRep
 
         return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
+
+    @Override
+    public List<FireControlReport> getNewfireControlByTaskId(String taskId) {
+        return fireControlReportRepository.getNewfireControlByTaskId(taskId);
+    }
 }

@@ -30,4 +30,6 @@ public interface ShipToAirMissileTestReportService {
     String insert(ShipToAirMissileTestReport entity);
 
     void update(ShipToAirMissileTestReport entity);
+
+    ShipToAirMissileTestReport getNewShipByTaskId(String taskId);
 }

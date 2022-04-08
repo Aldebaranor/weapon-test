@@ -7,6 +7,7 @@ import com.egova.model.QueryModel;
 import com.flagwind.persistent.model.Sorting;
 import com.soul.weapon.condition.ThreatenReportCondition;
 import com.soul.weapon.domain.historyInfo.ThreatenReportRepository;
+import com.soul.weapon.entity.historyInfo.InstructionAccuracyReport;
 import com.soul.weapon.entity.historyInfo.ThreatenReport;
 import com.soul.weapon.service.ThreatenReportService;
 import lombok.RequiredArgsConstructor;
@@ -45,4 +46,10 @@ public class ThreatenReportServiceImpl extends TemplateService<ThreatenReport,St
 
         return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
+
+    @Override
+    public List<ThreatenReport> getNewthreatenTestByTaskId(String taskId) {
+        return threatenReportRepository.getNewthreatenTestByTaskId(taskId);
+    }
+
 }

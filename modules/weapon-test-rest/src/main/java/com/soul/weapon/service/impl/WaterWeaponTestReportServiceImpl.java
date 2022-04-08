@@ -42,7 +42,11 @@ public class WaterWeaponTestReportServiceImpl extends TemplateService<WaterWeapo
 
     @Override
     public List<WaterWeaponTestReport> list(WaterWeaponTestReportCondition condition) {
-
         return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
+    }
+
+    @Override
+    public WaterWeaponTestReport getNewwaterWeaponByTaskId(String taskId) {
+        return waterWeaponTestReportRepository.getNewwaterWeaponByTaskId(taskId);
     }
 }

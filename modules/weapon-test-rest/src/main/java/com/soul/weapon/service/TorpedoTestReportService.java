@@ -4,6 +4,7 @@ import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
 import com.soul.weapon.condition.ElectronicWeaponTestReportCondition;
 import com.soul.weapon.condition.TorpedoTestReportCondition;
+import com.soul.weapon.entity.historyInfo.AntiMissileShipGunTestReport;
 import com.soul.weapon.entity.historyInfo.ElectronicWeaponTestReport;
 import com.soul.weapon.entity.historyInfo.TorpedoTestReport;
 
@@ -30,4 +31,6 @@ public interface TorpedoTestReportService {
     String insert(TorpedoTestReport entity);
 
     void update(TorpedoTestReport entity);
+
+    TorpedoTestReport getNewTorpeByTaskId(String taskId);
 }

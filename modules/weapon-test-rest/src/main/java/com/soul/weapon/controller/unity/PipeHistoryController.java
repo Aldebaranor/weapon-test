@@ -1,5 +1,6 @@
 package com.soul.weapon.controller.unity;
 
+import com.egova.exception.ExceptionUtils;
 import com.egova.model.annotation.Display;
 import com.egova.utils.ExcelUtils;
 import com.egova.web.annotation.Api;
@@ -67,24 +68,33 @@ public class PipeHistoryController {
     private final MultiTargetInterceptionReportService multiTargetInterceptionReportService;
 
 
-    //舰空导弹武器通道测试-1
+    //获取全部舰空导弹武器通道测试-1
     @Api
     @GetMapping(value = "/ship/{taskId}")
     public List<ShipToAirMissileTestReport> getShipByTaskId(@PathVariable("taskId") String taskId) {
         ShipToAirMissileTestReportCondition condition = new ShipToAirMissileTestReportCondition();
         condition.setTaskId(taskId);
-
         return shipToAirMissileTestReportService.list(condition);
     }
-
+    //下载excel文档
     @Api
     @GetMapping("/ship/down/{taskId}")
-    public void ShipDown(@PathVariable("taskId") String taskId, HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException {
+    public void ShipDown(@PathVariable("taskId") String taskId, HttpServletRequest httpRequest, HttpServletResponse httpResponse) {
         ShipToAirMissileTestReportCondition condition = new ShipToAirMissileTestReportCondition();
         condition.setTaskId(taskId);
         List<ShipToAirMissileTestReport> list = shipToAirMissileTestReportService.list(condition);
+        if (list == null || list.size() == 0) {
+            throw ExceptionUtils.api("下载数据为空！");
+        }
         getWorkbook(list,"舰空导弹武器通道测试",httpRequest,httpResponse);
     }
+    //获取最新生成的航空导弹武器通道测试
+    @Api
+    @GetMapping("/ship/new/{taskId}")
+    public ShipToAirMissileTestReport getNewShipByTaskId(@PathVariable("taskId") String taskId){
+        return shipToAirMissileTestReportService.getNewShipByTaskId(taskId);
+    }
+
 
     //反导舰炮武器通道测试-2
     @Api
@@ -94,15 +104,24 @@ public class PipeHistoryController {
         condition.setTaskId(taskId);
         return antiMissileShipGunTestReportService.list(condition);
     }
-
     @Api
     @GetMapping("/anti/down/{taskId}")
     public void AntiDown(@PathVariable("taskId") String taskId, HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException {
         AntiMissileShipGunTestReportCondition condition = new AntiMissileShipGunTestReportCondition();
         condition.setTaskId(taskId);
         List<AntiMissileShipGunTestReport> list = antiMissileShipGunTestReportService.list(condition);
+        if (list == null || list.size() == 0) {
+            throw ExceptionUtils.api("下载数据为空！");
+        }
         getWorkbook(list,"反导舰炮武器通道测试",httpRequest,httpResponse);
     }
+    //获取最新生成的反导舰炮武器通道测试
+    @Api
+    @GetMapping("/ship/new/{taskId}")
+    public AntiMissileShipGunTestReport getNewAntiByTaskId(@PathVariable("taskId") String taskId){
+        return antiMissileShipGunTestReportService.getNewAntiByTaskId(taskId);
+    }
+
 
     //鱼雷防御武器通道测试-3
     @Api
@@ -112,15 +131,24 @@ public class PipeHistoryController {
         condition.setTaskId(taskId);
         return torpedoTestReportService.list(condition);
     }
-
     @Api
     @GetMapping("/torpe/down/{taskId}")
     public void TorpeDown(@PathVariable("taskId") String taskId, HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws IOException {
         TorpedoTestReportCondition condition = new TorpedoTestReportCondition();
         condition.setTaskId(taskId);
         List<TorpedoTestReport> list = torpedoTestReportService.list(condition);
+        if (list == null || list.size() == 0) {
+            throw ExceptionUtils.api("下载数据为空！");
+        }
         getWorkbook(list,"鱼雷防御武器通道测试",httpRequest,httpResponse);
     }
+    //获取最新生成的鱼雷防御武器通道测试
+    @Api
+    @GetMapping("/torpe/new/{taskId}")
+    public TorpedoTestReport getNewTorpeByTaskId(@PathVariable("taskId") String taskId){
+        return torpedoTestReportService.getNewTorpeByTaskId(taskId);
+    }
+
 
     //电子对抗武器通道测试-4
     @Api
@@ -136,7 +164,15 @@ public class PipeHistoryController {
         ElectronicWeaponTestReportCondition condition = new ElectronicWeaponTestReportCondition();
         condition.setTaskId(taskId);
         List<ElectronicWeaponTestReport> list = electronicWeaponTestReportService.list(condition);
+        if (list == null || list.size() == 0) {
+            throw ExceptionUtils.api("下载数据为空！");
+        }
         getWorkbook(list,"电子对抗武器通道测试",httpRequest,httpResponse);
+    }
+    @Api
+    @GetMapping("/electWeapon/new/{taskId}")
+    public ElectronicWeaponTestReport getNewelectWeaponByTaskId(@PathVariable("taskId") String taskId){
+        return electronicWeaponTestReportService.getNewelectWeaponByTaskId(taskId);
     }
 
 
@@ -154,8 +190,17 @@ public class PipeHistoryController {
         WaterWeaponTestReportCondition condition = new WaterWeaponTestReportCondition();
         condition.setTaskId(taskId);
         List<WaterWeaponTestReport> list = waterWeaponTestReportService.list(condition);
+        if (list == null || list.size() == 0) {
+            throw ExceptionUtils.api("下载数据为空！");
+        }
         getWorkbook(list,"水声对抗武器通道测试",httpRequest,httpResponse);
     }
+    @Api
+    @GetMapping("/waterWeapon/new/{taskId}")
+    public WaterWeaponTestReport getNewwaterWeaponByTaskId(@PathVariable("taskId") String taskId){
+        return waterWeaponTestReportService.getNewwaterWeaponByTaskId(taskId);
+    }
+
 
     //信息流程测试-6
     @Api
@@ -171,8 +216,17 @@ public class PipeHistoryController {
         InfoProcessTestReportCondition condition = new InfoProcessTestReportCondition();
         condition.setTaskId(taskId);
         List<InfoProcessTestReport> list = infoProcessTestReportService.list(condition);
+        if (list == null || list.size() == 0) {
+            throw ExceptionUtils.api("下载数据为空！");
+        }
         getWorkbook(list,"信息流程测试",httpRequest,httpResponse);
     }
+    @Api
+    @GetMapping("/infoProcessTest/new/{taskId}")
+    public List<InfoProcessTestReport> getNewinfoProcessTestByTaskId(@PathVariable("taskId") String taskId){
+        return infoProcessTestReportService.getNewinfoProcessTestByTaskId(taskId);
+    }
+
 
     //威胁判断测试-7
     @Api
@@ -188,8 +242,17 @@ public class PipeHistoryController {
         ThreatenReportCondition condition = new ThreatenReportCondition();
         condition.setTaskId(taskId);
         List<ThreatenReport> list = threatenReportService.list(condition);
+        if (list == null || list.size() == 0) {
+            throw ExceptionUtils.api("下载数据为空！");
+        }
         getWorkbook(list,"威胁判断测试",httpRequest,httpResponse);
     }
+    @Api
+    @GetMapping("/threaten/new/{taskId}")
+    public List<ThreatenReport> getNewthreatenByTaskId(@PathVariable("taskId") String taskId){
+        return threatenReportService.getNewthreatenTestByTaskId(taskId);
+    }
+
 
     //指示处理精度测试-8
     @Api
@@ -205,8 +268,18 @@ public class PipeHistoryController {
         InstructionAccuracyReportCondition condition = new InstructionAccuracyReportCondition();
         condition.setTaskId(taskId);
         List<InstructionAccuracyReport> list = instructionAccuracyReportService.list(condition);
+        if (list == null || list.size() == 0) {
+            throw ExceptionUtils.api("下载数据为空！");
+        }
         getWorkbook(list,"指示处理精度测试",httpRequest,httpResponse);
     }
+    @Api
+    @GetMapping("/insAcc/new/{taskId}")
+    public List<InstructionAccuracyReport> getNewinsAccByTaskId(@PathVariable("taskId") String taskId){
+        return instructionAccuracyReportService.getNewinsAccByTaskId(taskId);
+    }
+
+
 
     //执行情况测试-9
     @Api
@@ -222,7 +295,15 @@ public class PipeHistoryController {
         ExecutionStatusReportCondition condition = new ExecutionStatusReportCondition();
         condition.setTaskId(taskId);
         List<ExecutionStatusReport> list = executionStatusReportService.list(condition);
+        if (list == null || list.size() == 0) {
+            throw ExceptionUtils.api("下载数据为空！");
+        }
         getWorkbook(list,"执行情况测试",httpRequest,httpResponse);
+    }
+    @Api
+    @GetMapping("/execStatus/new/{taskId}")
+    public List<ExecutionStatusReport> getNewexecStatusByTaskId(@PathVariable("taskId") String taskId){
+        return executionStatusReportService.getNewexecStatusByTaskId(taskId);
     }
 
     //雷达航迹测试-10
@@ -239,8 +320,18 @@ public class PipeHistoryController {
         RadarPathReportCondition condition = new RadarPathReportCondition();
         condition.setTaskId(taskId);
         List<RadarPathReport> list = radarPathReportService.list(condition);
+        if (list == null || list.size() == 0) {
+            throw ExceptionUtils.api("下载数据为空！");
+        }
         getWorkbook(list,"雷达航迹测试",httpRequest,httpResponse);
     }
+    @Api
+    @GetMapping("/radarPath/new/{taskId}")
+    public List<RadarPathReport> getNewradarPathByTaskId(@PathVariable("taskId") String taskId){
+        return radarPathReportService.getNewradarPathByTaskId(taskId);
+    }
+
+
 
     //拦截距离测试-11
     @Api
@@ -256,7 +347,15 @@ public class PipeHistoryController {
         InterceptDistanceReportCondition condition = new InterceptDistanceReportCondition();
         condition.setTaskId(taskId);
         List<InterceptDistanceReport> list = interceptDistanceReportService.list(condition);
+        if (list == null || list.size() == 0) {
+            throw ExceptionUtils.api("下载数据为空！");
+        }
         getWorkbook(list,"拦截距离测试",httpRequest,httpResponse);
+    }
+    @Api
+    @GetMapping("/intDis/new/{taskId}")
+    public List<InterceptDistanceReport> getNewintDisByTaskId(@PathVariable("taskId") String taskId){
+        return interceptDistanceReportService.getNewintDisByTaskId(taskId);
     }
 
     //火控解算精度测试-12
@@ -273,7 +372,15 @@ public class PipeHistoryController {
         FireControlReportCondition condition = new FireControlReportCondition();
         condition.setTaskId(taskId);
         List<FireControlReport> list = fireControlReportService.list(condition);
+        if (list == null || list.size() == 0) {
+            throw ExceptionUtils.api("下载数据为空！");
+        }
         getWorkbook(list,"拦截距离测试",httpRequest,httpResponse);
+    }
+    @Api
+    @GetMapping("/fireControl/new/{taskId}")
+    public List<FireControlReport> getNewfireControlByTaskId(@PathVariable("taskId") String taskId){
+        return fireControlReportService.getNewfireControlByTaskId(taskId);
     }
 
     //反应时间测试-13
@@ -290,7 +397,15 @@ public class PipeHistoryController {
         ReactionReportCondition condition = new ReactionReportCondition();
         condition.setTaskId(taskId);
         List<ReactionReport> list = reactionReportService.list(condition);
+        if (list == null || list.size() == 0) {
+            throw ExceptionUtils.api("下载数据为空！");
+        }
         getWorkbook(list,"反应时间测试",httpRequest,httpResponse);
+    }
+    @Api
+    @GetMapping("/reaction/new/{taskId}")
+    public List<ReactionReport> getNewreactionByTaskId(@PathVariable("taskId") String taskId){
+        return reactionReportService.getNewreactionByTaskId(taskId);
     }
 
     //发射架调转精度测试-14
@@ -307,7 +422,15 @@ public class PipeHistoryController {
         LauncherRotationReportCondition condition = new LauncherRotationReportCondition();
         condition.setTaskId(taskId);
         List<LauncherRotationReport> list = launcherRotationReportService.list(condition);
+        if (list == null || list.size() == 0) {
+            throw ExceptionUtils.api("下载数据为空！");
+        }
         getWorkbook(list,"发射架调转精度测试",httpRequest,httpResponse);
+    }
+    @Api
+    @GetMapping("/lauRot/new/{taskId}")
+    public List<LauncherRotationReport> getNewlauRotByTaskId(@PathVariable("taskId") String taskId){
+        return launcherRotationReportService.getNewlauRotByTaskId(taskId);
     }
 
     //多目标拦截能力测试-15
@@ -324,7 +447,15 @@ public class PipeHistoryController {
         MultiTargetInterceptionReportCondition condition = new MultiTargetInterceptionReportCondition();
         condition.setTaskId(taskId);
         List<MultiTargetInterceptionReport> list = multiTargetInterceptionReportService.list(condition);
+        if (list == null || list.size() == 0) {
+            throw ExceptionUtils.api("下载数据为空！");
+        }
         getWorkbook(list,"发射架调转精度测试",httpRequest,httpResponse);
+    }
+    @Api
+    @GetMapping("/mit/new/{taskId}")
+    public List<MultiTargetInterceptionReport> getNewmitByTaskId(@PathVariable("taskId") String taskId){
+        return multiTargetInterceptionReportService.getNewmitByTaskId(taskId);
     }
 
 

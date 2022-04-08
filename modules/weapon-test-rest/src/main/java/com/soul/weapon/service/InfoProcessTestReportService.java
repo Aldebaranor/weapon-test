@@ -30,4 +30,6 @@ public interface InfoProcessTestReportService {
     String insert(InfoProcessTestReport entity);
 
     void update(InfoProcessTestReport entity);
+
+    List<InfoProcessTestReport> getNewinfoProcessTestByTaskId(String taskId);
 }

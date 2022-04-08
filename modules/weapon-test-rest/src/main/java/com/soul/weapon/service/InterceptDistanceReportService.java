@@ -31,4 +31,6 @@ public interface InterceptDistanceReportService {
     String insert(InterceptDistanceReport entity);
 
     void update(InterceptDistanceReport entity);
+
+    List<InterceptDistanceReport> getNewintDisByTaskId(String taskId);
 }

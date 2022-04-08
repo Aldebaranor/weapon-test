@@ -45,4 +45,9 @@ public class InterceptDistanceReportServiceImpl extends TemplateService<Intercep
 
         return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
+
+    @Override
+    public List<InterceptDistanceReport> getNewintDisByTaskId(String taskId) {
+        return interceptDistanceReportRepository.getNewintDisByTaskId(taskId);
+    }
 }
