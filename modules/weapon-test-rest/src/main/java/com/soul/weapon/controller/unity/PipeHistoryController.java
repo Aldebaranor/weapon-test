@@ -117,7 +117,7 @@ public class PipeHistoryController {
     }
     //获取最新生成的反导舰炮武器通道测试
     @Api
-    @GetMapping("/ship/new/{taskId}")
+    @GetMapping("/anti/new/{taskId}")
     public AntiMissileShipGunTestReport getNewAntiByTaskId(@PathVariable("taskId") String taskId){
         return antiMissileShipGunTestReportService.getNewAntiByTaskId(taskId);
     }
