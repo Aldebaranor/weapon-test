@@ -15,16 +15,12 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-//@Component("ConflictPredictJob")
-//@com.egova.quartz.annotation.Job(name="ConflictPredictJob",group = "weapon",cron = "1000")
-//@DisallowConcurrentExecution
 public class ConflictPredictJob  {
 
     @Autowired
     public FireConflictPredictService fireConflictPredictService;
     @Autowired
     public FireConflictChargeService fireConflictCharge;
-
     @Autowired
     public CommonConfig config;
 

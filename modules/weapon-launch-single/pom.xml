@@ -23,7 +23,7 @@
         <dependency>
             <groupId>com.egova</groupId>
             <artifactId>egova-framework-redis</artifactId>
-            <version>1.0.3-SNAPSHOT</version>
+            <version>1.0.4-SNAPSHOT</version>
         </dependency>
         <!-- 业务模块 -->
         <dependency>
@@ -54,6 +54,21 @@
         <dependency>
             <groupId>com.soul</groupId>
             <artifactId>weapon-fire-rest</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.soul</groupId>
+            <artifactId>weapon-screen-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.soul</groupId>
+            <artifactId>weapon-screen-rest</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.soul</groupId>
+            <artifactId>meta-netty-rest</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

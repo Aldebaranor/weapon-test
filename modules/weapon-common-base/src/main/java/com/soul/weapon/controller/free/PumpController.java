@@ -110,10 +110,13 @@ public class PumpController {
             break;
             //map 装备状态
             //key:[weapon:equipment_status:yyyymmdd]
-            //value:[Map(equipmentId,EquipmentStatus)
+            //value:[Map(equipmentTypeId_equipmentId,EquipmentStatus)]
+            // TODO: 2022/6/8  需要修改,一个武器类型有多个武器
             case "EquipmentStatus": {
                 //反序列化
                 EquipmentStatus equipmentStatus = JsonUtils.deserialize(JsonUtils.serialize(msg), EquipmentStatus.class);
+                //进行拼接hash中的key
+                String mapKey = String.format("%s_%s",equipmentStatus.getEquipmentTypeId(),equipmentStatus.getEquipmentId());
                 //拼接redis中当天的key
                 String key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
                 //判断是否存在key
@@ -121,12 +124,12 @@ public class PumpController {
                     //如果存在进行添加或者更新
                     RedisUtils.getService(config.getPumpDataBase()).
                             boundHashOps(key).put(
-                                    equipmentStatus.getEquipmentId(), JsonUtils.serialize(equipmentStatus));
+                                    mapKey, JsonUtils.serialize(equipmentStatus));
                 } else {
                     //如果不存在存入对应结构并设置过期时间
                     RedisUtils.getService(config.getPumpDataBase()).
                             boundHashOps(key).put(
-                                    equipmentStatus.getEquipmentId(), JsonUtils.serialize(equipmentStatus));
+                                    mapKey, JsonUtils.serialize(equipmentStatus));
                     RedisUtils.getService(config.getPumpDataBase()).expire(key, ONE_DAY);
                 }
 
