@@ -11,7 +11,7 @@ import javax.annotation.Priority;
 
 /**
  * @ClassName ScreenUdpMsgImpl
- * @Description TODO
+ * @Description 大屏数据解析
  * @Author ShiZuan
  * @Date 2022/7/12 14:39
  * @Version
@@ -22,11 +22,10 @@ import javax.annotation.Priority;
 @RequiredArgsConstructor
 @Component("Screen-udp")
 public class ScreenUdpMsgImpl implements UnpackMessageService {
-
+    
     @Override
     public void unpackNetty(ByteBuf buf) {
         //标记已读索引
         buf.markReaderIndex();
-        System.out.println("接收udp成功!!!");
     }
 }

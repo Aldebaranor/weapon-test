@@ -7,6 +7,7 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
+import io.netty.channel.socket.InternetProtocolFamily;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import io.netty.util.CharsetUtil;
 import io.netty.util.NetUtil;
@@ -75,7 +76,12 @@ public class NettyUdpGroupServer {
         System.out.println("---UDP组播，本机地址：" + localAddress);
 
         bootstrap.group(group)
-                .channel(NioDatagramChannel.class)
+                .channelFactory(new ChannelFactory<Channel>() {
+                    @Override
+                    public NioDatagramChannel newChannel() {
+                        return new NioDatagramChannel(InternetProtocolFamily.IPv4);
+                    }
+                })
                 .localAddress(localAddress, groupAddress.getPort())
                 //设置Option 组播
                 .option(ChannelOption.IP_MULTICAST_IF, ni)

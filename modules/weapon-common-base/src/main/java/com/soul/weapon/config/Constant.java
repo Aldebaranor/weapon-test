@@ -115,4 +115,34 @@ public class Constant {
     //dds报文发送路径
     public static String DDS_URL = "http://127.0.0.1:8016/free/pump/";
 
+    /**
+     * 大屏redis数据key
+     */
+    //水下计数
+    public static String SCREEN_COUNT_WATERTYPE = "SCREEN:WATERTYPE:COUNT";
+    //对空计数
+    public static String SCREEN_COUNT_AIRTYPE = "SCREEN:AIRTYPE:COUNT";
+    //水下无目标报文周期
+    public static String SCREEN_STATUSREPORTDATA_WATERTYPE = "SCREEN:WATERTYPE:STATUSREPORTDATA";
+    //对空无目标报文周期
+    public static String SCREEN_STATUSREPORTDATA_AIRTYPE = "SCREEN:AIRTYPE:STATUSREPORTDATA";
+    //水下有目标报文周期
+    public static String SCREEN_STATUSREPORTDATA_WATERTYPE_TARGETID = "SCREEN:WATERTYPE:%s:STATUSREPORTDATA";
+    //对空有目标报文周期
+    public static String SCREEN_STATUSREPORTDATA_AIRTYPE_TARGETID = "SCREEN:AIRTYPE:%s:STATUSREPORTDATA";
+    //水下通道时间报文
+    public static String SCREEN_RESPONSETIME_WATERTYPE_TARGETID = "SCREEN:WATERTYPE:%s:RESPONSETIME";
+    //对空通道时间报文
+    public static String SCREEN_RESPONSETIME_AIRTYPE_TARGETID = "SCREEN:AIRTYPE:%s:RESPONSETIME";
+    //水下任务通道状态-任务
+    public static String SCREEN_TASKCHANNELSTATUS_WATERTYPE_TARGETID = "SCREEN:WATERTYPE:%s:TASKCHANNELSTATUS";
+    //对空任务通道状态-任务
+    public static String SCREEN_TASKCHANNELSTATUS_AIRTYPE_TARGETID = "SCREEN:AIRTYPE:%s:TASKCHANNELSTATUS";
+    //水下任务通道状态
+    public static String SCREEN_TASKCHANNELSTATUS_WATERTYPE = "SCREEN:WATERTYPE:TASKCHANNELSTATUS";
+    //对空任务通道状态
+    public static String SCREEN_TASKCHANNELSTATUS_AIRTYPE = "SCREEN:AIRTYPE:TASKCHANNELSTATUS";
+
+
+
 }
