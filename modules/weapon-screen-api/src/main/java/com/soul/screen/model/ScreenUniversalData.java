@@ -31,5 +31,9 @@ public class ScreenUniversalData implements Serializable {
      * 值
      */
     private Object value;
+    /**
+     * 平均值
+     */
+    private Double ave;
 
 }

@@ -3,6 +3,7 @@ package com.soul.screen.model;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * @ClassName ScreenDetectorAccuracyData
@@ -12,6 +13,14 @@ import java.io.Serializable;
  * @Version
  **/
 @Data
-public class ScreenDetectorAccuracyData implements Serializable {
+public class ScreenAccuracyData implements Serializable {
+    /**
+     * 目标批号
+     */
+    private String targetId;
 
+    /**
+     * 精度数据
+     */
+    private List<AccuracyData> accuracyData;
 }
