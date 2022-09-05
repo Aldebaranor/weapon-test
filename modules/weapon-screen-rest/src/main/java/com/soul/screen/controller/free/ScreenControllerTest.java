@@ -383,8 +383,8 @@ public class ScreenControllerTest {
      * 获取探测器精度报文
      */
     @Api
-    @GetMapping("/detectoraccuracy/underwater")
-    public ScreenAccuracyData getScreenDetectorAccuracyData(){
+    @GetMapping("/detectoraccuracy/underwater/{number}")
+    public ScreenAccuracyData getScreenDetectorAccuracyData(@PathVariable Integer number){
         Random random = new Random();
         ScreenAccuracyData screenAccuracyData = new ScreenAccuracyData();
         List<AccuracyData> resultList = new ArrayList<>();
@@ -441,20 +441,20 @@ public class ScreenControllerTest {
      * 获取发射架精度报文
      */
     @Api
-    @GetMapping("/launcheraccuracy/underwater")
-    public ScreenAccuracyData getScreenLauncherAccuracyData(){
+    @GetMapping("/launcheraccuracy/underwater/{number}")
+    public ScreenAccuracyData getScreenLauncherAccuracyData(@PathVariable Integer number){
         Random random = new Random();
         ScreenAccuracyData screenAccuracyData = new ScreenAccuracyData();
         List<AccuracyData> resultList = new ArrayList<>();
         screenAccuracyData.setTargetId(this.SCREEN_TARGETID);
-        AccuracyData ad1 = new AccuracyData("1-2",null, random.nextDouble()*10,random.nextDouble()*10,System.currentTimeMillis()-random.nextInt(1000000));
-        AccuracyData ad2 = new AccuracyData("2-1",null, random.nextDouble()*10,random.nextDouble()*10,System.currentTimeMillis()-random.nextInt(1000000));
-        AccuracyData ad3 = new AccuracyData("2-2",null, random.nextDouble()*10,random.nextDouble()*10,System.currentTimeMillis()-random.nextInt(1000000));
-        AccuracyData ad4 = new AccuracyData("12-5",null, random.nextDouble()*10,random.nextDouble()*10,System.currentTimeMillis()-random.nextInt(1000000));
-        AccuracyData ad5 = new AccuracyData("2-15",null, random.nextDouble()*10,random.nextDouble()*10,System.currentTimeMillis()-random.nextInt(1000000));
-        AccuracyData ad6 = new AccuracyData("25-1",null, random.nextDouble()*10,random.nextDouble()*10,System.currentTimeMillis()-random.nextInt(1000000));
-        AccuracyData ad7 = new AccuracyData("26-3",null, random.nextDouble()*10,random.nextDouble()*10,System.currentTimeMillis()-random.nextInt(1000000));
-        AccuracyData ad8 = new AccuracyData("12-8",null, random.nextDouble()*10,random.nextDouble()*10,System.currentTimeMillis()-random.nextInt(1000000));
+        AccuracyData ad1 = new AccuracyData("1-2",random.nextDouble()*10, random.nextDouble()*10,null,System.currentTimeMillis()-random.nextInt(1000000));
+        AccuracyData ad2 = new AccuracyData("2-1",random.nextDouble()*10, random.nextDouble()*10,null,System.currentTimeMillis()-random.nextInt(1000000));
+        AccuracyData ad3 = new AccuracyData("2-2",random.nextDouble()*10, random.nextDouble()*10,null,System.currentTimeMillis()-random.nextInt(1000000));
+        AccuracyData ad4 = new AccuracyData("12-5",random.nextDouble()*10, random.nextDouble()*10,null,System.currentTimeMillis()-random.nextInt(1000000));
+        AccuracyData ad5 = new AccuracyData("2-15",random.nextDouble()*10, random.nextDouble()*10,null,System.currentTimeMillis()-random.nextInt(1000000));
+        AccuracyData ad6 = new AccuracyData("25-1",random.nextDouble()*10, random.nextDouble()*10,null,System.currentTimeMillis()-random.nextInt(1000000));
+        AccuracyData ad7 = new AccuracyData("26-3",random.nextDouble()*10, random.nextDouble()*10,null,System.currentTimeMillis()-random.nextInt(1000000));
+        AccuracyData ad8 = new AccuracyData("12-8",random.nextDouble()*10, random.nextDouble()*10,null,System.currentTimeMillis()-random.nextInt(1000000));
         resultList.add(ad1);
         resultList.add(ad2);
         resultList.add(ad3);
