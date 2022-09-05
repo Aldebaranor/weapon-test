@@ -10,6 +10,7 @@ import com.soul.weapon.service.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.*;
+import org.jeecgframework.poi.word.WordExportUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.persistence.Column;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
@@ -538,6 +540,7 @@ public class PipeHistoryController {
         try {
             httpServletResponse.setHeader("Content-Disposition", "attachment; filename=" + fileName + strFileSuffix);
             workbook.write(httpServletResponse.getOutputStream());
+
             httpServletResponse.flushBuffer();
         } catch (IOException var6) {
             log.error("【ExcelUtils】生成Excel输出流异常", var6);

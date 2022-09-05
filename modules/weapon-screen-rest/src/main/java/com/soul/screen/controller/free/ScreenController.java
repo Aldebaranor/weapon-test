@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  **/
 @Slf4j
 @RestController
-@RequestMapping("/free/1/screen")
+@RequestMapping("/free/screen")
 public class ScreenController {
 
 
@@ -310,6 +310,19 @@ public class ScreenController {
         return result;
     }
 
+    /**
+     * 获取树状图状态报文
+     * @return
+     */
+    @Api
+    @GetMapping("/tree/status")
+    public FlowchartStatus getFlowchartStatus(){
+        String key = Constant.SCREEN_LIUCHENGTU_WATERTYPE;
+        String json = RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).entries().get(this.SCREEN_TARGETID);
+        FlowchartStatus deserialize = JsonUtils.deserialize(json, FlowchartStatus.class);
+        return deserialize;
+    }
+
 
 
 
@@ -342,4 +355,5 @@ public class ScreenController {
         screenSrAndRtData.setReportData(screenUniversalDataList1);
         return screenSrAndRtData;
     }
+
 }

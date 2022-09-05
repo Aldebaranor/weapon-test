@@ -98,8 +98,9 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             Set<String> keys = RedisUtils.getService(config.getScreenDataBase()).keys("SCREEN:*");
             List<String> keys1 = keys.stream().collect(Collectors.toList());
             if (CollectionUtils.isNotEmpty(keys)) {
-
                 RedisUtils.getService(config.getScreenDataBase()).deletes((keys1));
+                aveCMap.clear();
+                aveTVMap.clear();
             }
         }
 
@@ -375,7 +376,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     break;
                 case 34:
                     screenUniversalData.setText("态势-方案");
-                    screenUniversalData.setName("ts-sn");
+                    screenUniversalData.setName("ts-fa");
                     screenUniversalData.setType("34");
                     screenUniversalData.setValue(timevalue);
                     screenUniversalData.setAve(Double.valueOf(new DecimalFormat("#.00").format(aveTVMap.get(mapKey2)/aveCMap.get(mapKey2))));
@@ -636,7 +637,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     weaponType.add(1+"-"+iLauncherId+"-"+1);
                     deserialize.setWeaponType(weaponType);
                 } else if (iWeaponType == 10) {
-                    weaponType.add(1+"-"+iLauncherId+"-"+1);
+                    weaponType.add(1+"-"+iLauncherId+"-"+2);
                     deserialize.setWeaponType(weaponType);
                 }
             }else{
@@ -645,7 +646,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     weaponType.add(1+"-"+iLauncherId+"-"+1);
                     deserialize.setWeaponType(weaponType);
                 } else if (iWeaponType == 10) {
-                    weaponType.add(1+"-"+iLauncherId+"-"+1);
+                    weaponType.add(1+"-"+iLauncherId+"-"+2);
                     deserialize.setWeaponType(weaponType);
                 }
             }
