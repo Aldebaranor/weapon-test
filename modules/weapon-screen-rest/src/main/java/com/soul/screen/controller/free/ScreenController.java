@@ -39,6 +39,8 @@ public class ScreenController {
     //当前目标ID
     private String SCREEN_TARGETID = "";
 
+    private Boolean TARGETID_START = true;
+
 
     /**
      * 获取选中TargetID
@@ -145,12 +147,18 @@ public class ScreenController {
             ScreenUniversalData deserialize = JsonUtils.deserialize(v, ScreenUniversalData.class);
             return deserialize;
         }).collect(Collectors.toList());
+
+        screenUniversalDataList.sort(new Comparator<ScreenUniversalData>() {
+            @Override
+            public int compare(ScreenUniversalData o1, ScreenUniversalData o2) {
+                return Integer.valueOf(o1.getType()) - Integer.valueOf(o2.getType());
+            }
+        });
         ScreenSrAndRtData screenSrAndRtData = new ScreenSrAndRtData();
         screenSrAndRtData.setTargetId(this.SCREEN_TARGETID);
         screenSrAndRtData.setReportData(screenUniversalDataList);
         return screenSrAndRtData;
     }
-
 
     /**
      * 获取对空通道时间
@@ -259,8 +267,8 @@ public class ScreenController {
      * 获取探测器精度报文
      */
     @Api
-    @GetMapping("/detectoraccuracy/underwater")
-    public ScreenAccuracyData getScreenDetectorAccuracyData(){
+    @GetMapping("/detectoraccuracy/underwater/{number}")
+    public ScreenAccuracyData getScreenDetectorAccuracyData(@PathVariable Integer number){
         ScreenAccuracyData result = new ScreenAccuracyData();
         String key = String.format(Constant.SCREEN_SENSORACCURACY_WATERTYPE_TARGETID,this.SCREEN_TARGETID);
         List<AccuracyData> list = RedisUtils.getService(config.getScreenDataBase()).boundZSetOps(key).range(0, -1).stream().map(v -> {
@@ -274,17 +282,16 @@ public class ScreenController {
                 return (int) (o1.getTime() - o2.getTime());
             }
         });
-
         result.setTargetId(this.SCREEN_TARGETID);
-        result.setAccuracyData(list);
+        result.setAccuracyData(list.subList(number,list.size()));
         return result;
     }
     /**
      * 获取发射架精度报文
      */
     @Api
-    @GetMapping("/launcheraccuracy/underwater")
-    public ScreenAccuracyData getScreenLauncherAccuracyData(){
+    @GetMapping("/launcheraccuracy/underwater/{number}")
+    public ScreenAccuracyData getScreenLauncherAccuracyData(@PathVariable Integer number){
         ScreenAccuracyData result = new ScreenAccuracyData();
         String key = String.format(Constant.SCREEN_LAUNCHERROTATIONACCURACY_AIRTYPE_TARGETID,this.SCREEN_TARGETID);
         List<AccuracyData> list = RedisUtils.getService(config.getScreenDataBase()).boundZSetOps(key).range(0, -1).stream().map(v -> {
@@ -298,9 +305,8 @@ public class ScreenController {
                 return (int) (o1.getTime() - o2.getTime());
             }
         });
-
         result.setTargetId(this.SCREEN_TARGETID);
-        result.setAccuracyData(list);
+        result.setAccuracyData(list.subList(number,list.size()));
         return result;
     }
 
@@ -325,7 +331,12 @@ public class ScreenController {
         }).collect(Collectors.toList());
 
         screenUniversalDataList1.addAll(screenUniversalDataList2);
-
+        screenUniversalDataList1.sort(new Comparator<ScreenUniversalData>() {
+            @Override
+            public int compare(ScreenUniversalData o1, ScreenUniversalData o2) {
+                return Integer.valueOf(o1.getType()) - Integer.valueOf(o2.getType());
+            }
+        });
         ScreenSrAndRtData screenSrAndRtData = new ScreenSrAndRtData();
         screenSrAndRtData.setTargetId(targetId);
         screenSrAndRtData.setReportData(screenUniversalDataList1);

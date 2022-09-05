@@ -286,6 +286,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             //20-目标批号-诸元周期
             //33-目标批号 声呐-态势反应时间
             //34-目标批号 态势-方案反应时间
+            //35已用 36已用
             int type1 = buf.readInt();
             //目标批号
             int targetbatch = buf.readInt();
@@ -363,6 +364,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     screenUniversalData.setAve(Double.valueOf(new DecimalFormat("#.00").format(aveTVMap.get(mapKey2)/aveCMap.get(mapKey2))));
                     RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key2).put("zyxxbw", JsonUtils.serialize(screenUniversalData));
                     break;
+
                 case 33:
                     screenUniversalData.setText("声呐-态势");
                     screenUniversalData.setName("sn-ts");
@@ -510,6 +512,27 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     ScreenTctData deserialize = JsonUtils.deserialize(json, ScreenTctData.class);
                     List<TctStatus> tctStatusList = deserialize.getTctStatusList();
                     Map<String, TctStatus> collect = tctStatusList.stream().collect(Collectors.toMap(TctStatus::getType, Function.identity(), (keyA, keyB) -> keyB));
+                    String key3 = String.format(Constant.SCREEN_RESPONSETIME_WATERTYPE_TARGETID, targetbatch);
+                    ScreenUniversalData screenUniversalData = new ScreenUniversalData();
+                    //处理通道反应时间
+                    if (type1 == 5) {
+                        screenUniversalData.setText("方案-诸元");
+                        screenUniversalData.setName("fa-zy");
+                        screenUniversalData.setType("35");
+                        long time = (long) timevalue - collect.get("4").getTime();
+                        screenUniversalData.setValue(time);
+                        screenUniversalData.setAve(time/1.0);
+                        RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key3).put("fa-zy", JsonUtils.serialize(screenUniversalData));
+                    }
+                    if (type1 == 6) {
+                        screenUniversalData.setText("诸元-作战");
+                        screenUniversalData.setName("zy-zz");
+                        screenUniversalData.setType("36");
+                        long time = (long) timevalue - collect.get("5").getTime();
+                        screenUniversalData.setValue(time);
+                        screenUniversalData.setAve(time/1.0);
+                        RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key3).put("zy-zz", JsonUtils.serialize(screenUniversalData));
+                    }
                     TctStatus tctStatus = new TctStatus();
                     tctStatus.setType(String.valueOf(type1));
                     tctStatus.setTime((long) timevalue);
@@ -692,7 +715,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
         //相对于模型仰角 (雷达会有)
         double modelPitch = buf.readDouble();
         //时戳
-        double timeV = buf.readDouble();
+        double timeV = buf.readDouble() * 1000;
 
         RedisService service = RedisUtils.getService(config.getScreenDataBase());
 
@@ -705,7 +728,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                 //声呐
                 String key = String.format(Constant.SCREEN_SENSORACCURACY_WATERTYPE_TARGETID,targetBatch);
                 AccuracyData accuracyData = new AccuracyData();
-                accuracyData.setTime(System.currentTimeMillis());
+                accuracyData.setTime((long) timeV);
                 accuracyData.setDeflectionAngleAccuracy(Math.abs(sonarModelDir - sonarMsgDir));
                 accuracyData.setDistanceAccuracy(Math.abs(sonarModelDis - sonarMsgDis));
                 accuracyData.setType(String.valueOf(type));
