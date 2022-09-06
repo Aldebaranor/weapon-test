@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
  **/
 @Slf4j
 @RestController
-@RequestMapping("/free/screen")
+@RequestMapping("/free/1/screen")
 public class ScreenController {
 
 

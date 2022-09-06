@@ -451,6 +451,8 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                 }else{
                     FlowchartStatus deserialize = new FlowchartStatus();
                     deserialize.setTargetId(String.valueOf(targetbatch));
+                    HashSet<String> set = new HashSet<>();
+                    deserialize.setWeaponType(set);
                     switch (type){
                         case 1:
                             deserialize.setSensorStatus(true);
