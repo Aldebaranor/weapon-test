@@ -16,7 +16,7 @@ import java.util.*;
  * @Version
  **/
 @RestController
-@RequestMapping("/free/screen")
+@RequestMapping("/free/1/screen")
 public class ScreenControllerTest {
 
 

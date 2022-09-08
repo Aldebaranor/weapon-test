@@ -11,13 +11,11 @@ import com.soul.screen.model.*;
 import com.soul.weapon.config.CommonConfig;
 import com.soul.weapon.config.Constant;
 import groovy.util.logging.Slf4j;
+import org.intellij.lang.annotations.Flow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -29,7 +27,7 @@ import java.util.stream.Collectors;
  **/
 @Slf4j
 @RestController
-@RequestMapping("/free/1/screen")
+@RequestMapping("/free/screen")
 public class ScreenController {
 
 
@@ -38,8 +36,6 @@ public class ScreenController {
 
     //当前目标ID
     private String SCREEN_TARGETID = "";
-
-    private Boolean TARGETID_START = true;
 
 
     /**
@@ -283,7 +279,11 @@ public class ScreenController {
             }
         });
         result.setTargetId(this.SCREEN_TARGETID);
-        result.setAccuracyData(list.subList(number,list.size()));
+        if (list.size() > number || list.size() == number) {
+            result.setAccuracyData(list.subList(number,list.size()));
+        }else{
+            result.setAccuracyData(list);
+        }
         return result;
     }
     /**
@@ -293,20 +293,18 @@ public class ScreenController {
     @GetMapping("/launcheraccuracy/underwater/{number}")
     public ScreenAccuracyData getScreenLauncherAccuracyData(@PathVariable Integer number){
         ScreenAccuracyData result = new ScreenAccuracyData();
-        String key = String.format(Constant.SCREEN_LAUNCHERROTATIONACCURACY_AIRTYPE_TARGETID,this.SCREEN_TARGETID);
+        String key = String.format(Constant.SCREEN_LAUNCHERROTATIONACCURACY_WATERTYPE_TARGETID,this.SCREEN_TARGETID);
         List<AccuracyData> list = RedisUtils.getService(config.getScreenDataBase()).boundZSetOps(key).range(0, -1).stream().map(v -> {
             AccuracyData deserialize = JsonUtils.deserialize(v, AccuracyData.class);
             return deserialize;
         }).collect(Collectors.toList());
 
-        list.sort(new Comparator<AccuracyData>() {
-            @Override
-            public int compare(AccuracyData o1, AccuracyData o2) {
-                return (int) (o1.getTime() - o2.getTime());
-            }
-        });
         result.setTargetId(this.SCREEN_TARGETID);
-        result.setAccuracyData(list.subList(number,list.size()));
+        if (list.size() > number || list.size() == number) {
+            result.setAccuracyData(list.subList(number,list.size()));
+        }else{
+            result.setAccuracyData(list);
+        }
         return result;
     }
 
@@ -318,12 +316,17 @@ public class ScreenController {
     @GetMapping("/tree/status")
     public FlowchartStatus getFlowchartStatus(){
         String key = Constant.SCREEN_LIUCHENGTU_WATERTYPE;
-        String json = RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).entries().get(this.SCREEN_TARGETID);
-        FlowchartStatus deserialize = JsonUtils.deserialize(json, FlowchartStatus.class);
-        return deserialize;
+        FlowchartStatus flowchartStatus = new FlowchartStatus();
+        flowchartStatus.setWeaponType(new HashSet<>(0));
+        if (RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
+            if (RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).entries().containsKey(this.SCREEN_TARGETID)) {
+                String json = RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).entries().get(this.SCREEN_TARGETID);
+                FlowchartStatus deserialize = JsonUtils.deserialize(json, FlowchartStatus.class);
+                return deserialize;
+            }
+        }
+        return flowchartStatus;
     }
-
-
 
 
     /**

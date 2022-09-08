@@ -1,6 +1,5 @@
 package com.soul.screen.service.impl;
 
-import com.egova.cache.RedisEhcacheProperties;
 import com.egova.json.utils.JsonUtils;
 import com.egova.redis.RedisService;
 import com.egova.redis.RedisUtils;
@@ -300,12 +299,12 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             String mapKey1 = system+"-"+type1;
             String mapKey2 = mapKey1+"-"+targetbatch;
 
-            if (aveTVMap.containsKey(mapKey1) && aveCMap.containsKey(mapKey1)) {
-                aveTVMap.put(mapKey1,(aveTVMap.get(mapKey1) + timevalue));
-                aveCMap.put(mapKey1,(aveCMap.get(mapKey1) + 1));
+            if (aveTVMap.containsKey(mapKey2) && aveCMap.containsKey(mapKey2)) {
+                aveTVMap.put(mapKey2,(aveTVMap.get(mapKey2) + timevalue));
+                aveCMap.put(mapKey2,(aveCMap.get(mapKey2) + 1));
             }else{
-                aveTVMap.put(mapKey1,timevalue);
-                aveCMap.put(mapKey1,1);
+                aveTVMap.put(mapKey2,timevalue);
+                aveCMap.put(mapKey2,1);
             }
 
             switch (type1) {
@@ -314,7 +313,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     screenUniversalData.setName("snxxbw");
                     screenUniversalData.setType("1");
                     screenUniversalData.setValue(timevalue);
-                    screenUniversalData.setAve(Double.valueOf(new DecimalFormat("#.00").format(aveTVMap.get(mapKey1)/aveCMap.get(mapKey1))));
+                    screenUniversalData.setAve(Double.valueOf(new DecimalFormat("#.00").format(aveTVMap.get(mapKey2)/aveCMap.get(mapKey2))));
                     RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key1).put("snxxbw", JsonUtils.serialize(screenUniversalData));
                     break;
                 case 2:
@@ -322,7 +321,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     screenUniversalData.setName("sxfmbw");
                     screenUniversalData.setType("2");
                     screenUniversalData.setValue(timevalue);
-                    screenUniversalData.setAve(Double.valueOf(new DecimalFormat("#.00").format(aveTVMap.get(mapKey1)/aveCMap.get(mapKey1))));
+                    screenUniversalData.setAve(Double.valueOf(new DecimalFormat("#.00").format(aveTVMap.get(mapKey2)/aveCMap.get(mapKey2))));
                     RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key1).put("sxfmbw", JsonUtils.serialize(screenUniversalData));
                     break;
                 case 3:
@@ -330,7 +329,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     screenUniversalData.setName("dzdkbw");
                     screenUniversalData.setType("3");
                     screenUniversalData.setValue(timevalue);
-                    screenUniversalData.setAve(Double.valueOf(new DecimalFormat("#.00").format(aveTVMap.get(mapKey1)/aveCMap.get(mapKey1))));
+                    screenUniversalData.setAve(Double.valueOf(new DecimalFormat("#.00").format(aveTVMap.get(mapKey2)/aveCMap.get(mapKey2))));
                     RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key1).put("dzdkbw", JsonUtils.serialize(screenUniversalData));
                     break;
                 case 17:
@@ -429,6 +428,9 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                 if (RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key2).entries().containsKey(String.valueOf(targetbatch))) {
                     String json = RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key2).entries().get(String.valueOf(targetbatch));
                     FlowchartStatus deserialize = JsonUtils.deserialize(json, FlowchartStatus.class);
+                    if (deserialize.getWeaponType() == null) {
+                        deserialize.setWeaponType(new HashSet<>(0));
+                    }
                     switch (type){
                         case 1:
                             deserialize.setSensorStatus(true);
@@ -476,6 +478,8 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             }else{
                 FlowchartStatus deserialize = new FlowchartStatus();
                 deserialize.setTargetId(String.valueOf(targetbatch));
+                HashSet<String> set = new HashSet<>();
+                deserialize.setWeaponType(set);
                 switch (type){
                     case 1:
                         deserialize.setSensorStatus(true);
@@ -522,18 +526,18 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                         screenUniversalData.setText("方案-诸元");
                         screenUniversalData.setName("fa-zy");
                         screenUniversalData.setType("35");
-                        long time = (long) timevalue - collect.get("4").getTime();
-                        screenUniversalData.setValue(time);
-                        screenUniversalData.setAve(time/1.0);
+                        double time = timevalue - collect.get("4").getTime();
+                        screenUniversalData.setValue(time/1000);
+                        screenUniversalData.setAve(time/1000);
                         RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key3).put("fa-zy", JsonUtils.serialize(screenUniversalData));
                     }
                     if (type1 == 6) {
                         screenUniversalData.setText("诸元-作战");
                         screenUniversalData.setName("zy-zz");
                         screenUniversalData.setType("36");
-                        long time = (long) timevalue - collect.get("5").getTime();
-                        screenUniversalData.setValue(time);
-                        screenUniversalData.setAve(time/1.0);
+                        double time = timevalue - collect.get("5").getTime();
+                        screenUniversalData.setValue(time/1000);
+                        screenUniversalData.setAve(time/1000);
                         RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key3).put("zy-zz", JsonUtils.serialize(screenUniversalData));
                     }
                     TctStatus tctStatus = new TctStatus();
@@ -760,9 +764,9 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
         //战斗状态 1.正在发声 2.停止发声 3.起爆
         int weaponFightState = buf.readInt();
         //目标相对距离
-        double distance = buf.readDouble();
+        double distance = Double.valueOf(new DecimalFormat("#.00").format(buf.readDouble()));
         //显示时间
-        double timeValue = buf.readDouble();
+        double timeValue = buf.readDouble() * 1000;
         //时戳
         double timeStamp = buf.readDouble();
         RedisService service = RedisUtils.getService(config.getScreenDataBase());
@@ -779,7 +783,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             String type1 = String.valueOf(weaponType);
             Map<String, TctStatus> collect = tctStatusList.stream().collect(Collectors.toMap(TctStatus::getType, Function.identity(), (keyA, keyB) -> keyB));
             TctStatus tctStatus = new TctStatus();
-            tctStatus.setType(type1);
+            tctStatus.setType(String.valueOf(weaponType+1));
             tctStatus.setTime((long) timeValue);
             tctStatus.setDistance(distance);
             if (weaponFlyState == 1 && weaponType == 8) {
