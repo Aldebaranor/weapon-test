@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  **/
 @Slf4j
 @RestController
-@RequestMapping("/free/screen")
+@RequestMapping("/1/free/screen")
 public class ScreenController {
 
 
@@ -267,6 +267,12 @@ public class ScreenController {
     public ScreenAccuracyData getScreenDetectorAccuracyData(@PathVariable Integer number){
         ScreenAccuracyData result = new ScreenAccuracyData();
         String key = String.format(Constant.SCREEN_SENSORACCURACY_WATERTYPE_TARGETID,this.SCREEN_TARGETID);
+
+        if (!RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
+            result.setTargetId(this.SCREEN_TARGETID);
+            result.setStatus(true);
+            result.setAccuracyData(new ArrayList<>(0));
+        }
         List<AccuracyData> list = RedisUtils.getService(config.getScreenDataBase()).boundZSetOps(key).range(0, -1).stream().map(v -> {
             AccuracyData deserialize = JsonUtils.deserialize(v, AccuracyData.class);
             return deserialize;
@@ -279,6 +285,7 @@ public class ScreenController {
             }
         });
         result.setTargetId(this.SCREEN_TARGETID);
+        result.setStatus(false);
         if (list.size() > number || list.size() == number) {
             result.setAccuracyData(list.subList(number,list.size()));
         }else{
@@ -294,12 +301,17 @@ public class ScreenController {
     public ScreenAccuracyData getScreenLauncherAccuracyData(@PathVariable Integer number){
         ScreenAccuracyData result = new ScreenAccuracyData();
         String key = String.format(Constant.SCREEN_LAUNCHERROTATIONACCURACY_WATERTYPE_TARGETID,this.SCREEN_TARGETID);
+        if (!RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
+            result.setTargetId(this.SCREEN_TARGETID);
+            result.setStatus(true);
+            result.setAccuracyData(new ArrayList<>(0));
+        }
         List<AccuracyData> list = RedisUtils.getService(config.getScreenDataBase()).boundZSetOps(key).range(0, -1).stream().map(v -> {
             AccuracyData deserialize = JsonUtils.deserialize(v, AccuracyData.class);
             return deserialize;
         }).collect(Collectors.toList());
-
         result.setTargetId(this.SCREEN_TARGETID);
+        result.setStatus(false);
         if (list.size() > number || list.size() == number) {
             result.setAccuracyData(list.subList(number,list.size()));
         }else{

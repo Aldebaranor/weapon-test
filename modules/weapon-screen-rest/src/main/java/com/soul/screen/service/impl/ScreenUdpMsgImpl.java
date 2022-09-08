@@ -783,7 +783,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             String type1 = String.valueOf(weaponType);
             Map<String, TctStatus> collect = tctStatusList.stream().collect(Collectors.toMap(TctStatus::getType, Function.identity(), (keyA, keyB) -> keyB));
             TctStatus tctStatus = new TctStatus();
-            tctStatus.setType(String.valueOf(weaponType+1));
+            tctStatus.setType(String.valueOf(weaponType + 1));
             tctStatus.setTime((long) timeValue);
             tctStatus.setDistance(distance);
             if (weaponFlyState == 1 && weaponType == 8) {
