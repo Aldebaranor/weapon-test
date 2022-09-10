@@ -780,10 +780,10 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             String json1 = service.boundHashOps(key1).entries().get(String.valueOf(targetBatch));
             ScreenTctData screenTctData = JsonUtils.deserialize(json1, ScreenTctData.class);
             List<TctStatus> tctStatusList = screenTctData.getTctStatusList();
-            String type1 = String.valueOf(weaponType);
+            String type1 = String.valueOf(weaponType + 1);
             Map<String, TctStatus> collect = tctStatusList.stream().collect(Collectors.toMap(TctStatus::getType, Function.identity(), (keyA, keyB) -> keyB));
             TctStatus tctStatus = new TctStatus();
-            tctStatus.setType(String.valueOf(weaponType + 1));
+            tctStatus.setType(type1);
             tctStatus.setTime((long) timeValue);
             tctStatus.setDistance(distance);
             if (weaponFlyState == 1 && weaponType == 8) {
