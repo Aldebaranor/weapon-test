@@ -379,7 +379,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     screenUniversalData.setType("34");
                     screenUniversalData.setValue(timevalue);
                     screenUniversalData.setAve(Double.valueOf(new DecimalFormat("#.00").format(aveTVMap.get(mapKey2)/aveCMap.get(mapKey2))));
-                    RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key3).put("ts-sn", JsonUtils.serialize(screenUniversalData));
+                    RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key3).put("ts-fa", JsonUtils.serialize(screenUniversalData));
                     break;
                 default:
                     log.info("报文3-暂无对应报文type");
@@ -786,21 +786,21 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             tctStatus.setType(type1);
             tctStatus.setTime((long) timeValue);
             tctStatus.setDistance(distance);
-            if (weaponFlyState == 1 && weaponType == 8) {
+            if (weaponFlyState == 1 && weaponType == 9) {
                 tctStatus.setName("声干扰:飞行");
-            } else if (weaponFlyState == 1 && weaponType == 9) {
+            } else if (weaponFlyState == 1 && weaponType == 10) {
                 tctStatus.setName("声诱饵:飞行");
-            } else if(weaponFlyState == 2 && weaponType == 8 && weaponFightState == 1){
-                tctStatus.setName("声干扰:发声");
-            } else if(weaponFlyState == 2 && weaponType == 8 && weaponFightState == 2){
-                tctStatus.setName("声干扰:停声");
-            } else if(weaponFlyState == 2 && weaponType == 8 && weaponFightState == 3){
-                tctStatus.setName("声干扰:起爆");
             } else if(weaponFlyState == 2 && weaponType == 9 && weaponFightState == 1){
-                tctStatus.setName("声诱饵:发声");
+                tctStatus.setName("声干扰:发声");
             } else if(weaponFlyState == 2 && weaponType == 9 && weaponFightState == 2){
-                tctStatus.setName("声诱饵:停声");
+                tctStatus.setName("声干扰:停声");
             } else if(weaponFlyState == 2 && weaponType == 9 && weaponFightState == 3){
+                tctStatus.setName("声干扰:起爆");
+            } else if(weaponFlyState == 2 && weaponType == 10 && weaponFightState == 1){
+                tctStatus.setName("声诱饵:发声");
+            } else if(weaponFlyState == 2 && weaponType == 10 && weaponFightState == 2){
+                tctStatus.setName("声诱饵:停声");
+            } else if(weaponFlyState == 2 && weaponType == 10 && weaponFightState == 3){
                 tctStatus.setName("声诱饵:起爆");
             }
             collect.put(type1,tctStatus);
