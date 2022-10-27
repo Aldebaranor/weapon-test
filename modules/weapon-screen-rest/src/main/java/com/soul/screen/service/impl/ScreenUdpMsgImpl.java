@@ -300,12 +300,12 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             String mapKey1 = system+"-"+type1;
             String mapKey2 = mapKey1+"-"+targetbatch;
 
-            if (aveTVMap.containsKey(mapKey1) && aveCMap.containsKey(mapKey1)) {
-                aveTVMap.put(mapKey1,(aveTVMap.get(mapKey1) + timevalue));
-                aveCMap.put(mapKey1,(aveCMap.get(mapKey1) + 1));
+            if (aveTVMap.containsKey(mapKey2) && aveCMap.containsKey(mapKey2)) {
+                aveTVMap.put(mapKey2,(aveTVMap.get(mapKey2) + timevalue));
+                aveCMap.put(mapKey2,(aveCMap.get(mapKey2) + 1));
             }else{
-                aveTVMap.put(mapKey1,timevalue);
-                aveCMap.put(mapKey1,1);
+                aveTVMap.put(mapKey2,timevalue);
+                aveCMap.put(mapKey2,1);
             }
 
             switch (type1) {
@@ -314,7 +314,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     screenUniversalData.setName("snxxbw");
                     screenUniversalData.setType("1");
                     screenUniversalData.setValue(timevalue);
-                    screenUniversalData.setAve(Double.valueOf(new DecimalFormat("#.00").format(aveTVMap.get(mapKey1)/aveCMap.get(mapKey1))));
+                    screenUniversalData.setAve(Double.valueOf(new DecimalFormat("#.00").format(aveTVMap.get(mapKey2)/aveCMap.get(mapKey2))));
                     RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key1).put("snxxbw", JsonUtils.serialize(screenUniversalData));
                     break;
                 case 2:
@@ -322,7 +322,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     screenUniversalData.setName("sxfmbw");
                     screenUniversalData.setType("2");
                     screenUniversalData.setValue(timevalue);
-                    screenUniversalData.setAve(Double.valueOf(new DecimalFormat("#.00").format(aveTVMap.get(mapKey1)/aveCMap.get(mapKey1))));
+                    screenUniversalData.setAve(Double.valueOf(new DecimalFormat("#.00").format(aveTVMap.get(mapKey2)/aveCMap.get(mapKey2))));
                     RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key1).put("sxfmbw", JsonUtils.serialize(screenUniversalData));
                     break;
                 case 3:
@@ -330,7 +330,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     screenUniversalData.setName("dzdkbw");
                     screenUniversalData.setType("3");
                     screenUniversalData.setValue(timevalue);
-                    screenUniversalData.setAve(Double.valueOf(new DecimalFormat("#.00").format(aveTVMap.get(mapKey1)/aveCMap.get(mapKey1))));
+                    screenUniversalData.setAve(Double.valueOf(new DecimalFormat("#.00").format(aveTVMap.get(mapKey2)/aveCMap.get(mapKey2))));
                     RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key1).put("dzdkbw", JsonUtils.serialize(screenUniversalData));
                     break;
                 case 17:
@@ -750,7 +750,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
         //目标批号
         int targetBatch = buf.readInt();
         //武器类型 1.声干扰器 2.助飞声诱饵 3.摇曳声诱饵 4.ATT
-        int weaponType = buf.readInt() + 7;
+        int weaponType = buf.readInt() + 8;
         // 实体Id
         int weaponId = buf.readInt();
         //飞行状态 1.飞行中 2.已入水
@@ -758,9 +758,9 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
         //战斗状态 1.正在发声 2.停止发声 3.起爆
         int weaponFightState = buf.readInt();
         //目标相对距离
-        double distance = buf.readDouble();
+        double distance = Double.valueOf(new DecimalFormat("#.00").format(buf.readDouble()));
         //显示时间
-        double timeValue = buf.readDouble();
+        double timeValue = buf.readDouble() * 1000;
         //时戳
         double timeStamp = buf.readDouble();
         RedisService service = RedisUtils.getService(config.getScreenDataBase());
@@ -780,21 +780,21 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             tctStatus.setType(type1);
             tctStatus.setTime((long) timeValue);
             tctStatus.setDistance(distance);
-            if (weaponFlyState == 1 && weaponType == 8) {
+            if (weaponFlyState == 1 && weaponType == 9) {
                 tctStatus.setName("声干扰:飞行");
-            } else if (weaponFlyState == 1 && weaponType == 9) {
+            } else if (weaponFlyState == 1 && weaponType == 10) {
                 tctStatus.setName("声诱饵:飞行");
-            } else if(weaponFlyState == 2 && weaponType == 8 && weaponFightState == 1){
-                tctStatus.setName("声干扰:发声");
-            } else if(weaponFlyState == 2 && weaponType == 8 && weaponFightState == 2){
-                tctStatus.setName("声干扰:停声");
-            } else if(weaponFlyState == 2 && weaponType == 8 && weaponFightState == 3){
-                tctStatus.setName("声干扰:起爆");
             } else if(weaponFlyState == 2 && weaponType == 9 && weaponFightState == 1){
-                tctStatus.setName("声诱饵:发声");
+                tctStatus.setName("声干扰:发声");
             } else if(weaponFlyState == 2 && weaponType == 9 && weaponFightState == 2){
-                tctStatus.setName("声诱饵:停声");
+                tctStatus.setName("声干扰:停声");
             } else if(weaponFlyState == 2 && weaponType == 9 && weaponFightState == 3){
+                tctStatus.setName("声干扰:起爆");
+            } else if(weaponFlyState == 2 && weaponType == 10 && weaponFightState == 1){
+                tctStatus.setName("声诱饵:发声");
+            } else if(weaponFlyState == 2 && weaponType == 10 && weaponFightState == 2){
+                tctStatus.setName("声诱饵:停声");
+            } else if(weaponFlyState == 2 && weaponType == 10 && weaponFightState == 3){
                 tctStatus.setName("声诱饵:起爆");
             }
             collect.put(type1,tctStatus);
@@ -806,3 +806,5 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
         }
     }
 }
+
+

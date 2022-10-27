@@ -293,7 +293,7 @@ public class ScreenController {
     @GetMapping("/launcheraccuracy/underwater/{number}")
     public ScreenAccuracyData getScreenLauncherAccuracyData(@PathVariable Integer number){
         ScreenAccuracyData result = new ScreenAccuracyData();
-        String key = String.format(Constant.SCREEN_LAUNCHERROTATIONACCURACY_AIRTYPE_TARGETID,this.SCREEN_TARGETID);
+        String key = String.format(Constant.SCREEN_LAUNCHERROTATIONACCURACY_WATERTYPE_TARGETID,this.SCREEN_TARGETID);
         List<AccuracyData> list = RedisUtils.getService(config.getScreenDataBase()).boundZSetOps(key).range(0, -1).stream().map(v -> {
             AccuracyData deserialize = JsonUtils.deserialize(v, AccuracyData.class);
             return deserialize;
@@ -318,6 +318,15 @@ public class ScreenController {
     @GetMapping("/tree/status")
     public FlowchartStatus getFlowchartStatus(){
         String key = Constant.SCREEN_LIUCHENGTU_WATERTYPE;
+        if (!RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
+            return new FlowchartStatus();
+        }
+
+
+        if (!RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).entries().containsKey(this.SCREEN_TARGETID)) {
+            return new FlowchartStatus();
+        }
+
         String json = RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).entries().get(this.SCREEN_TARGETID);
         FlowchartStatus deserialize = JsonUtils.deserialize(json, FlowchartStatus.class);
         return deserialize;
