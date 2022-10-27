@@ -20,6 +20,11 @@ public class ScreenAccuracyData implements Serializable {
     private String targetId;
 
     /**
+     * 替换标识
+     */
+    private Boolean status;
+
+    /**
      * 精度数据
      */
     private List<AccuracyData> accuracyData;

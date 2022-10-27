@@ -271,6 +271,12 @@ public class ScreenController {
     public ScreenAccuracyData getScreenDetectorAccuracyData(@PathVariable Integer number){
         ScreenAccuracyData result = new ScreenAccuracyData();
         String key = String.format(Constant.SCREEN_SENSORACCURACY_WATERTYPE_TARGETID,this.SCREEN_TARGETID);
+
+        if (!RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
+            result.setTargetId(this.SCREEN_TARGETID);
+            result.setStatus(true);
+            result.setAccuracyData(new ArrayList<>(0));
+        }
         List<AccuracyData> list = RedisUtils.getService(config.getScreenDataBase()).boundZSetOps(key).range(0, -1).stream().map(v -> {
             AccuracyData deserialize = JsonUtils.deserialize(v, AccuracyData.class);
             return deserialize;
@@ -283,7 +289,12 @@ public class ScreenController {
             }
         });
         result.setTargetId(this.SCREEN_TARGETID);
-        result.setAccuracyData(list.subList(number,list.size()));
+        result.setStatus(false);
+        if (list.size() > number || list.size() == number) {
+            result.setAccuracyData(list.subList(number,list.size()));
+        }else{
+            result.setAccuracyData(list);
+        }
         return result;
     }
     /**
@@ -294,19 +305,22 @@ public class ScreenController {
     public ScreenAccuracyData getScreenLauncherAccuracyData(@PathVariable Integer number){
         ScreenAccuracyData result = new ScreenAccuracyData();
         String key = String.format(Constant.SCREEN_LAUNCHERROTATIONACCURACY_WATERTYPE_TARGETID,this.SCREEN_TARGETID);
+        if (!RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
+            result.setTargetId(this.SCREEN_TARGETID);
+            result.setStatus(true);
+            result.setAccuracyData(new ArrayList<>(0));
+        }
         List<AccuracyData> list = RedisUtils.getService(config.getScreenDataBase()).boundZSetOps(key).range(0, -1).stream().map(v -> {
             AccuracyData deserialize = JsonUtils.deserialize(v, AccuracyData.class);
             return deserialize;
         }).collect(Collectors.toList());
-
-        list.sort(new Comparator<AccuracyData>() {
-            @Override
-            public int compare(AccuracyData o1, AccuracyData o2) {
-                return (int) (o1.getTime() - o2.getTime());
-            }
-        });
         result.setTargetId(this.SCREEN_TARGETID);
-        result.setAccuracyData(list.subList(number,list.size()));
+        result.setStatus(false);
+        if (list.size() > number || list.size() == number) {
+            result.setAccuracyData(list.subList(number,list.size()));
+        }else{
+            result.setAccuracyData(list);
+        }
         return result;
     }
 
@@ -318,18 +332,16 @@ public class ScreenController {
     @GetMapping("/tree/status")
     public FlowchartStatus getFlowchartStatus(){
         String key = Constant.SCREEN_LIUCHENGTU_WATERTYPE;
-        if (!RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
-            return new FlowchartStatus();
+        FlowchartStatus flowchartStatus = new FlowchartStatus();
+        flowchartStatus.setWeaponType(new HashSet<>(0));
+        if (RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
+            if (RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).entries().containsKey(this.SCREEN_TARGETID)) {
+                String json = RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).entries().get(this.SCREEN_TARGETID);
+                FlowchartStatus deserialize = JsonUtils.deserialize(json, FlowchartStatus.class);
+                return deserialize;
+            }
         }
-
-
-        if (!RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).entries().containsKey(this.SCREEN_TARGETID)) {
-            return new FlowchartStatus();
-        }
-
-        String json = RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).entries().get(this.SCREEN_TARGETID);
-        FlowchartStatus deserialize = JsonUtils.deserialize(json, FlowchartStatus.class);
-        return deserialize;
+        return flowchartStatus;
     }
 
 
