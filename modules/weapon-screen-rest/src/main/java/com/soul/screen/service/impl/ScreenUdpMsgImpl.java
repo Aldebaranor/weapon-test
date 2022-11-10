@@ -602,6 +602,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
      * @param buf
      */
     private void Msg6_LaunchResult(ByteBuf buf) {
+
         //1.水下 2.对空
         int system = buf.readInt();
         //是否成功

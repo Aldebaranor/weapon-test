@@ -1,5 +1,6 @@
 package com.soul.screen.model;
 
+import com.soul.weapon.config.Constant;
 import lombok.Data;
 
 import java.io.Serializable;

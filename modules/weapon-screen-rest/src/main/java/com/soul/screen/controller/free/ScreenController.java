@@ -370,5 +370,4 @@ public class ScreenController {
         screenSrAndRtData.setReportData(screenUniversalDataList1);
         return screenSrAndRtData;
     }
-
 }
