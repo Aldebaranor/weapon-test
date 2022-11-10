@@ -11,7 +11,6 @@ import com.soul.screen.model.*;
 import com.soul.weapon.config.CommonConfig;
 import com.soul.weapon.config.Constant;
 import groovy.util.logging.Slf4j;
-import org.intellij.lang.annotations.Flow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +26,7 @@ import java.util.stream.Collectors;
  **/
 @Slf4j
 @RestController
-@RequestMapping("/1/free/screen")
+@RequestMapping("/free/screen")
 public class ScreenController {
 
 
@@ -36,6 +35,8 @@ public class ScreenController {
 
     //当前目标ID
     private String SCREEN_TARGETID = "";
+
+    private Boolean TARGETID_START = true;
 
 
     /**
@@ -339,6 +340,8 @@ public class ScreenController {
         }
         return flowchartStatus;
     }
+
+
 
 
     /**

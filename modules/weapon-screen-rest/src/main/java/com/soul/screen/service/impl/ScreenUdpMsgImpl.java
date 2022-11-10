@@ -757,7 +757,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
         //目标批号
         int targetBatch = buf.readInt();
         //武器类型 1.声干扰器 2.助飞声诱饵 3.摇曳声诱饵 4.ATT
-        int weaponType = buf.readInt() + 7;
+        int weaponType = buf.readInt() + 8;
         // 实体Id
         int weaponId = buf.readInt();
         //飞行状态 1.飞行中 2.已入水
@@ -813,3 +813,5 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
         }
     }
 }
+
+
