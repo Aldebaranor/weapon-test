@@ -184,20 +184,20 @@
     <repositories>
         <repository>
             <id>egova</id>
-            <url>http://egova.top:2981/repository/maven-public/</url>
+            <url>http://47.97.116.47:8020/repository/maven-public/</url>
         </repository>
     </repositories>
 
     <distributionManagement>
         <repository>
-            <id>egova-nexus-releases</id>
+            <id>soul-nexus-releases</id>
             <name>Nexus Release Repository</name>
-            <url>http://egova.top:2981/repository/maven-releases</url>
+            <url>http://47.97.116.47:8020/repository/maven-releases</url>
         </repository>
         <snapshotRepository>
-            <id>egova-nexus-snapshots</id>
+            <id>soul-nexus-snapshots</id>
             <name>Nexus Snapshot Repository</name>
-            <url>http://egova.top:2981/repository/maven-snapshots</url>
+            <url>http://47.97.116.47:8020/repository/maven-snapshots</url>
         </snapshotRepository>
     </distributionManagement>
 
