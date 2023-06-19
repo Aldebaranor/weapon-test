@@ -24,7 +24,7 @@ public class FlowchartStatus implements Serializable {
     private Boolean sensorStatus;
 
     /**
-     * 传感器类型 1.探雷声呐 2.探潜声呐
+     * 传感器类型 水下：1.探雷声呐 2.探潜声呐 空中：1.搜索雷达 2.相控阵雷达
      */
     private Integer sensorType;
 
@@ -39,9 +39,9 @@ public class FlowchartStatus implements Serializable {
     private Integer situationType;
 
     /**
-     * 水下类型 1.水下方案
+     * 任务类型 1.水下方案 2.空中方案
      */
-    private Integer underwaterType;
+    private Integer missionType;
 
     /**
      * 作战执行状态

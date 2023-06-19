@@ -487,7 +487,7 @@ public class ScreenControllerTest {
         flowchartStatus.setSensorType(1);
         flowchartStatus.setChargeDeviceStatus(true);
         flowchartStatus.setSituationType(1);
-        flowchartStatus.setUnderwaterType(1);
+        flowchartStatus.setMissionType(1);
         flowchartStatus.setCombatExecutionStatus(true);
         result.add("1-1-1");
         result.add("1-2-1");

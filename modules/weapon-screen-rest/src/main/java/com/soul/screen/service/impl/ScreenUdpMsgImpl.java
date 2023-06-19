@@ -750,7 +750,6 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
      *
      * @param buf
      */
-    //TODO:空中流程图
     private void Msg4_FirstTime_Struct(ByteBuf buf) {
         //1.对空 2.水下
         int system = buf.readInt();
@@ -780,11 +779,10 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             if (RedisUtils.getService(config.getScreenDataBase()).exists(key2)) {
                 if (RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key2).entries().containsKey(String.valueOf(targetbatch))) {
                     String json = RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key2).entries().get(String.valueOf(targetbatch));
-                    FlowchartAirStatus deserialize = JsonUtils.deserialize(json, FlowchartStatus.class);
+                    FlowchartStatus deserialize = JsonUtils.deserialize(json, FlowchartStatus.class);
                     if (deserialize.getWeaponType() == null) {
                         deserialize.setWeaponType(new HashSet<>(0));
                     }
-                    //TODO：对空流程图逻辑
                     switch (type){
                         case 1:
                             deserialize.setSensorStatus(true);
@@ -795,11 +793,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                             deserialize.setSituationType(1);
                             break;
                         case 3:
-                            deserialize.setAirType(1);
-                            break;
-                        case 7:
-                            deserialize.setSensorStatus(true);
-                            deserialize.setSensorType(2);
+                            deserialize.setMissionType(2);
                             break;
                         default: break;
                     }
@@ -819,11 +813,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                             deserialize.setSituationType(1);
                             break;
                         case 3:
-                            deserialize.setUnderwaterType(1);
-                            break;
-                        case 7:
-                            deserialize.setSensorStatus(true);
-                            deserialize.setSensorType(2);
+                            deserialize.setMissionType(2);
                             break;
                         default: break;
                     }
@@ -844,18 +834,13 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                         deserialize.setSituationType(1);
                         break;
                     case 3:
-                        deserialize.setUnderwaterType(1);
+                        deserialize.setMissionType(2);
                         break;
-                    case 7:
-                        deserialize.setSensorStatus(true);
-                        deserialize.setSensorType(2);
-                        break;
+
                     default: break;
                 }
                 RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key2).put(String.valueOf(targetbatch),JsonUtils.serialize(deserialize));
             }
-
-            //TODO:空中任务通道处理
             if (RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
                 if (!RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).hasKey(String.valueOf(targetbatch))) {
                     ScreenTctData screenTctData = new ScreenTctData();
@@ -958,7 +943,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                             deserialize.setSituationType(1);
                             break;
                         case 3:
-                            deserialize.setUnderwaterType(1);
+                            deserialize.setMissionType(1);
                             break;
                         case 7:
                             deserialize.setSensorStatus(true);
@@ -982,7 +967,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                             deserialize.setSituationType(1);
                             break;
                         case 3:
-                            deserialize.setUnderwaterType(1);
+                            deserialize.setMissionType(1);
                             break;
                         case 7:
                             deserialize.setSensorStatus(true);
@@ -1007,7 +992,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                         deserialize.setSituationType(1);
                         break;
                     case 3:
-                        deserialize.setUnderwaterType(1);
+                        deserialize.setMissionType(1);
                         break;
                     case 7:
                         deserialize.setSensorStatus(true);
@@ -1126,7 +1111,6 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
      *
      * @param buf
      */
-    //TODO:处理空中流程图和任务通道
     private void Msg6_LaunchResult(ByteBuf buf) {
 
         //1.水下 2.对空
@@ -1156,8 +1140,6 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
 
         if (system == 1) {
             //对空数据处理
-
-            //TODO:空中流程图处理
             String liuchengKey = Constant.SCREEN_LIUCHENGTU_AIRTYPE;
             String json = RedisUtils.getService(config.getScreenDataBase()).boundHashOps(liuchengKey).entries().get(String.valueOf(iAimBatch));
             FlowchartStatus deserialize = JsonUtils.deserialize(json, FlowchartStatus.class);
