@@ -156,7 +156,8 @@ public class Constant {
     public static String SCREEN_QUERENZHUYUAN_AIRTYPE_TARGETID = "SCREEN:AIRTYPE:%s:QUERENZHUYUAN:%s";
     //水下防御流程图
     public static String SCREEN_LIUCHENGTU_WATERTYPE = "SCREEN:WATERTYPE:LIUCHENGTU";
-
+    //空中防御流程图
+    public static String SCREEN_LIUCHENGTU_AIRTYPE = "SCREEN:AIRTYPE:LIUCHENGTU";
 
 
 

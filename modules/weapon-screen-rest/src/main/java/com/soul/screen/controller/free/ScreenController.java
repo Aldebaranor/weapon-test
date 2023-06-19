@@ -10,7 +10,7 @@ import com.egova.web.annotation.Api;
 import com.soul.screen.model.*;
 import com.soul.weapon.config.CommonConfig;
 import com.soul.weapon.config.Constant;
-import groovy.util.logging.Slf4j;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
