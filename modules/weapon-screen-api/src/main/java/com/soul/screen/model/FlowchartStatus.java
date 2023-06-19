@@ -55,6 +55,6 @@ public class FlowchartStatus implements Serializable {
      * 武器类型 对应执行类别 1: 1,声干扰 2,声诱饵
      * 例如:1-1-1  1-1-2  等等
      */
-    private HashSet<String> weaponType;
+    private HashSet<String> weaponType = new HashSet<>();
 
 }

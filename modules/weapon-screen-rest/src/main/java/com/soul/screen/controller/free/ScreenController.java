@@ -14,10 +14,7 @@ import groovy.util.logging.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -96,7 +93,8 @@ public class ScreenController {
         String key = Constant.SCREEN_COUNT_AIRTYPE;
 
         if (!RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
-            throw ExceptionUtils.api("暂无对空计数数据!");
+            System.out.println("暂无对空计数数据!");
+            return new ArrayList<ScreenUniversalData>();
         }
         List<ScreenUniversalData> screenUniversalDataList = RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).values().stream().map(v -> {
             ScreenUniversalData deserialize = JsonUtils.deserialize(v, ScreenUniversalData.class);
@@ -114,7 +112,8 @@ public class ScreenController {
         String key1 = Constant.SCREEN_STATUSREPORTDATA_WATERTYPE;
         String key2 = String.format(Constant.SCREEN_STATUSREPORTDATA_WATERTYPE_TARGETID, this.SCREEN_TARGETID);
         if (!RedisUtils.getService(config.getScreenDataBase()).exists(key1) && !RedisUtils.getService(config.getScreenDataBase()).exists(key2)) {
-            throw ExceptionUtils.api("暂无水下周期报数据!");
+            System.out.println("暂无水下周期报数据!");
+            return new ScreenSrAndRtData();
         }
         return getScreenStatusReportData(key1, key2, this.SCREEN_TARGETID);
     }
@@ -141,7 +140,9 @@ public class ScreenController {
     public ScreenSrAndRtData getUnderwarterResponseTime(){
         String key = String.format(Constant.SCREEN_RESPONSETIME_WATERTYPE_TARGETID,this.SCREEN_TARGETID);
         if (!RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
-            throw ExceptionUtils.api("暂无水下响应时间数据!");
+
+            System.out.println("暂无水下响应时间数据!");
+            return new ScreenSrAndRtData();
         }
         List<ScreenUniversalData> screenUniversalDataList = RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).values().stream().map(v -> {
             ScreenUniversalData deserialize = JsonUtils.deserialize(v, ScreenUniversalData.class);
@@ -188,7 +189,8 @@ public class ScreenController {
     public List<ScreenTctData> getUnberwaterTaskChannelStatus(){
         String key = Constant.SCREEN_TASKCHANNELSTATUS_WATERTYPE;
         if (!RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
-            throw ExceptionUtils.api("暂无水下任务通道数据!");
+            System.out.println("暂无水下任务通道数据!");
+            return new ArrayList<ScreenTctData>();
         }
         List<ScreenTctData> screenTctDataList = RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).values().stream().map(v -> {
             ScreenTctData objects = JsonUtils.deserialize(v, ScreenTctData.class);
@@ -212,7 +214,8 @@ public class ScreenController {
     public PageResult<ScreenTctData> getPageUnberwaterTaskChannelStatus(@RequestBody QueryModel<ScreenTctData> model){
         String key = Constant.SCREEN_TASKCHANNELSTATUS_WATERTYPE;
         if (!RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
-            throw ExceptionUtils.api("暂无水下任务通道数据!");
+            System.out.println("暂无水下任务通道数据!");
+            return null;
         }
         List<ScreenTctData> screenTctDataList = RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).values().stream().map(v -> {
             ScreenTctData objects = JsonUtils.deserialize(v, ScreenTctData.class);
@@ -271,6 +274,12 @@ public class ScreenController {
     public ScreenAccuracyData getScreenDetectorAccuracyData(@PathVariable Integer number){
         ScreenAccuracyData result = new ScreenAccuracyData();
         String key = String.format(Constant.SCREEN_SENSORACCURACY_WATERTYPE_TARGETID,this.SCREEN_TARGETID);
+
+        if (!RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
+            result.setTargetId(this.SCREEN_TARGETID);
+            result.setStatus(true);
+            result.setAccuracyData(new ArrayList<>(0));
+        }
         List<AccuracyData> list = RedisUtils.getService(config.getScreenDataBase()).boundZSetOps(key).range(0, -1).stream().map(v -> {
             AccuracyData deserialize = JsonUtils.deserialize(v, AccuracyData.class);
             return deserialize;
@@ -283,7 +292,12 @@ public class ScreenController {
             }
         });
         result.setTargetId(this.SCREEN_TARGETID);
-        result.setAccuracyData(list.subList(number,list.size()));
+        result.setStatus(false);
+        if (list.size() > number || list.size() == number) {
+            result.setAccuracyData(list.subList(number,list.size()));
+        }else{
+            result.setAccuracyData(list);
+        }
         return result;
     }
     /**
@@ -293,20 +307,23 @@ public class ScreenController {
     @GetMapping("/launcheraccuracy/underwater/{number}")
     public ScreenAccuracyData getScreenLauncherAccuracyData(@PathVariable Integer number){
         ScreenAccuracyData result = new ScreenAccuracyData();
-        String key = String.format(Constant.SCREEN_LAUNCHERROTATIONACCURACY_AIRTYPE_TARGETID,this.SCREEN_TARGETID);
+        String key = String.format(Constant.SCREEN_LAUNCHERROTATIONACCURACY_WATERTYPE_TARGETID,this.SCREEN_TARGETID);
+        if (!RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
+            result.setTargetId(this.SCREEN_TARGETID);
+            result.setStatus(true);
+            result.setAccuracyData(new ArrayList<>(0));
+        }
         List<AccuracyData> list = RedisUtils.getService(config.getScreenDataBase()).boundZSetOps(key).range(0, -1).stream().map(v -> {
             AccuracyData deserialize = JsonUtils.deserialize(v, AccuracyData.class);
             return deserialize;
         }).collect(Collectors.toList());
-
-        list.sort(new Comparator<AccuracyData>() {
-            @Override
-            public int compare(AccuracyData o1, AccuracyData o2) {
-                return (int) (o1.getTime() - o2.getTime());
-            }
-        });
         result.setTargetId(this.SCREEN_TARGETID);
-        result.setAccuracyData(list.subList(number,list.size()));
+        result.setStatus(false);
+        if (list.size() > number || list.size() == number) {
+            result.setAccuracyData(list.subList(number,list.size()));
+        }else{
+            result.setAccuracyData(list);
+        }
         return result;
     }
 
@@ -318,13 +335,17 @@ public class ScreenController {
     @GetMapping("/tree/status")
     public FlowchartStatus getFlowchartStatus(){
         String key = Constant.SCREEN_LIUCHENGTU_WATERTYPE;
-        String json = RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).entries().get(this.SCREEN_TARGETID);
-        FlowchartStatus deserialize = JsonUtils.deserialize(json, FlowchartStatus.class);
-        return deserialize;
+        FlowchartStatus flowchartStatus = new FlowchartStatus();
+        flowchartStatus.setWeaponType(new HashSet<>(0));
+        if (RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
+            if (RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).entries().containsKey(this.SCREEN_TARGETID)) {
+                String json = RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).entries().get(this.SCREEN_TARGETID);
+                FlowchartStatus deserialize = JsonUtils.deserialize(json, FlowchartStatus.class);
+                return deserialize;
+            }
+        }
+        return flowchartStatus;
     }
-
-
-
 
     /**
      * 获取周期报
@@ -355,5 +376,4 @@ public class ScreenController {
         screenSrAndRtData.setReportData(screenUniversalDataList1);
         return screenSrAndRtData;
     }
-
 }

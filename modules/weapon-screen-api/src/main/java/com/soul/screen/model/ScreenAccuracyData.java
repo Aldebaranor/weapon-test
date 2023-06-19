@@ -1,5 +1,6 @@
 package com.soul.screen.model;
 
+import com.soul.weapon.config.Constant;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -18,6 +19,11 @@ public class ScreenAccuracyData implements Serializable {
      * 目标批号
      */
     private String targetId;
+
+    /**
+     * 替换标识
+     */
+    private Boolean status;
 
     /**
      * 精度数据
