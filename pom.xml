@@ -63,12 +63,6 @@
             </dependency>
             <dependency>
                 <groupId>com.egova</groupId>
-                <artifactId>egova-bunches-iotdb</artifactId>
-                <version>${egova.bunches.version}</version>
-            </dependency>
-
-            <dependency>
-                <groupId>com.egova</groupId>
                 <artifactId>egova-common-liquibase</artifactId>
                 <version>${egova.base.version}</version>
             </dependency>
@@ -133,34 +127,7 @@
                 <version>${egova.base.version}</version>
             </dependency>
 
-            <!-- 数据服务 -->
-            <dependency>
-                <groupId>com.egova</groupId>
-                <artifactId>ddcat-common-liquibase</artifactId>
-                <version>${egova.ddcat.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.egova</groupId>
-                <artifactId>ddcat-model-rest</artifactId>
-                <version>${egova.ddcat.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.egova</groupId>
-                <artifactId>ddcat-source-rest</artifactId>
-                <version>${egova.ddcat.version}</version>
-            </dependency>
-            <!-- 神州数据库驱动 -->
-            <dependency>
-                <groupId>com.egova</groupId>
-                <artifactId>ddcat-driver-oscar</artifactId>
-                <version>${egova.ddcat.version}</version>
-            </dependency>
-            <!-- 达梦数据库驱动 -->
-            <dependency>
-                <groupId>com.egova</groupId>
-                <artifactId>ddcat-driver-dm</artifactId>
-                <version>${egova.ddcat.version}</version>
-            </dependency>
+
 
             <dependency>
                 <groupId>mysql</groupId>
@@ -168,18 +135,7 @@
                 <version>8.0.17</version>
             </dependency>
 
-            <!-- iotdb驱动 -->
-            <dependency>
-                <groupId>org.apache.iotdb</groupId>
-                <artifactId>iotdb-jdbc</artifactId>
-                <version>0.12.0</version>
-            </dependency>
 
-            <dependency>
-                <groupId>io.netty</groupId>
-                <artifactId>netty-all</artifactId>
-                <version>4.1.36.Final</version>
-            </dependency>
 
 
         </dependencies>
@@ -253,6 +209,9 @@
         <module>modules/weapon-test-api</module>
         <module>modules/weapon-fire-api</module>
         <module>modules/weapon-fire-rest</module>
+        <module>modules/meta-netty-rest</module>
+        <module>modules/weapon-screen-api</module>
+        <module>modules/weapon-screen-rest</module>
     </modules>
 
 </project>

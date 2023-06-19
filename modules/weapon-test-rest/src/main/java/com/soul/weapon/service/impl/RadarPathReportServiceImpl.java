@@ -45,4 +45,9 @@ public class RadarPathReportServiceImpl extends TemplateService<RadarPathReport,
 
         return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
+
+    @Override
+    public List<RadarPathReport> getNewradarPathByTaskId(String taskId) {
+        return radarPathReportRepository.getNewradarPathByTaskId(taskId);
+    }
 }

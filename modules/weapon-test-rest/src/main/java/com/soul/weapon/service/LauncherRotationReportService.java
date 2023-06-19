@@ -31,4 +31,5 @@ public interface LauncherRotationReportService {
 
     void update(LauncherRotationReport entity);
 
+    List<LauncherRotationReport> getNewlauRotByTaskId(String taskId);
 }

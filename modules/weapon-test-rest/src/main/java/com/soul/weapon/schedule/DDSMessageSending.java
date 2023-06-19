@@ -25,10 +25,6 @@ import java.util.Random;
 import java.util.Set;
 
 
-/*@Slf4j
-@Component("DDSMessageSendingJob")
-@com.egova.quartz.annotation.Job(name = "DDSMessageSendingJob", group = "weapon", cron = "1000")
-@DisallowConcurrentExecution*/
 @Slf4j
 @Component
 public class DDSMessageSending {
@@ -283,6 +279,5 @@ public class DDSMessageSending {
             restTemplate.postForEntity(Constant.DDS_URL+"EquipmentLaunchStatus", new HttpEntity<>(equipmentLaunchStatus, headers), String.class);
         }
     }
-
 
 }

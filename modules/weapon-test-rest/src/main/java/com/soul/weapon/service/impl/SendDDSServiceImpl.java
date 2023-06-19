@@ -45,10 +45,8 @@ public class SendDDSServiceImpl implements SendDDSService {
     @Autowired
     private RestTemplate restTemplate;
 
-
-
     @Override
-    public String sendDDSBytestCode(String testCode)    {
+    public String sendDDSBytestCode(String testCode) {
 
         ClassPathResource classPathResource = new ClassPathResource("DDSTest.json");
 
@@ -76,7 +74,7 @@ public class SendDDSServiceImpl implements SendDDSService {
             if (Constant.threadMap.get(testCode) != null) {
                 return "当前测试报文任务已开启，请先停止";
             }
-            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskTargetInfoDDS(headers,restTemplate), new CronTrigger("0/3 * * * * ?"));
+            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskTargetInfoDDS(headers, restTemplate), new CronTrigger("0/3 * * * * ?"));
             Constant.threadMap.put(testCode, future);
         }
 
@@ -85,7 +83,7 @@ public class SendDDSServiceImpl implements SendDDSService {
             if (Constant.threadMap.get(testCode) != null) {
                 return "当前测试报文任务已开启，请先停止";
             }
-            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskTargetInstructionsInfoDDS(headers, RedisUtils.getService(config.getPumpDataBase()),restTemplate), new CronTrigger("0/3 * * * * ?"));
+            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskTargetInstructionsInfoDDS(headers, RedisUtils.getService(config.getPumpDataBase()), restTemplate), new CronTrigger("0/3 * * * * ?"));
             Constant.threadMap.put(testCode, future);
         }
 
@@ -94,7 +92,7 @@ public class SendDDSServiceImpl implements SendDDSService {
             if (Constant.threadMap.get(testCode) != null) {
                 return "当前测试报文任务已开启，请先停止";
             }
-            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskTargetFireControlInfoDDS(headers, RedisUtils.getService(config.getPumpDataBase()),restTemplate), new CronTrigger("0/3 * * * * ?"));
+            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskTargetFireControlInfoDDS(headers, RedisUtils.getService(config.getPumpDataBase()), restTemplate), new CronTrigger("0/3 * * * * ?"));
             Constant.threadMap.put(testCode, future);
         }
         //发射架调转
@@ -102,7 +100,7 @@ public class SendDDSServiceImpl implements SendDDSService {
             if (Constant.threadMap.get(testCode) != null) {
                 return "当前测试报文任务已开启，请先停止";
             }
-            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskLauncherRotationInfoDDS(headers, RedisUtils.getService(config.getPumpDataBase()),restTemplate), new CronTrigger("0/3 * * * * ?"));
+            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskLauncherRotationInfoDDS(headers, RedisUtils.getService(config.getPumpDataBase()), restTemplate), new CronTrigger("0/3 * * * * ?"));
             Constant.threadMap.put(testCode, future);
         }
 
@@ -111,12 +109,11 @@ public class SendDDSServiceImpl implements SendDDSService {
             if (Constant.threadMap.get(testCode) != null) {
                 return "当前测试报文任务已开启，请先停止";
             }
-            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskEquipmentLaunchStatusDDS(headers, RedisUtils.getService(config.getPumpDataBase()),restTemplate), new CronTrigger("0/3 * * * * ?"));
+            future = threadPoolTaskScheduler.schedule(new DDSMessageSending.taskEquipmentLaunchStatusDDS(headers, RedisUtils.getService(config.getPumpDataBase()), restTemplate), new CronTrigger("0/3 * * * * ?"));
             Constant.threadMap.put(testCode, future);
         }
         return "DDS报文发送任务已启动，发送的任务编号为：" + testCode;
     }
-
 
     @Override
     public String stopSendDDSBytestCode(String testCode) {
@@ -144,11 +141,11 @@ public class SendDDSServiceImpl implements SendDDSService {
             Constant.threadMap.remove(key);
             resultList.add(key);
         }
-        return "关闭任务成功，任务列表："+resultList.toString();
+        return "关闭任务成功，任务列表：" + resultList.toString();
     }
 
     @Override
-    public String startAllList(){
+    public String startAllList() {
         List<String> keys = Constant.threadMap.keySet().stream().collect(Collectors.toList());
         return keys.toString();
     }

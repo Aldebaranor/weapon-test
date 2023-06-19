@@ -12,14 +12,18 @@ import com.soul.weapon.condition.PipeTaskCondition;
 import com.soul.weapon.config.CommonConfig;
 import com.soul.weapon.config.Constant;
 import com.soul.weapon.domain.PipeTaskRepository;
+import com.soul.weapon.domain.PipeTestRepository;
 import com.soul.weapon.entity.PipeTask;
 import com.soul.weapon.entity.PipeTest;
 import com.soul.weapon.entity.codes.PipeState;
 import com.soul.weapon.service.PipeTaskService;
+import com.soul.weapon.service.PipeTestService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Priority;
@@ -39,6 +43,8 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask, String> imple
 
     private final PipeTaskRepository pipeTaskRepository;
     private final CommonConfig config;
+    @Autowired
+    private PipeTestService pipeTestService;
 
     @Override
     protected AbstractRepositoryBase<PipeTask, String> getRepository() {
@@ -70,6 +76,14 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask, String> imple
             return pipeTask.getId();
         }
     }
+
+    @Override
+    @Transactional
+    public int deleteById( String id){
+        pipeTestService.deleteByTaskId(id);
+        return super.deleteById(id);
+    }
+
 
     @Override
     public PageResult<PipeTask> page(QueryModel<PipeTaskCondition> model) {
@@ -109,6 +123,23 @@ public class PipeTaskServiceImpl extends TemplateService<PipeTask, String> imple
         RedisUtils.getService(config.getPumpDataBase()).delete(Constant.WEAPON_CURRENT_TASK);
         RedisUtils.getService(config.getPumpDataBase()).delete(Constant.WEAPON_CURRENT_PIPETEST);
         return true;
+    }
+
+    @Override
+    @Transactional
+    public void copeTask(PipeTask pipeTask) {
+
+        String id = UUID.randomUUID().toString();
+        List<PipeTest> pipeTestList = pipeTestService.getByTaskId(pipeTask.getId());
+        pipeTestList.stream().forEach(pipeTest -> {
+            pipeTest.setTaskId(id);
+            pipeTest.setId(UUID.randomUUID().toString());
+        });
+        pipeTask.setId(id);
+        pipeTask.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        pipeTaskRepository.insert(pipeTask);
+        pipeTestService.insertList(pipeTestList);
+
     }
 
     @Override

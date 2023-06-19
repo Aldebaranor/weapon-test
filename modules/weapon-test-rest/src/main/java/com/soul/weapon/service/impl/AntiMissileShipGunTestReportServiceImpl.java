@@ -44,4 +44,9 @@ public class AntiMissileShipGunTestReportServiceImpl extends TemplateService<Ant
     public List<AntiMissileShipGunTestReport> list(AntiMissileShipGunTestReportCondition condition) {
         return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
+
+    @Override
+    public AntiMissileShipGunTestReport getNewAntiByTaskId(String taskId) {
+        return antiMissileShipGunTestReportRepository.getNewAntiByTaskId(taskId);
+    }
 }

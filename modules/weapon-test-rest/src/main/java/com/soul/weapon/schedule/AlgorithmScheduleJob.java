@@ -60,8 +60,6 @@ public class AlgorithmScheduleJob  {
     }
 
 
-
-
     private  Map<String, PipeTest> getCurrentPipeTest(){
         return RedisUtils.getService(config.getPumpDataBase()).extrasForHash().hgetall(Constant.WEAPON_CURRENT_PIPETEST, PipeTest.class);
     }

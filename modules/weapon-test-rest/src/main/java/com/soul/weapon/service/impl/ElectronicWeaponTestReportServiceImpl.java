@@ -45,4 +45,9 @@ public class ElectronicWeaponTestReportServiceImpl extends TemplateService<Elect
 
         return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
+
+    @Override
+    public ElectronicWeaponTestReport getNewelectWeaponByTaskId(String taskId) {
+        return electronicWeaponTestReportRepository.getNewelectWeaponByTaskId(taskId);
+    }
 }

@@ -4,6 +4,7 @@ import com.egova.data.service.AbstractRepositoryBase;
 import com.egova.data.service.TemplateService;
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
+import com.flagwind.persistent.model.Clause;
 import com.flagwind.persistent.model.Sorting;
 import com.soul.weapon.condition.ShipToAirMissileTestReportCondition;
 import com.soul.weapon.config.Constant;
@@ -45,5 +46,11 @@ public class ShipToAirMissileTestReportServiceImpl extends TemplateService<ShipT
     public List<ShipToAirMissileTestReport> list(ShipToAirMissileTestReportCondition condition) {
 
         return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
+    }
+
+    //获取最新一条报文
+    @Override
+    public ShipToAirMissileTestReport getNewShipByTaskId(String taskId) {
+        return shipToAirMissileTestReportRepository.getNewShipByTaskId(taskId);
     }
 }

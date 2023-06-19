@@ -32,5 +32,5 @@ public interface AntiMissileShipGunTestReportService {
 
     void update(AntiMissileShipGunTestReport entity);
 
-
+    AntiMissileShipGunTestReport getNewAntiByTaskId(String taskId);
 }

@@ -11,6 +11,7 @@ import com.soul.weapon.domain.historyInfo.AntiMissileShipGunTestReportRepository
 import com.soul.weapon.domain.historyInfo.ExecutionStatusReportRepository;
 import com.soul.weapon.entity.historyInfo.AntiMissileShipGunTestReport;
 import com.soul.weapon.entity.historyInfo.ExecutionStatusReport;
+import com.soul.weapon.entity.historyInfo.InstructionAccuracyReport;
 import com.soul.weapon.service.AntiMissileShipGunTestReportService;
 import com.soul.weapon.service.ExecutionStatusReportService;
 import lombok.RequiredArgsConstructor;
@@ -48,5 +49,10 @@ public class ExecutionStatusReportServiceImpl extends TemplateService<ExecutionS
     public List<ExecutionStatusReport> list(ExecutionStatusReportCondition condition) {
 
         return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
+    }
+
+    @Override
+    public List<ExecutionStatusReport> getNewexecStatusByTaskId(String taskId) {
+        return executionStatusReportRepository.getNewexecStatusByTaskId(taskId);
     }
 }

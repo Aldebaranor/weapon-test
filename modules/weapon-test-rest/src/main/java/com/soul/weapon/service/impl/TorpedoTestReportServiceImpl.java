@@ -7,6 +7,7 @@ import com.egova.model.QueryModel;
 import com.flagwind.persistent.model.Sorting;
 import com.soul.weapon.condition.TorpedoTestReportCondition;
 import com.soul.weapon.domain.historyInfo.TorpedoTestReportRepository;
+import com.soul.weapon.entity.historyInfo.AntiMissileShipGunTestReport;
 import com.soul.weapon.entity.historyInfo.TorpedoTestReport;
 import com.soul.weapon.service.TorpedoTestReportService;
 import lombok.RequiredArgsConstructor;
@@ -44,5 +45,10 @@ public class TorpedoTestReportServiceImpl extends TemplateService<TorpedoTestRep
     public List<TorpedoTestReport> list(TorpedoTestReportCondition condition) {
 
         return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
+    }
+
+    @Override
+    public TorpedoTestReport getNewTorpeByTaskId(String taskId) {
+        return torpedoTestReportRepository.getNewTorpeByTaskId(taskId);
     }
 }

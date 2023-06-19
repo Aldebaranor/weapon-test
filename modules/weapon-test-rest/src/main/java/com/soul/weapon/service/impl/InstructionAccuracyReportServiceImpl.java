@@ -45,4 +45,9 @@ public class InstructionAccuracyReportServiceImpl extends TemplateService<Instru
 
         return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
+
+    @Override
+    public List<InstructionAccuracyReport> getNewinsAccByTaskId(String taskId) {
+        return instructionAccuracyReportRepository.getNewinsAccByTaskId(taskId);
+    }
 }

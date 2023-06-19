@@ -32,4 +32,5 @@ public interface RadarPathReportService {
 
     void update(RadarPathReport entity);
 
+    List<RadarPathReport> getNewradarPathByTaskId(String taskId);
 }

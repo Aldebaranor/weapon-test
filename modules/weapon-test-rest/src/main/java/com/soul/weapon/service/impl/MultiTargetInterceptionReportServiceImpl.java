@@ -45,4 +45,9 @@ public class MultiTargetInterceptionReportServiceImpl extends TemplateService<Mu
 
         return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
+
+    @Override
+    public List<MultiTargetInterceptionReport> getNewmitByTaskId(String taskId) {
+        return multiTargetInterceptionReportRepository.getNewmitByTaskId(taskId);
+    }
 }

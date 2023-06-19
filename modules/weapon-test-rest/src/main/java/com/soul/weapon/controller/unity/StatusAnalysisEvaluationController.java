@@ -32,10 +32,8 @@ public class StatusAnalysisEvaluationController {
      * @Author: Shizuan
      * @Date: 2022/3/8 16:31
      * @Description: 获取全部目标Id的状态分析评估
-     * @params:[]
      * @return:Map targetTypeId, List<StatusAnalysisEvaluation>(所需数据)
      **/
-
     @Api
     @GetMapping("/list")
     public Map<String, List<StatusAnalysisEvaluation>> getStatusAnglysisAll() {

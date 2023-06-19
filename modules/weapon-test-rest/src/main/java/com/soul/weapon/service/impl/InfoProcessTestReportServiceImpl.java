@@ -49,4 +49,9 @@ public class InfoProcessTestReportServiceImpl extends TemplateService<InfoProces
 
         return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
+
+    @Override
+    public List<InfoProcessTestReport> getNewinfoProcessTestByTaskId(String taskId) {
+        return infoProcessTestReportRepository.getNewinfoProcessTestByTaskId(taskId);
+    }
 }

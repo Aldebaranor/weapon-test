@@ -30,4 +30,6 @@ public interface InstructionAccuracyReportService {
     String insert(InstructionAccuracyReport entity);
 
     void update(InstructionAccuracyReport entity);
+
+    List<InstructionAccuracyReport> getNewinsAccByTaskId(String taskId);
 }

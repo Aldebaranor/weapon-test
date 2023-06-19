@@ -90,6 +90,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
 
     /**
      * 航空导弹-1
+     * 当分类ID出现自检状态为no的,视为不正常
      */
     @Override
     public void shipToAirMissile(String taskId, PipeTest pipeTest) {
@@ -103,6 +104,8 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
             log.error("redis报文信息不满足航空导弹测试");
             return;
         }
+
+        //判断报文是否存在相应的武器
         if (!pipeTestHelper(allEquipmentStatus, new String[]{
                 PipeWeaponIndices.AirMissileRadar.getValue(),
                 PipeWeaponIndices.AirMissileFireControl.getValue(),
@@ -111,13 +114,15 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
                 PipeWeaponIndices.AirMissileMediumRange.getValue(),
                 PipeWeaponIndices.AirMissileLongRange.getValue()
         })) {
+            //条件不满足
             log.error("redis报文信息不满足航空导弹测试");
             return;
         }
+
         //创建测试报告
         ShipToAirMissileTestReport tmpReport = new ShipToAirMissileTestReport();
         //添加装备标识和自检状态
-        tmpReport.setTime(System.currentTimeMillis());
+
         tmpReport.setRadarSelfCheck(allEquipmentStatus.get(PipeWeaponIndices.AirMissileRadar.getValue()).getCheckStatus());
         tmpReport.setRadarId(PipeWeaponIndices.AirMissileRadar.getValue());
         tmpReport.setFireControlId(PipeWeaponIndices.AirMissileFireControl.getValue());
@@ -155,6 +160,8 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
         tmpReport.setId(UUID.randomUUID().toString());
         tmpReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
         tmpReport.setDisabled(false);
+        //设置报文生成时间
+        tmpReport.setTime(System.currentTimeMillis());
         shipToAirMissileTestReportService.insert(tmpReport);
     }
 
@@ -418,6 +425,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
             log.error("dds报文信息不满足信息流程测试！");
             return;
         }
+
         //获取目标指示的报文所有的targetId
         Set<String> targetIds = redisService.boundHashOps(targetInstructionKey).keys();
         InfoProcessTestReport infoProcessTestReport = new InfoProcessTestReport();
@@ -1032,7 +1040,7 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
                     launcherRotationReport.setTime(launcherRotationInfo.getTime());
                     launcherRotationReport.setLauncherPitchAccuracy(launcherPitchAccuracy);
                     launcherRotationReport.setLauncherAzimuthAccuracy(launcherAzimuthAccuracy);
-                    launcherRotationReport.setTargetId(taskId);
+                    launcherRotationReport.setTaskId(taskId);
                     launcherRotationReport.setId(UUID.randomUUID().toString());
                     launcherRotationReport.setCreateTime(new Timestamp(System.currentTimeMillis()));
                     launcherRotationReport.setDisabled(false);
@@ -1104,6 +1112,10 @@ public class AllAlgorithmServiceImpl implements AllAlgorithmService {
     public boolean pipeTestHelper(Map<String, EquipmentStatus> allEquipmentStatus, String[] indices) {
         boolean res = true;
         for (String idx : indices) {
+            List<String> collect = allEquipmentStatus.keySet().stream().filter(e -> e.indexOf(idx) > -1).collect(Collectors.toList());
+            if (collect.size() == 0 || collect == null) {
+                return false;
+            }
             if (!allEquipmentStatus.containsKey(idx)) {
                 return false;
             }

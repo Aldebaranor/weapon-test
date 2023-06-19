@@ -110,10 +110,13 @@ public class PumpController {
             break;
             //map 装备状态
             //key:[weapon:equipment_status:yyyymmdd]
-            //value:[Map(equipmentId,EquipmentStatus)
+            //value:[Map(equipmentTypeId_equipmentId,EquipmentStatus)]
+            // TODO: 2022/6/8  需要修改,一个武器类型有多个武器
             case "EquipmentStatus": {
                 //反序列化
                 EquipmentStatus equipmentStatus = JsonUtils.deserialize(JsonUtils.serialize(msg), EquipmentStatus.class);
+                //进行拼接hash中的key
+                String mapKey = String.format("%s_%s",equipmentStatus.getEquipmentTypeId(),equipmentStatus.getEquipmentId());
                 //拼接redis中当天的key
                 String key = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
                 //判断是否存在key
@@ -121,12 +124,12 @@ public class PumpController {
                     //如果存在进行添加或者更新
                     RedisUtils.getService(config.getPumpDataBase()).
                             boundHashOps(key).put(
-                                    equipmentStatus.getEquipmentId(), JsonUtils.serialize(equipmentStatus));
+                                    mapKey, JsonUtils.serialize(equipmentStatus));
                 } else {
                     //如果不存在存入对应结构并设置过期时间
                     RedisUtils.getService(config.getPumpDataBase()).
                             boundHashOps(key).put(
-                                    equipmentStatus.getEquipmentId(), JsonUtils.serialize(equipmentStatus));
+                                    mapKey, JsonUtils.serialize(equipmentStatus));
                     RedisUtils.getService(config.getPumpDataBase()).expire(key, ONE_DAY);
                 }
 
@@ -197,16 +200,29 @@ public class PumpController {
             }
             break;
             case "Report": {
-                ConflictReport conflictReport = JsonUtils.deserialize(JsonUtils.serialize(msg),
-                        ConflictReport.class);
 
-                if (RedisUtils.getService(config.getFireDataBase()).exists(Constant.PREDICT_KEY)) {
-                    RedisUtils.getService(config.getFireDataBase()).boundHashOps(Constant.PREDICT_KEY).put(
-                            conflictReport.getId(), JsonUtils.serialize(conflictReport));
-                } else {
-                    RedisUtils.getService(config.getFireDataBase()).boundHashOps(Constant.PREDICT_KEY).put(
-                            conflictReport.getId(), JsonUtils.serialize(conflictReport));
-                    RedisUtils.getService(config.getFireDataBase()).expire(Constant.PREDICT_KEY, 3600);
+                if (msg.get("conflictType") == null) {
+                    ChargeReport chargeReport = JsonUtils.deserialize(JsonUtils.serialize(msg),
+                            ChargeReport.class);
+                    if (RedisUtils.getService(config.getFireDataBase()).exists(Constant.CHARGE_KEY)) {
+                        RedisUtils.getService(config.getFireDataBase()).boundHashOps(Constant.CHARGE_KEY).put(
+                                chargeReport.getId(), JsonUtils.serialize(chargeReport));
+                    } else {
+                        RedisUtils.getService(config.getFireDataBase()).boundHashOps(Constant.CHARGE_KEY).put(
+                                chargeReport.getId(), JsonUtils.serialize(chargeReport));
+                        RedisUtils.getService(config.getFireDataBase()).expire(Constant.CHARGE_KEY, 3600);
+                    }
+                }else{
+                    ConflictReport conflictReport = JsonUtils.deserialize(JsonUtils.serialize(msg),
+                            ConflictReport.class);
+                    if (RedisUtils.getService(config.getFireDataBase()).exists(Constant.PREDICT_KEY)) {
+                        RedisUtils.getService(config.getFireDataBase()).boundHashOps(Constant.PREDICT_KEY).put(
+                                conflictReport.getId(), JsonUtils.serialize(conflictReport));
+                    } else {
+                        RedisUtils.getService(config.getFireDataBase()).boundHashOps(Constant.PREDICT_KEY).put(
+                                conflictReport.getId(), JsonUtils.serialize(conflictReport));
+                        RedisUtils.getService(config.getFireDataBase()).expire(Constant.PREDICT_KEY, 3600);
+                    }
                 }
 
             }
@@ -490,20 +506,40 @@ public class PumpController {
 
                 ConflictReport conflictReport2 = new ConflictReport();
                 conflictReport2.setId("423425322342352");
-                conflictReport2.setEquipmentIdB("3");
-                conflictReport2.setEquipmentIdA("7");
+                conflictReport2.setEquipmentIdB("2");
+                conflictReport2.setEquipmentIdA("9");
                 conflictReport2.setConflictType(1);
                 conflictReport2.setTime(System.currentTimeMillis());
 
+                ChargeReport chargeReport1 = new ChargeReport();
+                chargeReport1.setId("46451654546546");
+                chargeReport1.setChargeMethod("模仿数据");
+                chargeReport1.setChargeEquipId("5");
+                chargeReport1.setChargeType(1);
+                chargeReport1.setFreeEquipId("10");
+                chargeReport1.setTime(System.currentTimeMillis());
+
+                ChargeReport chargeReport2 = new ChargeReport();
+                chargeReport2.setId("854845645554");
+                chargeReport2.setChargeMethod("模仿数据");
+                chargeReport2.setChargeEquipId("9");
+                chargeReport2.setChargeType(1);
+                chargeReport2.setFreeEquipId("12");
+                chargeReport2.setTime(System.currentTimeMillis());
+
+
+
                 HttpEntity<Object> request = new HttpEntity<>(conflictReport, headers);
+                HttpEntity<Object> request2 = new HttpEntity<>(conflictReport2, headers);
+                HttpEntity<Object> request3 = new HttpEntity<>(chargeReport1, headers);
+                HttpEntity<Object> request4 = new HttpEntity<>(chargeReport2, headers);
 
-                restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName,
-                        request, String.class).toString();
 
-
-                HttpEntity<Object> request2 = new HttpEntity<>(conflictReport, headers);
-                return restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName,
-                        request2, String.class).toString();
+                restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName, request, String.class).toString();
+                restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName, request2, String.class).toString();
+                restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName, request3, String.class).toString();
+                restTemplate.postForEntity("http://127.0.0.1:8016/free/pump/" + structName, request4, String.class).toString();
+                return "成功";
             }
             default: {
                 log.error("unrecognized struct name for http telegram test!");

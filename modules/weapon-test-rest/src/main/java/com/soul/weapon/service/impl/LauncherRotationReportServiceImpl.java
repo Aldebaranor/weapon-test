@@ -45,4 +45,9 @@ public class LauncherRotationReportServiceImpl extends TemplateService<LauncherR
 
         return super.query(condition,new Sorting[]{Sorting.descending("createTime")});
     }
+
+    @Override
+    public List<LauncherRotationReport> getNewlauRotByTaskId(String taskId) {
+        return launcherRotationReportRepository.getNewlauRotByTaskId(taskId);
+    }
 }
