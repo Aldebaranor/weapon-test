@@ -1,12 +1,16 @@
 package com.soul.screen.controller.free;
 
+import com.egova.json.utils.JsonUtils;
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
+import com.egova.redis.RedisUtils;
 import com.egova.web.annotation.Api;
 import com.soul.screen.model.*;
+import com.soul.weapon.config.Constant;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName ScreenControllerTest
@@ -31,6 +35,16 @@ public class ScreenControllerTest {
     @GetMapping("/sendTargetId/{targetId}")
     public void sendTargetId(@PathVariable String targetId){
         this.SCREEN_TARGETID = targetId;
+    }
+
+    /**
+     * 获取当前选择的TargetId
+     */
+    @Api
+    @GetMapping("/getTargetId")
+    public String getTargetId()
+    {
+        return this.SCREEN_TARGETID;
     }
 
     /**
@@ -320,6 +334,103 @@ public class ScreenControllerTest {
         ScreenUniversalData sc6 = new ScreenUniversalData();
         sc6.setText("拦截目标数量");
         sc6.setName("ljyl");
+        sc6.setType("1-6");
+        sc6.setValue(random.nextInt(300));
+        ScreenUniversalData sc7 = new ScreenUniversalData();
+        sc7.setText("鱼雷防御武器");
+        sc7.setName("ylfywl");
+        sc7.setType("3-1");
+        sc7.setValue(random.nextInt(300));
+        ScreenUniversalData sc8 = new ScreenUniversalData();
+        sc8.setText("鱼雷");
+        sc8.setName("yl");
+        sc8.setType("3-2");
+        sc8.setValue(random.nextInt(300));
+        ScreenUniversalData sc9 = new ScreenUniversalData();
+        sc9.setText("鱼雷防御武器");
+        sc9.setName("ylfywq");
+        sc9.setType("4-1");
+        sc9.setValue(random.nextInt(300));
+        ScreenUniversalData sc10 = new ScreenUniversalData();
+        sc10.setText("鱼雷");
+        sc10.setName("yl");
+        sc10.setType("4-2");
+        sc10.setValue(random.nextInt(300));
+        ScreenUniversalData sc11 = new ScreenUniversalData();
+        sc11.setText("张瑶弹");
+        sc11.setName("ylfywl");
+        sc11.setType("3-3");
+        sc11.setValue(random.nextInt(300));
+        ScreenUniversalData sc12 = new ScreenUniversalData();
+        sc12.setText("施钻弹");
+        sc12.setName("yl");
+        sc12.setType("3-4");
+        sc12.setValue(random.nextInt(300));
+        ScreenUniversalData sc13 = new ScreenUniversalData();
+        sc13.setText("张瑶弹");
+        sc13.setName("ylfywq");
+        sc13.setType("4-3");
+        sc13.setValue(random.nextInt(300));
+        ScreenUniversalData sc14 = new ScreenUniversalData();
+        sc14.setText("施钻弹");
+        sc14.setName("yl");
+        sc14.setType("4-4");
+        sc14.setValue(random.nextInt(300));
+        list.add(sc1);
+        list.add(sc2);
+        list.add(sc3);
+        list.add(sc4);
+        list.add(sc5);
+        list.add(sc6);
+        list.add(sc7);
+        list.add(sc8);
+        list.add(sc9);
+        list.add(sc10);
+        list.add(sc11);
+        list.add(sc12);
+        list.add(sc13);
+        list.add(sc14);
+        return list;
+    }
+
+    /**
+     * 获取对空数量统计
+     *
+     * @return
+     */
+    @Api
+    @GetMapping("/count/airtype")
+    public List<ScreenUniversalData> getAirtypeCountData() {
+        Random random = new Random();
+        List<ScreenUniversalData> list = new ArrayList<>();
+        ScreenUniversalData sc1 = new ScreenUniversalData();
+        sc1.setText("来袭导弹");
+        sc1.setName("lxdd");
+        sc1.setType("1-1");
+        sc1.setValue(random.nextInt(300));
+        ScreenUniversalData sc2 = new ScreenUniversalData();
+        sc2.setText("搜索雷达探测导弹数量");
+        sc2.setName("ssldtcddsl");
+        sc2.setType("1-2");
+        sc2.setValue(random.nextInt(300));
+        ScreenUniversalData sc3 = new ScreenUniversalData();
+        sc3.setText("相控阵雷达探测导弹数量");
+        sc3.setName("xkzldtcddsl");
+        sc3.setType("1-3");
+        sc3.setValue(random.nextInt(300));
+        ScreenUniversalData sc4 = new ScreenUniversalData();
+        sc4.setText("态势处理导弹数量");
+        sc4.setName("tsclddsl");
+        sc4.setType("1-4");
+        sc4.setValue(random.nextInt(300));
+        ScreenUniversalData sc5 = new ScreenUniversalData();
+        sc5.setText("成功拦截导弹数量");
+        sc5.setName("cgljddsl");
+        sc5.setType("1-5");
+        sc5.setValue(random.nextInt(300));
+        ScreenUniversalData sc6 = new ScreenUniversalData();
+        sc6.setText("方案数量");
+        sc6.setName("ddfa");
         sc6.setType("1-6");
         sc6.setValue(random.nextInt(300));
         ScreenUniversalData sc7 = new ScreenUniversalData();
