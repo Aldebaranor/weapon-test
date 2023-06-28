@@ -165,7 +165,7 @@ public class ScreenController {
      * 获取对空通道时间
      */
     @Api
-    @GetMapping("/responsetime/airtype")
+    @GetMapping("/responsetime/air")
     public ScreenSrAndRtData getAirtypeResponseTime(){
         String key = String.format(Constant.SCREEN_RESPONSETIME_AIRTYPE_TARGETID,this.SCREEN_TARGETID);
         if (!RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
@@ -267,11 +267,54 @@ public class ScreenController {
     }
 
     /**
-     * 获取探测器精度报文
+     * 获取水下任务通道报文
+     */
+    @Api
+    @PostMapping("/page/taskchannelstatus/air")
+    public PageResult<ScreenTctData> getPageAirTaskChannelStatus(@RequestBody QueryModel<ScreenTctData> model){
+        String key = Constant.SCREEN_TASKCHANNELSTATUS_AIRTYPE;
+        if (!RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
+            System.out.println("暂无空中任务通道数据!");
+            return null;
+        }
+        List<ScreenTctData> screenTctDataList = RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).values().stream().map(v -> {
+            ScreenTctData objects = JsonUtils.deserialize(v, ScreenTctData.class);
+            return objects;
+        }).collect(Collectors.toList());
+
+        screenTctDataList.sort(new Comparator<ScreenTctData>() {
+            @Override
+            public int compare(ScreenTctData o1, ScreenTctData o2) {
+                return Integer.valueOf(o1.getTargetId()) - Integer.valueOf(o2.getTargetId());
+            }
+        });
+
+        ArrayList<ScreenTctData> result = new ArrayList<>();
+        Long pageIndex = model.getPaging().getPageIndex();
+        Long pageSize = model.getPaging().getPageSize();
+
+        if ((pageIndex-1)*pageSize > screenTctDataList.size()) {
+            return null;
+        }
+        if ((screenTctDataList.size() - (pageSize*pageIndex)) < pageSize) {
+            for (long i = (pageIndex-1)*pageSize; i < screenTctDataList.size(); i++) {
+                result.add(screenTctDataList.get((int) i));
+            }
+        }else{
+            for (long i = (pageIndex-1)*pageSize; i < pageIndex*pageSize; i++) {
+                result.add(screenTctDataList.get((int) i));
+            }
+        }
+
+        return PageResult.of(result,screenTctDataList.size());
+    }
+
+    /**
+     * 获取水下探测器精度报文
      */
     @Api
     @GetMapping("/detectoraccuracy/underwater/{number}")
-    public ScreenAccuracyData getScreenDetectorAccuracyData(@PathVariable Integer number){
+    public ScreenAccuracyData getUnderwaterScreenDetectorAccuracyData(@PathVariable Integer number){
         ScreenAccuracyData result = new ScreenAccuracyData();
         String key = String.format(Constant.SCREEN_SENSORACCURACY_WATERTYPE_TARGETID,this.SCREEN_TARGETID);
 
@@ -292,7 +335,7 @@ public class ScreenController {
             }
         });
         result.setTargetId(this.SCREEN_TARGETID);
-        result.setStatus(false);
+//        result.setStatus(false);
         if (list.size() > number || list.size() == number) {
             result.setAccuracyData(list.subList(number,list.size()));
         }else{
@@ -301,11 +344,11 @@ public class ScreenController {
         return result;
     }
     /**
-     * 获取发射架精度报文
+     * 获取水下发射架精度报文
      */
     @Api
     @GetMapping("/launcheraccuracy/underwater/{number}")
-    public ScreenAccuracyData getScreenLauncherAccuracyData(@PathVariable Integer number){
+    public ScreenAccuracyData getUnderwaterScreenLauncherAccuracyData(@PathVariable Integer number){
         ScreenAccuracyData result = new ScreenAccuracyData();
         String key = String.format(Constant.SCREEN_LAUNCHERROTATIONACCURACY_WATERTYPE_TARGETID,this.SCREEN_TARGETID);
         if (!RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
@@ -318,7 +361,7 @@ public class ScreenController {
             return deserialize;
         }).collect(Collectors.toList());
         result.setTargetId(this.SCREEN_TARGETID);
-        result.setStatus(false);
+//        result.setStatus(false);
         if (list.size() > number || list.size() == number) {
             result.setAccuracyData(list.subList(number,list.size()));
         }else{
@@ -326,6 +369,68 @@ public class ScreenController {
         }
         return result;
     }
+
+    /**
+     * 获取空中探测器精度报文
+     */
+    @Api
+    @GetMapping("/detectoraccuracy/air/{number}")
+    public ScreenAccuracyData getAirScreenDetectorAccuracyData(@PathVariable Integer number){
+        ScreenAccuracyData result = new ScreenAccuracyData();
+        String key = String.format(Constant.SCREEN_SENSORACCURACY_AIRTYPE_TARGETID,this.SCREEN_TARGETID);
+
+        if (!RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
+            result.setTargetId(this.SCREEN_TARGETID);
+            result.setStatus(true);
+            result.setAccuracyData(new ArrayList<>(0));
+        }
+        List<AccuracyData> list = RedisUtils.getService(config.getScreenDataBase()).boundZSetOps(key).range(0, -1).stream().map(v -> {
+            AccuracyData deserialize = JsonUtils.deserialize(v, AccuracyData.class);
+            return deserialize;
+        }).collect(Collectors.toList());
+
+        list.sort(new Comparator<AccuracyData>() {
+            @Override
+            public int compare(AccuracyData o1, AccuracyData o2) {
+                return (int) (o1.getTime() - o2.getTime());
+            }
+        });
+        result.setTargetId(this.SCREEN_TARGETID);
+//        result.setStatus(false);
+        if (list.size() > number || list.size() == number) {
+            result.setAccuracyData(list.subList(number,list.size()));
+        }else{
+            result.setAccuracyData(list);
+        }
+        return result;
+    }
+    /**
+     * 获取空中发射架精度报文
+     */
+    @Api
+    @GetMapping("/launcheraccuracy/air/{number}")
+    public ScreenAccuracyData getScreenLauncherAccuracyData(@PathVariable Integer number){
+        ScreenAccuracyData result = new ScreenAccuracyData();
+        String key = String.format(Constant.SCREEN_LAUNCHERROTATIONACCURACY_AIRTYPE_TARGETID,this.SCREEN_TARGETID);
+        if (!RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
+            result.setTargetId(this.SCREEN_TARGETID);
+            result.setStatus(true);
+            result.setAccuracyData(new ArrayList<>(0));
+        }
+        List<AccuracyData> list = RedisUtils.getService(config.getScreenDataBase()).boundZSetOps(key).range(0, -1).stream().map(v -> {
+            AccuracyData deserialize = JsonUtils.deserialize(v, AccuracyData.class);
+            return deserialize;
+        }).collect(Collectors.toList());
+        result.setTargetId(this.SCREEN_TARGETID);
+//        result.setStatus(false);
+        if (list.size() > number || list.size() == number) {
+            result.setAccuracyData(list.subList(number,list.size()));
+        }else{
+            result.setAccuracyData(list);
+        }
+        return result;
+    }
+
 
     /**
      * 获取树状图状态报文
@@ -352,7 +457,7 @@ public class ScreenController {
      * @return
      */
     @Api
-    @GetMapping("/tree/status/airtype")
+    @GetMapping("/tree/status/air")
     public FlowchartStatus getAirFlowchartStatus(){
         String key = Constant.SCREEN_LIUCHENGTU_AIRTYPE;
         FlowchartStatus flowchartStatus = new FlowchartStatus();
