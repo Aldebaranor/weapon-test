@@ -477,8 +477,33 @@ public class ScreenControllerTest {
      * 获取树状图
      */
     @Api
-    @GetMapping("/tree/status")
-    public FlowchartStatus getFlowchartStatus(){
+    @GetMapping("/tree/status/underwater")
+    public FlowchartStatus getUnderWaterFlowchartStatus(){
+
+        FlowchartStatus flowchartStatus = new FlowchartStatus();
+        HashSet<String> result = new HashSet<>();
+        flowchartStatus.setTargetId(this.SCREEN_TARGETID);
+        flowchartStatus.setSensorStatus(true);
+        flowchartStatus.setSensorType(1);
+        flowchartStatus.setChargeDeviceStatus(true);
+        flowchartStatus.setSituationType(1);
+        flowchartStatus.setMissionType(1);
+        flowchartStatus.setCombatExecutionStatus(true);
+        result.add("1-1-1");
+        result.add("1-2-1");
+        result.add("1-3-2");
+        result.add("1-4-1");
+        result.add("1-5-2");
+        flowchartStatus.setWeaponType(result);
+        return flowchartStatus;
+    }
+
+    /**
+     * 获取树状图
+     */
+    @Api
+    @GetMapping("/tree/status/airtype")
+    public FlowchartStatus getAirFlowchartStatus(){
 
         FlowchartStatus flowchartStatus = new FlowchartStatus();
         HashSet<String> result = new HashSet<>();

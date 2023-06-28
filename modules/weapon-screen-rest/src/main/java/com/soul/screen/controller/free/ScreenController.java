@@ -332,9 +332,29 @@ public class ScreenController {
      * @return
      */
     @Api
-    @GetMapping("/tree/status")
-    public FlowchartStatus getFlowchartStatus(){
+    @GetMapping("/tree/status/underwater")
+    public FlowchartStatus getUnderWaterFlowchartStatus(){
         String key = Constant.SCREEN_LIUCHENGTU_WATERTYPE;
+        FlowchartStatus flowchartStatus = new FlowchartStatus();
+        flowchartStatus.setWeaponType(new HashSet<>(0));
+        if (RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
+            if (RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).entries().containsKey(this.SCREEN_TARGETID)) {
+                String json = RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).entries().get(this.SCREEN_TARGETID);
+                FlowchartStatus deserialize = JsonUtils.deserialize(json, FlowchartStatus.class);
+                return deserialize;
+            }
+        }
+        return flowchartStatus;
+    }
+
+    /**
+     * 获取树状图状态报文
+     * @return
+     */
+    @Api
+    @GetMapping("/tree/status/airtype")
+    public FlowchartStatus getAirFlowchartStatus(){
+        String key = Constant.SCREEN_LIUCHENGTU_AIRTYPE;
         FlowchartStatus flowchartStatus = new FlowchartStatus();
         flowchartStatus.setWeaponType(new HashSet<>(0));
         if (RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
