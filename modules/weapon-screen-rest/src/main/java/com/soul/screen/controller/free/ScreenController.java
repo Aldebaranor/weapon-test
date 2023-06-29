@@ -267,7 +267,7 @@ public class ScreenController {
     }
 
     /**
-     * 获取水下任务通道报文
+     * 获取对空任务通道报文
      */
     @Api
     @PostMapping("/page/taskchannelstatus/air")

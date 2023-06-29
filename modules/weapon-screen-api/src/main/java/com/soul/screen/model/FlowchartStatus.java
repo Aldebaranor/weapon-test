@@ -49,6 +49,11 @@ public class FlowchartStatus implements Serializable {
     private Boolean combatExecutionStatus;
 
     /**
+     * 是否有通垂，只有空中流程图，前端业务逻辑校验用到
+     */
+    private Boolean vlsLauncher;
+
+    /**
      * 武器类型
      * 执行类型 1.舷外干扰 2.鱼雷防御 3.管装鱼雷 4.助飞鱼雷
      * 发射装置 对应执行类别 1: 1.装置1,2.装置2 等等  2: 1.左舷 2.右舷 等等

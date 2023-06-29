@@ -151,7 +151,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                         screenUniversalData.setType("3-1");
                         screenUniversalData.setText("来袭水面舰");
                         screenUniversalData.setName("lxsmj");
-                        RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(type2), JsonUtils.serialize(screenUniversalData));
+//                        RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(type2), JsonUtils.serialize(screenUniversalData));
                         break;
                     case 4:
                         screenUniversalData.setValue(buf.readInt());
@@ -172,7 +172,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                         screenUniversalData.setType("3-2");
                         screenUniversalData.setText("搜索雷达探测水面舰数量");
                         screenUniversalData.setName("ssldtcsmjsl");
-                        RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(type2), JsonUtils.serialize(screenUniversalData));
+//                        RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(type2), JsonUtils.serialize(screenUniversalData));
                         break;
                     case 7:
                         screenUniversalData.setValue(buf.readInt());
@@ -193,7 +193,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                         screenUniversalData.setType("3-3");
                         screenUniversalData.setText("相控阵雷达探测水面舰数量");
                         screenUniversalData.setName("xkzldtcsmjsl");
-                        RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(type2), JsonUtils.serialize(screenUniversalData));
+//                        RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(type2), JsonUtils.serialize(screenUniversalData));
                         break;
                     case 10:
                         screenUniversalData.setValue(buf.readInt());
@@ -214,7 +214,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                         screenUniversalData.setType("3-4");
                         screenUniversalData.setText("态势处理水面舰数量");
                         screenUniversalData.setName("tsclsmjsl");
-                        RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(type2), JsonUtils.serialize(screenUniversalData));
+//                        RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(type2), JsonUtils.serialize(screenUniversalData));
                         break;
                     case 13:
                         screenUniversalData.setValue(buf.readInt());
@@ -235,60 +235,60 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                         screenUniversalData.setType("3-5");
                         screenUniversalData.setText("成功打击水面舰数量");
                         screenUniversalData.setName("cgdjsmjsl");
-                        RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(type2), JsonUtils.serialize(screenUniversalData));
+//                        RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(type2), JsonUtils.serialize(screenUniversalData));
                         break;
                     case 16:
                         screenUniversalData.setValue(buf.readInt());
-                        screenUniversalData.setType("4-1");
+                        screenUniversalData.setType("3-1");
                         screenUniversalData.setText("中程弹装填数量");
                         screenUniversalData.setName("zzdztsl");
                         RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(type2), JsonUtils.serialize(screenUniversalData));
                         break;
                     case 17:
                         screenUniversalData.setValue(buf.readInt());
-                        screenUniversalData.setType("4-2");
+                        screenUniversalData.setType("3-2");
                         screenUniversalData.setText("舰空弹装填数量");
                         screenUniversalData.setName("jkdztsl");
                         RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(type2), JsonUtils.serialize(screenUniversalData));
                         break;
                     case 18:
                         screenUniversalData.setValue(buf.readInt());
-                        screenUniversalData.setType("4-3");
+                        screenUniversalData.setType("3-3");
                         screenUniversalData.setText("万炮装填数量");
                         screenUniversalData.setName("wpztsl");
                         RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(type2), JsonUtils.serialize(screenUniversalData));
                         break;
                     case 19:
                         screenUniversalData.setValue(buf.readInt());
-                        screenUniversalData.setType("4-4");
+                        screenUniversalData.setType("3-4");
                         screenUniversalData.setText("电子对抗弹装填数量");
                         screenUniversalData.setName("dzdkdztsl");
                         RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(type2), JsonUtils.serialize(screenUniversalData));
                         break;
                     case 20:
                         screenUniversalData.setValue(buf.readInt());
-                        screenUniversalData.setType("5-1");
+                        screenUniversalData.setType("4-1");
                         screenUniversalData.setText("中程弹余弹量");
                         screenUniversalData.setName("zcdydl");
                         RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(type2), JsonUtils.serialize(screenUniversalData));
                         break;
                     case 21:
                         screenUniversalData.setValue(buf.readInt());
-                        screenUniversalData.setType("5-2");
+                        screenUniversalData.setType("4-2");
                         screenUniversalData.setText("舰空弹余弹量");
                         screenUniversalData.setName("jkdydl");
                         RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(type2), JsonUtils.serialize(screenUniversalData));
                         break;
                     case 22:
                         screenUniversalData.setValue(buf.readInt());
-                        screenUniversalData.setType("5-3");
+                        screenUniversalData.setType("4-3");
                         screenUniversalData.setText("万炮余弹量");
                         screenUniversalData.setName("wpydl");
                         RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(type2), JsonUtils.serialize(screenUniversalData));
                         break;
                     case 23:
                         screenUniversalData.setValue(buf.readInt());
-                        screenUniversalData.setType("5-4");
+                        screenUniversalData.setType("4-4");
                         screenUniversalData.setText("电子对抗弹余弹量");
                         screenUniversalData.setName("dzdkdydl");
                         RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(type2), JsonUtils.serialize(screenUniversalData));
@@ -297,9 +297,9 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                         log.info("报文1暂无此类型type:" + type2 + "---值为:" + buf.readInt());
                         break;
                 }
-                double timev = buf.readDouble();
-                log.info("收到空中报文<1>----时戳:" + timev);
             }
+            double timev = buf.readDouble();
+            log.info("收到空中报文<1>----时戳:" + timev);
         }else if (type1 == 2) {
             String key = Constant.SCREEN_COUNT_WATERTYPE;
             //水下操作
@@ -453,7 +453,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             screenUniversalData2.setType("1-7");
             screenUniversalData2.setText("发射武器数量");
             screenUniversalData2.setValue(wqfs);
-            String key = Constant.SCREEN_COUNT_WATERTYPE;
+            String key = Constant.SCREEN_COUNT_AIRTYPE;
             RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put("ddfa", JsonUtils.serialize(screenUniversalData1));
             RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put("fswq", JsonUtils.serialize(screenUniversalData2));
             log.info("收到空中报文<2>----时戳:" + timev);
@@ -858,7 +858,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     ScreenTctData deserialize = JsonUtils.deserialize(json, ScreenTctData.class);
                     List<TctStatus> tctStatusList = deserialize.getTctStatusList();
                     Map<String, TctStatus> collect = tctStatusList.stream().collect(Collectors.toMap(TctStatus::getType, Function.identity(), (keyA, keyB) -> keyB));
-                    String key3 = String.format(Constant.SCREEN_RESPONSETIME_WATERTYPE_TARGETID, targetbatch);
+                    String key3 = String.format(Constant.SCREEN_RESPONSETIME_AIRTYPE_TARGETID, targetbatch);
                     ScreenUniversalData screenUniversalData = new ScreenUniversalData();
                     //处理通道反应时间
                     if (type1 == 5) {
@@ -1113,11 +1113,11 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
      */
     private void Msg6_LaunchResult(ByteBuf buf) {
 
-        //1.水下 2.对空
+        //1.对空 2.水下
         int system = buf.readInt();
         //是否成功
-        int bSuccessSign = buf.readInt();
-        //发射装置Id
+        boolean bSuccessSign = buf.readBoolean();
+        //发射装置Id对应报文5的fsj
         int iLauncherId = buf.readInt();
         //发射孔
         int iHoleId = buf.readInt();
@@ -1135,7 +1135,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
         double dLaunchTime = buf.readDouble() * 1000;
 
         log.info("报文<6>数据：system："+system+"bSuccessSign:"+bSuccessSign+"iLauncherId:"+iLauncherId+"iHoleId:"+iHoleId+"iWeaponType:"+iWeaponType+"dLaunchHeading:"+dLaunchHeading+"dLaunchPitch:"+dLaunchPitch
-        +"iAimBatch:"+iAimBatch+"distance:"+distance+"dLaunchTime"+dLaunchTime);
+                +"iAimBatch:"+iAimBatch+"distance:"+distance+"dLaunchTime"+dLaunchTime);
         RedisService service = RedisUtils.getService(config.getScreenDataBase());
 
         if (system == 1) {
@@ -1144,26 +1144,41 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             String json = RedisUtils.getService(config.getScreenDataBase()).boundHashOps(liuchengKey).entries().get(String.valueOf(iAimBatch));
             FlowchartStatus deserialize = JsonUtils.deserialize(json, FlowchartStatus.class);
             deserialize.setCombatExecutionStatus(true);
-            if (CollectionUtils.isNotEmpty(deserialize.getWeaponType())) {
+            //对空武器流程图weapon
+            if(CollectionUtils.isNotEmpty(deserialize.getWeaponType())){
                 HashSet<String> weaponType = deserialize.getWeaponType();
-                if (iWeaponType == 9) {
-                    weaponType.add(1+"-"+iLauncherId+"-"+1);
-                    deserialize.setWeaponType(weaponType);
-                } else if (iWeaponType == 10) {
-                    weaponType.add(1+"-"+iLauncherId+"-"+2);
-                    deserialize.setWeaponType(weaponType);
-                }
-            }else{
+                weaponType.add(String.valueOf(iLauncherId)+"-"+String.valueOf(iHoleId)+"-1");
+                deserialize.setWeaponType(weaponType);
+            }else {
                 HashSet<String> weaponType = new HashSet<>();
-                if (iWeaponType == 9) {
-                    weaponType.add(1+"-"+iLauncherId+"-"+1);
-                    deserialize.setWeaponType(weaponType);
-                } else if (iWeaponType == 10) {
-                    weaponType.add(1+"-"+iLauncherId+"-"+2);
-                    deserialize.setWeaponType(weaponType);
-                }
+                weaponType.add(String.valueOf(iLauncherId)+"-"+String.valueOf(iHoleId)+"-1");
+                deserialize.setWeaponType(weaponType);
             }
 
+
+//            if (CollectionUtils.isNotEmpty(deserialize.getWeaponType())) {
+//                HashSet<String> weaponType = deserialize.getWeaponType();
+//                if (iWeaponType == 9) {
+//                    weaponType.add(1+"-"+iLauncherId+"-"+1);
+//                    deserialize.setWeaponType(weaponType);
+//                } else if (iWeaponType == 10) {
+//                    weaponType.add(1+"-"+iLauncherId+"-"+2);
+//                    deserialize.setWeaponType(weaponType);
+//                }
+//            }else{
+//                HashSet<String> weaponType = new HashSet<>();
+//                if (iWeaponType == 9) {
+//                    weaponType.add(1+"-"+iLauncherId+"-"+1);
+//                    deserialize.setWeaponType(weaponType);
+//                } else if (iWeaponType == 10) {
+//                    weaponType.add(1+"-"+iLauncherId+"-"+2);
+//                    deserialize.setWeaponType(weaponType);
+//                }
+//            }
+            //判断垂发
+            if(iLauncherId==2){
+                deserialize.setVlsLauncher(true);
+            }
             RedisUtils.getService(config.getScreenDataBase()).boundHashOps(liuchengKey).put(String.valueOf(iAimBatch),JsonUtils.serialize(deserialize));
             //处理任务通道的武器状态
             String key1 = Constant.SCREEN_TASKCHANNELSTATUS_AIRTYPE;
@@ -1176,11 +1191,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             tctStatus.setType(type1);
             tctStatus.setTime((long) dLaunchTime);
             tctStatus.setDistance(distance);
-            if (iWeaponType == 9) {
-                tctStatus.setName("声干扰:发射");
-            } else if (iWeaponType == 10) {
-                tctStatus.setName("声诱饵:发射");
-            }
+            //TODO:是否需要setName
             collect.put(type1,tctStatus);
             List<TctStatus> values = collect.values().stream().collect(Collectors.toList());
             screenTctData.setTctStatusList(values);
@@ -1350,7 +1361,8 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
         //目标批号
         int targetBatch = buf.readInt();
         //武器类型 1.声干扰器 2.助飞声诱饵 3.摇曳声诱饵 4.ATT
-        int weaponType = buf.readInt() + 8;
+        //武器类型 1.中程弹 2.H10 3.万发 4.箔条弹 5.红外 6.烟雾
+        int weaponType = buf.readInt();
         // 实体Id
         int weaponId = buf.readInt();
         //水下飞行状态 1.飞行中 2.已入水
@@ -1380,22 +1392,38 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             tctStatus.setType(type1);
             tctStatus.setTime((long) timeValue);
             tctStatus.setDistance(distance);
-            if (weaponFlyState == 1 && weaponType == 9) {
-                tctStatus.setName("声干扰:飞行");
-            } else if (weaponFlyState == 1 && weaponType == 10) {
-                tctStatus.setName("声诱饵:飞行");
-            } else if (weaponFlyState == 2 && weaponType == 9 && weaponFightState == 1) {
-                tctStatus.setName("声干扰:发声");
-            } else if (weaponFlyState == 2 && weaponType == 9 && weaponFightState == 2) {
-                tctStatus.setName("声干扰:停声");
-            } else if (weaponFlyState == 2 && weaponType == 9 && weaponFightState == 3) {
-                tctStatus.setName("声干扰:起爆");
-            } else if (weaponFlyState == 2 && weaponType == 10 && weaponFightState == 1) {
-                tctStatus.setName("声诱饵:发声");
-            } else if (weaponFlyState == 2 && weaponType == 10 && weaponFightState == 2) {
-                tctStatus.setName("声诱饵:停声");
-            } else if (weaponFlyState == 2 && weaponType == 10 && weaponFightState == 3) {
-                tctStatus.setName("声诱饵:起爆");
+            if (weaponFlyState == 1 && weaponType == 1) {
+                tctStatus.setName("中程弹:飞行");
+            } else if (weaponFlyState == 1 && weaponType == 2) {
+                tctStatus.setName("H10:飞行");
+            } else if (weaponFlyState == 1 && weaponType == 3) {
+                tctStatus.setName("子弹:飞行");
+            } else if (weaponFlyState == 1 && (weaponType == 4 ||weaponType == 5 ||weaponType == 6)) {
+                tctStatus.setName("干扰弹:飞行");
+            } else if (weaponFlyState == 2 && weaponType == 1 && weaponFightState == 1) {
+                tctStatus.setName("中程弹:击毁目标");
+            } else if (weaponFlyState == 2 && weaponType == 1 && weaponFightState == 2) {
+                tctStatus.setName("中程弹:自毁");
+            } else if (weaponFlyState == 2 && weaponType == 1 && weaponFightState == 3) {
+                tctStatus.setName("中程弹:空中散开");
+            } else if (weaponFlyState == 2 && weaponType == 2 && weaponFightState == 1) {
+                tctStatus.setName("H10:击毁目标");
+            } else if (weaponFlyState == 2 && weaponType == 2 && weaponFightState == 2) {
+                tctStatus.setName("H10:自毁");
+            } else if (weaponFlyState == 2 && weaponType == 2 && weaponFightState == 3) {
+                tctStatus.setName("H10:空中散开");
+            } else if (weaponFlyState == 2 && weaponType == 3 && weaponFightState == 1) {
+                tctStatus.setName("子弹:击毁目标");
+            } else if (weaponFlyState == 2 && weaponType == 3 && weaponFightState == 2) {
+                tctStatus.setName("子弹:自毁");
+            } else if (weaponFlyState == 2 && weaponType == 3 && weaponFightState == 3) {
+                tctStatus.setName("子弹:空中散开");
+            } else if (weaponFlyState == 2 && (weaponType == 4 ||weaponType == 5 ||weaponType == 6) && weaponFightState == 1) {
+                tctStatus.setName("干扰弹:击毁目标");
+            } else if (weaponFlyState == 2 && (weaponType == 4 ||weaponType == 5 ||weaponType == 6) && weaponFightState == 2) {
+                tctStatus.setName("干扰弹:自毁");
+            } else if (weaponFlyState == 2 && (weaponType == 4 ||weaponType == 5 ||weaponType == 6) && weaponFightState == 3) {
+                tctStatus.setName("干扰弹:空中散开");
             }
             collect.put(type1, tctStatus);
             List<TctStatus> values = collect.values().stream().collect(Collectors.toList());
@@ -1405,7 +1433,8 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             log.info("收到空中报文<8>");
         }else if (system == 2) {
             //水下
-            //处理任务通道的武器状态
+            //处理任务通道的武器状态,+8是为了对应报文6里面声干扰和声诱饵约定的id分别是9和10
+            weaponType = weaponType + 8;
             String key1 = Constant.SCREEN_TASKCHANNELSTATUS_WATERTYPE;
             String json1 = service.boundHashOps(key1).entries().get(String.valueOf(targetBatch));
             ScreenTctData screenTctData = JsonUtils.deserialize(json1, ScreenTctData.class);
@@ -1418,20 +1447,28 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             tctStatus.setDistance(distance);
             if (weaponFlyState == 1 && weaponType == 9) {
                 tctStatus.setName("声干扰:飞行");
-            } else if (weaponFlyState == 1 && weaponType == 10) {
+            } else if (weaponFlyState == 1 && (weaponType == 10||weaponType == 11)) {
                 tctStatus.setName("声诱饵:飞行");
+            } else if(weaponFlyState == 1 && weaponType == 12){
+                tctStatus.setName("ATT:飞行");
             } else if(weaponFlyState == 2 && weaponType == 9 && weaponFightState == 1){
                 tctStatus.setName("声干扰:发声");
             } else if(weaponFlyState == 2 && weaponType == 9 && weaponFightState == 2){
                 tctStatus.setName("声干扰:停声");
             } else if(weaponFlyState == 2 && weaponType == 9 && weaponFightState == 3){
                 tctStatus.setName("声干扰:起爆");
-            } else if(weaponFlyState == 2 && weaponType == 10 && weaponFightState == 1){
+            } else if(weaponFlyState == 2 && (weaponType == 10||weaponType == 11) && weaponFightState == 1){
                 tctStatus.setName("声诱饵:发声");
-            } else if(weaponFlyState == 2 && weaponType == 10 && weaponFightState == 2){
+            } else if(weaponFlyState == 2 && (weaponType == 10||weaponType == 11) && weaponFightState == 2){
                 tctStatus.setName("声诱饵:停声");
-            } else if(weaponFlyState == 2 && weaponType == 10 && weaponFightState == 3){
+            } else if(weaponFlyState == 2 && (weaponType == 10||weaponType == 11) && weaponFightState == 3){
                 tctStatus.setName("声诱饵:起爆");
+            } else if(weaponFlyState == 2 && weaponType == 12 && weaponFightState == 1){
+                tctStatus.setName("ATT:发声");
+            } else if(weaponFlyState == 2 && weaponType == 12 && weaponFightState == 2){
+                tctStatus.setName("ATT:停声");
+            } else if(weaponFlyState == 2 && weaponType == 12 && weaponFightState == 3){
+                tctStatus.setName("ATT:起爆");
             }
             collect.put(type1,tctStatus);
             List<TctStatus> values = collect.values().stream().collect(Collectors.toList());
