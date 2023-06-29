@@ -586,7 +586,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     screenUniversalData.setType("7");
                     screenUniversalData.setValue(timevalue);
                     screenUniversalData.setAve(Double.valueOf(new DecimalFormat("#.00").format(aveTVMap.get(mapKey2)/aveCMap.get(mapKey2))));
-                    RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key2).put("mb-ssld", JsonUtils.serialize(screenUniversalData));
+                    RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key3).put("mb-ssld", JsonUtils.serialize(screenUniversalData));
                     break;
                 case 8:
                     screenUniversalData.setText("目标批号-相控阵雷达数据更新周期");
@@ -1176,9 +1176,9 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
 //                }
 //            }
             //判断垂发
-            if(iLauncherId==2){
-                deserialize.setVlsLauncher(true);
-            }
+//            if(iLauncherId==2){
+//                deserialize.setVlsLauncher(true);
+//            }
             RedisUtils.getService(config.getScreenDataBase()).boundHashOps(liuchengKey).put(String.valueOf(iAimBatch),JsonUtils.serialize(deserialize));
             //处理任务通道的武器状态
             String key1 = Constant.SCREEN_TASKCHANNELSTATUS_AIRTYPE;

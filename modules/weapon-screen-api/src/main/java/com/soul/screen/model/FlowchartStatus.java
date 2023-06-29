@@ -51,7 +51,7 @@ public class FlowchartStatus implements Serializable {
     /**
      * 是否有通垂，只有空中流程图，前端业务逻辑校验用到
      */
-    private Boolean vlsLauncher;
+//    private Boolean vlsLauncher;
 
     /**
      * 武器类型
