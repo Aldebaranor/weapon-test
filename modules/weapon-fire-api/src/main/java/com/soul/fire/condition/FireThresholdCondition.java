@@ -23,6 +23,6 @@ public class FireThresholdCondition implements Serializable {
 
     @Display("disabled")
     @ConditionOperator(name = "disabled", operator = ClauseOperator.Equal)
-    private boolean disabled;
+    private Boolean disabled;
 
 }

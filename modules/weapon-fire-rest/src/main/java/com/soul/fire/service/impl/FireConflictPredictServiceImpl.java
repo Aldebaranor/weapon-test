@@ -64,7 +64,9 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
     public ConflictReport conflictPredict(ScenariosInfo scenariosA , ScenariosInfo scenariosB) {
 
         readThreshold(scenariosA,scenariosB);
-        conflictReport.setId(UUID.randomUUID().toString());
+        //这里用UUID会产生重复存储的问题
+//        conflictReport.setId(UUID.randomUUID().toString());
+        conflictReport.setId(scenariosA.getEquipmentId()+scenariosB.getEquipmentId());
 
         Long timeA = scenariosA.getBeginTime();
         Long timeB = scenariosB.getBeginTime();
@@ -79,9 +81,8 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
             boolean timeState = Math.abs(scenariosA.getBeginTime()-scenariosB.getBeginTime())<fireConflictTimeThreshold;
             boolean pitchState = Math.abs(scenariosA.getLaunchPitchAngle()-scenariosB.getLaunchPitchAngle())<fireConflictPitchAngleThreshold;
             boolean azimuthState = Math.sqrt((Math.pow((posAx-posBx),2)+Math.pow((posAy-posBy),2)/100))<fireConflictAzimuthThreshold;
-
             if(timeState && pitchState && azimuthState ){
-                conflictReport.setConflictType(0);
+                conflictReport.setConflictType(1);
                 generateDetail(scenariosA,scenariosB);
 
                 if(!RedisUtils.getService(config.getFireDataBase()).exists(Constant.PREDICT_KEY)){
@@ -116,7 +117,7 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
             boolean frequencyState = Math.abs(scenariosA.getElectromagneticFrequency()-scenariosB.getElectromagneticFrequency())<electFrequency;
 
             if(timeState && frequencyState){
-                conflictReport.setConflictType(1);
+                conflictReport.setConflictType(2);
                 generateDetail(scenariosA,scenariosB);
 
                 if(!RedisUtils.getService(config.getFireDataBase()).exists(Constant.PREDICT_KEY)){
@@ -157,7 +158,7 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
             boolean frequencyState =(0<(minFreB-maxFreA) &&(minFreB-maxFreA)<5)||(0<(minFreA-maxFreB) &&(minFreA-maxFreB)<waterFrequency);
 
             if(timeState && frequencyState){
-                conflictReport.setConflictType(2);
+                conflictReport.setConflictType(3);
                 generateDetail(scenariosA,scenariosB);
 
                 if(!RedisUtils.getService(config.getFireDataBase()).exists(Constant.PREDICT_KEY)){
@@ -192,8 +193,10 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
 
     @Override
     public void predictTest() {
+//        if (!Boolean.TRUE.equals(RedisUtils.getService(config.getPumpDataBase()).getTemplate()
+//                .hasKey(Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY))) {
         if (!Boolean.TRUE.equals(RedisUtils.getService(config.getPumpDataBase()).getTemplate()
-                .hasKey(Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY))) {
+                .keys(Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY+":*").size()!=0)) {
             log.debug("从"+Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY+"中获取作战方案信息失败！");
             return;
         }

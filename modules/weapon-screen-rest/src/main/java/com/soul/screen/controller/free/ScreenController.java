@@ -296,7 +296,8 @@ public class ScreenController {
         if ((pageIndex-1)*pageSize > screenTctDataList.size()) {
             return null;
         }
-        if ((screenTctDataList.size() - (pageSize*pageIndex)) < pageSize) {
+//        if ((screenTctDataList.size() - (pageSize*pageIndex)) < pageSize) {
+        if (screenTctDataList.size() < (pageSize*pageIndex)) {
             for (long i = (pageIndex-1)*pageSize; i < screenTctDataList.size(); i++) {
                 result.add(screenTctDataList.get((int) i));
             }

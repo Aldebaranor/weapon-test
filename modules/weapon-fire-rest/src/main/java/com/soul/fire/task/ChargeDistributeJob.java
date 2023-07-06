@@ -34,6 +34,7 @@
 //public class ChargeDistributeJob implements Job {
 //
 //    @Autowired(required=false)
+////    @Autowired
 //    public SimpMessagingTemplate messageTemplate;
 //
 //    private final CommonConfig config;

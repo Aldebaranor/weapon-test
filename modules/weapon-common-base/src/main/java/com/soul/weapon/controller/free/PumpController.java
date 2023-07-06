@@ -515,7 +515,7 @@ public class PumpController {
                 chargeReport1.setId("46451654546546");
                 chargeReport1.setChargeMethod("模仿数据");
                 chargeReport1.setChargeEquipId("5");
-                chargeReport1.setChargeType(1);
+                chargeReport1.setChargeType(2);
                 chargeReport1.setFreeEquipId("10");
                 chargeReport1.setTime(System.currentTimeMillis());
 
@@ -523,7 +523,7 @@ public class PumpController {
                 chargeReport2.setId("854845645554");
                 chargeReport2.setChargeMethod("模仿数据");
                 chargeReport2.setChargeEquipId("9");
-                chargeReport2.setChargeType(1);
+                chargeReport2.setChargeType(2);
                 chargeReport2.setFreeEquipId("12");
                 chargeReport2.setTime(System.currentTimeMillis());
 

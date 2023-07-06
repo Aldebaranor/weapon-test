@@ -72,7 +72,7 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
 
         readThreshold(equipmentStatusA,equipmentStatusB);
 
-        chargeReport.setId(equipmentStatusA.getEquipmentId()+" " +equipmentStatusB.getEquipmentId());
+        chargeReport.setId(equipmentStatusA.getEquipmentId() +equipmentStatusB.getEquipmentId());
 
         Long timeA = equipmentStatusA.getTime();
         Long timeB = equipmentStatusB.getTime();
@@ -94,8 +94,9 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
             boolean azimuthState = Math.sqrt((Math.pow((posAx-posBx),2)+Math.pow((posAy-posBy),2)/100))<fireChargeAzimuthThreshold;
 
             if(timeState && pitchState && azimuthState && beWork){
-                chargeReport.setChargeType(0);
+                chargeReport.setChargeType(1);
                 generateDetail(equipmentStatusA,equipmentStatusB);
+                //这里有什么规则？直接查数据库表？
                 FirePriority firePriority = firePriorityService.getPriorityByIds(equipmentStatusA.getEquipmentTypeId(),equipmentStatusB.getEquipmentTypeId());
                 if(firePriority==null)
                 {
@@ -142,7 +143,7 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
             boolean frequencyState = Math.abs(equipmentStatusA.getElectromagneticFrequency()-equipmentStatusB.getElectromagneticFrequency())< electFrequencyThreshold;
 
             if(timeState && frequencyState && beWork){
-                chargeReport.setChargeType(1);
+                chargeReport.setChargeType(2);
                 generateDetail(equipmentStatusA,equipmentStatusB);
                 FirePriority firePriority = firePriorityService.getPriorityByIds(equipmentStatusA.getEquipmentTypeId(),equipmentStatusB.getEquipmentTypeId());
 
@@ -185,7 +186,7 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
             boolean frequencyState =(0<(minFreB-maxFreA) &&(minFreB-maxFreA)<waterFrequencyThreshold)||(0<(minFreA-maxFreB) &&(minFreA-maxFreB)< waterFrequencyThreshold);
 
             if(timeState && frequencyState && beWork){
-                chargeReport.setChargeType(2);
+                chargeReport.setChargeType(3);
                 generateDetail(equipmentStatusA,equipmentStatusB);
                 FirePriority firePriority = firePriorityService.getPriorityByIds(equipmentStatusA.getEquipmentTypeId(),equipmentStatusB.getEquipmentTypeId());
                 if(firePriority.isABetterThanB()){
@@ -221,8 +222,10 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
     @Override
     public void chargeTest() {
 
-        if(!RedisUtils.getService(config.getPumpDataBase()).getTemplate().hasKey(
-                Constant.EQUIPMENT_STATUS_HTTP_KEY)){
+//        if(!RedisUtils.getService(config.getPumpDataBase()).getTemplate().hasKey(
+//                Constant.EQUIPMENT_STATUS_HTTP_KEY)){
+        if(RedisUtils.getService(config.getPumpDataBase()).getTemplate().keys(
+                Constant.EQUIPMENT_STATUS_HTTP_KEY+":*").size()==0){
             log.debug("从"+Constant.EQUIPMENT_STATUS_HTTP_KEY+"中获取装备状态信息失败！");
         }
 
@@ -247,7 +250,7 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
         for(EquipmentStatus statusA:equipmentStatusMap.values()){
             for(EquipmentStatus statusB:equipmentStatusMap.values()){
 
-                if(!statusA.getEquipmentId().equals(statusB.getEquipmentId()) && Integer.valueOf(statusA.getEquipmentId())< Integer.valueOf(statusB.getEquipmentId())){
+                if(!statusA.getEquipmentId().equals(statusB.getEquipmentId()) && Integer.valueOf(statusA.getEquipmentId())> Integer.valueOf(statusB.getEquipmentId())){
                     ChargeReport chargeReport = chargeReport(statusA,statusB);
 
                     if(chargeReport!=null) {
@@ -275,7 +278,7 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
     private void generateDetail(EquipmentStatus equipmentStatusA, EquipmentStatus equipmentStatusB){
 
         chargeReportDetailA.setId(chargeReport.getId());
-        chargeReportDetailA.setId(equipmentStatusA.getEquipmentId());
+        chargeReportDetailA.setEquipmentId(equipmentStatusA.getEquipmentId());
         chargeReportDetailA.setEquipmentTypeId(equipmentStatusA.getEquipmentTypeId());
         chargeReportDetailA.setEquipmentMode(equipmentStatusA.getEquipmentMode());
         chargeReportDetailA.setElectromagneticFrequency(equipmentStatusA.getElectromagneticFrequency());
@@ -285,7 +288,7 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
         chargeReportDetailA.setLaunchPitchAngle(equipmentStatusA.getLaunchPitchAngle());
 
         chargeReportDetailB.setId(chargeReport.getId());
-        chargeReportDetailB.setId(equipmentStatusB.getEquipmentId());
+        chargeReportDetailB.setEquipmentId(equipmentStatusB.getEquipmentId());
         chargeReportDetailB.setEquipmentTypeId(equipmentStatusB.getEquipmentTypeId());
         chargeReportDetailB.setEquipmentMode(equipmentStatusB.getEquipmentMode());
         chargeReportDetailB.setElectromagneticFrequency(equipmentStatusB.getElectromagneticFrequency());

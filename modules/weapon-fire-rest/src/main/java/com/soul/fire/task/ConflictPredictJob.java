@@ -24,7 +24,7 @@ public class ConflictPredictJob  {
     @Autowired
     public CommonConfig config;
 
-
+    //定时任务去对redis里面的数据进行冲突兼容校验
     @Scheduled(fixedDelay = 1000)
     public void execute() {
         try {

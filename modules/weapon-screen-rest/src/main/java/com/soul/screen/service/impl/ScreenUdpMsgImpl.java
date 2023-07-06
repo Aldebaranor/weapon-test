@@ -5,13 +5,19 @@ import com.egova.redis.RedisService;
 import com.egova.redis.RedisUtils;
 import com.flagwind.mybatis.utils.CollectionUtils;
 import com.soul.meta.facade.UnpackMessageService;
+import com.soul.meta.utils.NettyUtils;
 import com.soul.screen.model.*;
 import com.soul.weapon.config.CommonConfig;
 import com.soul.weapon.config.Constant;
+import com.soul.weapon.model.ScenariosInfo;
+import com.soul.weapon.model.dds.CombatScenariosInfo;
+import com.soul.weapon.model.dds.EquipmentStatus;
 import io.netty.buffer.ByteBuf;
+import io.netty.util.CharsetUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +27,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.soul.weapon.utils.DateParserUtils.getTime;
 
 /**
  * @ClassName ScreenUdpMsgImpl
@@ -84,11 +92,86 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             case 8:
                 Msg8_WeaponStateAndDis_Struct(buf);
                 break;
+            case 9:
+                Msg9_Fire(buf);
+                break;
+
             default:
                 log.error("暂无对应报文解析,请查看报文头!");
                 break;
         }
     }
+
+    private void Msg9_Fire(ByteBuf buf) {
+
+        CombatScenariosInfo combatScenariosInfo = new CombatScenariosInfo();
+
+        String sender = NettyUtils.getName(buf.readBytes(16));
+        long msgTime = buf.readLong();
+        long time = buf.readLong();
+        String scenarios = NettyUtils.getName(buf.readBytes(32));
+
+        combatScenariosInfo.setSender(sender);
+        combatScenariosInfo.setMsgTime(msgTime);
+        combatScenariosInfo.setTime(time);
+        combatScenariosInfo.setScenarios(scenarios);
+
+        List<ScenariosInfo> list = new ArrayList<>();
+
+        int listSize = buf.readInt();
+        for(int i=0;i<listSize;i++){
+            ScenariosInfo scenariosInfo = new ScenariosInfo();
+            String equipmentId = NettyUtils.getName(buf.readBytes(32));
+            String equipmentTypeId = NettyUtils.getName(buf.readBytes(32));
+            String equipmentMode = NettyUtils.getName(buf.readBytes(50));
+            long beginTime = buf.readLong();
+            int duration = buf.readInt();
+            float launchAzimuth = buf.readFloat();
+            float launchPitchAngle = buf.readFloat();
+            float electromagneticFrequency = buf.readFloat();
+            float minHydroacousticFrequency = buf.readFloat();
+            float maxHydroacousticFrequency = buf.readFloat();
+            scenariosInfo.setEquipmentId(equipmentId);
+            scenariosInfo.setEquipmentTypeId(equipmentTypeId);
+            scenariosInfo.setEquipmentMode(equipmentMode);
+            scenariosInfo.setBeginTime(beginTime);
+            scenariosInfo.setDuration(duration);
+            scenariosInfo.setLaunchAzimuth(launchAzimuth);
+            scenariosInfo.setLaunchPitchAngle(launchPitchAngle);
+            scenariosInfo.setElectromagneticFrequency(electromagneticFrequency);
+            scenariosInfo.setMinHydroacousticFrequency(minHydroacousticFrequency);
+            scenariosInfo.setMaxHydroacousticFrequency(maxHydroacousticFrequency);
+            list.add(scenariosInfo);
+        }
+        combatScenariosInfo.setScenariosList(list);
+
+//        CombatScenariosInfo combatScenariosInfo = new CombatScenariosInfo();
+//        String s = buf.toString(CharsetUtil.UTF_8);
+//        combatScenariosInfo = JsonUtils.deserialize(s,CombatScenariosInfo.class);
+
+        String key = String.format("%s:%s", Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY, getTime());
+        String value = JsonUtils.serialize(combatScenariosInfo);
+        RedisUtils.getService(config.getFireDataBase()).extrasForValue().set(key,value);
+        for(ScenariosInfo scenariosInfo:combatScenariosInfo.getScenariosList()){
+            EquipmentStatus equipmentStatus = new EquipmentStatus();
+            equipmentStatus.setSender(combatScenariosInfo.getSender());
+            equipmentStatus.setMsgTime(combatScenariosInfo.getMsgTime());
+            equipmentStatus.setEquipmentId(scenariosInfo.getEquipmentId());
+            equipmentStatus.setEquipmentTypeId(scenariosInfo.getEquipmentTypeId());
+            equipmentStatus.setEquipmentMode(scenariosInfo.getEquipmentMode());
+            equipmentStatus.setCheckStatus(true);
+            equipmentStatus.setTime(scenariosInfo.getBeginTime());
+            equipmentStatus.setBeWork(true);
+            equipmentStatus.setLaunchAzimuth(scenariosInfo.getLaunchAzimuth());
+            equipmentStatus.setLaunchPitchAngle(scenariosInfo.getLaunchPitchAngle());
+            equipmentStatus.setElectromagneticFrequency(scenariosInfo.getElectromagneticFrequency());
+            equipmentStatus.setMinFrequency(scenariosInfo.getMinHydroacousticFrequency());
+            equipmentStatus.setMaxFrequency(scenariosInfo.getMaxHydroacousticFrequency());
+            String equipKey = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
+            RedisUtils.getService(config.getFireDataBase()).boundHashOps(equipKey).put(scenariosInfo.getEquipmentId(),JsonUtils.serialize(equipmentStatus));
+        }
+    }
+
 
     private void Msg0_SendScenarioStatus_Struct(ByteBuf buf) {
         int i = buf.readInt();

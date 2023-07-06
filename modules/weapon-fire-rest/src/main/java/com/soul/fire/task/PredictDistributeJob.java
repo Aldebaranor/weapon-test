@@ -33,6 +33,7 @@
 //public class PredictDistributeJob implements Job {
 //
 //    @Autowired(required=false)
+////    @Autowired
 //    public SimpMessagingTemplate messageTemplate;
 //
 //    private final CommonConfig config;

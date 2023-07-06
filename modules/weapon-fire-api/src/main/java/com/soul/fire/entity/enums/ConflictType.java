@@ -16,11 +16,11 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum ConflictType implements PropertyDescriptor {
 
-    FIREPOWER("0", "火力兼容"),
+    FIREPOWER("1", "火力兼容"),
 
-    ELECTROMAGNETIC("1", "电磁兼容"),
+    ELECTROMAGNETIC("2", "电磁兼容"),
 
-    ACOUSTIC("2", "水声兼容"),
+    ACOUSTIC("3", "水声兼容"),
 
     ;
 
