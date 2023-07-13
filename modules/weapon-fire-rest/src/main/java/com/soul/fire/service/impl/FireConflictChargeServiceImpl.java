@@ -85,14 +85,14 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
         // 是否都处于工作状态
         boolean beWork = equipmentStatusA.getBeWork()&&equipmentStatusB.getBeWork();
 
-        if(equipmentStatusA.getLaunchAzimuth()!=null && equipmentStatusB.getLaunchAzimuth()!=null){
+        if(equipmentStatusA.getLaunchAzimuth()!=-1 && equipmentStatusB.getLaunchAzimuth()!=-1){
 
             // 火力兼容管控计算
-            boolean timeState = Math.abs(equipmentStatusA.getTime()-equipmentStatusB.getTime())<fireChargeTimeThreshold;
-            boolean pitchState = Math.abs(equipmentStatusA.getLaunchPitchAngle()-equipmentStatusB.getLaunchPitchAngle())<fireChargePitchAngleThreshold;
+            boolean timeState = Math.abs(equipmentStatusA.getTime()-equipmentStatusB.getTime())<fireChargeTimeThreshold*1000;
+            //计算方位角
+            boolean pitchState = Math.abs(Math.toRadians(equipmentStatusA.getLaunchPitchAngle())-Math.toRadians(equipmentStatusB.getLaunchPitchAngle()))<fireChargePitchAngleThreshold;
 
-            boolean azimuthState = Math.sqrt((Math.pow((posAx-posBx),2)+Math.pow((posAy-posBy),2)/100))<fireChargeAzimuthThreshold;
-
+            boolean azimuthState = Math.abs(Math.toRadians(equipmentStatusA.getLaunchAzimuth())-Math.toRadians(equipmentStatusB.getLaunchAzimuth()))<fireChargeAzimuthThreshold*(Math.sqrt(Math.pow((posAx-posBx),2)+Math.pow((posAy-posBy),2))/100+1);
             if(timeState && pitchState && azimuthState && beWork){
                 chargeReport.setChargeType(1);
                 generateDetail(equipmentStatusA,equipmentStatusB);
@@ -137,7 +137,7 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
             }else {
                 return null;
             }
-        }else if(equipmentStatusA.getElectromagneticFrequency()!=null && equipmentStatusB.getElectromagneticFrequency()!=null){
+        }else if(equipmentStatusA.getElectromagneticFrequency()!=-1 && equipmentStatusB.getElectromagneticFrequency()!=-1){
             // 电磁冲突预判
             boolean timeState = Math.abs(equipmentStatusA.getTime()-equipmentStatusB.getTime())<electTimeThreshold;
             boolean frequencyState = Math.abs(equipmentStatusA.getElectromagneticFrequency()-equipmentStatusB.getElectromagneticFrequency())< electFrequencyThreshold;
@@ -175,7 +175,7 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
                 return null;
             }
 
-        }else if(equipmentStatusA.getMaxFrequency()!=null && equipmentStatusB.getMinFrequency()!=null){
+        }else if(equipmentStatusA.getMaxFrequency()!=-1 && equipmentStatusB.getMinFrequency()!=-1){
             // 水声冲突预判
             Float minFreA = equipmentStatusA.getMinFrequency();
             Float maxFreA = equipmentStatusA.getMaxFrequency();

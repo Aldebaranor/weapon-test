@@ -22,7 +22,6 @@ import java.sql.Timestamp;
 public class FirePriority extends BaseEntity{
 
     public static final String NAME = "fire-test:priority";
-
     @Id
     @Display("主键")
     @Column(name = "id")

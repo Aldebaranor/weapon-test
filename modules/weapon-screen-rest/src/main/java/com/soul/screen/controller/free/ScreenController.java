@@ -127,7 +127,8 @@ public class ScreenController {
         String key1 = Constant.SCREEN_STATUSREPORTDATA_AIRTYPE;
         String key2 = String.format(Constant.SCREEN_STATUSREPORTDATA_AIRTYPE_TARGETID, this.SCREEN_TARGETID);
         if (!RedisUtils.getService(config.getScreenDataBase()).exists(key1) && !RedisUtils.getService(config.getScreenDataBase()).exists(key2)) {
-            throw ExceptionUtils.api("暂无對空周期报数据!");
+            System.out.println("暂无对空周期报数据!");
+            return new ScreenSrAndRtData();
         }
         return getScreenStatusReportData(key1, key2, this.SCREEN_TARGETID);
     }
@@ -169,7 +170,8 @@ public class ScreenController {
     public ScreenSrAndRtData getAirtypeResponseTime(){
         String key = String.format(Constant.SCREEN_RESPONSETIME_AIRTYPE_TARGETID,this.SCREEN_TARGETID);
         if (!RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
-            throw ExceptionUtils.api("暂无对空响应时间数据!");
+            System.out.println("暂无对空响应时间数据!");
+            return new ScreenSrAndRtData();
         }
         List<ScreenUniversalData> screenUniversalDataList = RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).values().stream().map(v -> {
             ScreenUniversalData deserialize = JsonUtils.deserialize(v, ScreenUniversalData.class);

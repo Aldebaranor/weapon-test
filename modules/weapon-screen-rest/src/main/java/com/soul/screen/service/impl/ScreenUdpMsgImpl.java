@@ -531,11 +531,12 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             screenUniversalData1.setName("ddfa");
             screenUniversalData1.setType("1-6");
             screenUniversalData1.setText("方案数量");
-            screenUniversalData1.setValue(faqr);
+            screenUniversalData1.setValue(length);
             screenUniversalData2.setName("fswq");
             screenUniversalData2.setType("1-7");
             screenUniversalData2.setText("发射武器数量");
-            screenUniversalData2.setValue(wqfs);
+            screenUniversalData2.setValue(faqr);
+//            screenUniversalData2.setValue(wqfs);
             String key = Constant.SCREEN_COUNT_AIRTYPE;
             RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put("ddfa", JsonUtils.serialize(screenUniversalData1));
             RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put("fswq", JsonUtils.serialize(screenUniversalData2));
@@ -833,7 +834,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
      *
      * @param buf
      */
-    private void Msg4_FirstTime_Struct(ByteBuf buf) {
+    private void Msg4_FirstTime_Struct(ByteBuf buf){
         //1.对空 2.水下
         int system = buf.readInt();
         if (system == 1) {
@@ -845,12 +846,8 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             //5-首次收到诸元报（9c，H10，万发诸元任一）；
             int type = buf.readInt();
             int type1;
+            type1 = type;
 
-            if (type == 1 || type == 6) {
-                type1 = 1;
-            }else{
-                type1 = type;
-            }
             //目标批号
             int targetbatch = buf.readInt();
             double timevalue = buf.readDouble() * 1000;
@@ -1199,7 +1196,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
         //1.对空 2.水下
         int system = buf.readInt();
         //是否成功
-        boolean bSuccessSign = buf.readBoolean();
+        int bSuccessSign = buf.readInt();
         //发射装置Id对应报文5的fsj
         int iLauncherId = buf.readInt();
         //发射孔
@@ -1268,7 +1265,8 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             String json1 = service.boundHashOps(key1).entries().get(String.valueOf(iAimBatch));
             ScreenTctData screenTctData = JsonUtils.deserialize(json1, ScreenTctData.class);
             List<TctStatus> tctStatusList = screenTctData.getTctStatusList();
-            String type1 = String.valueOf(iWeaponType - 2);
+//            String type1 = String.valueOf(iWeaponType - 2);
+            String type1 = String.valueOf(6);
             Map<String, TctStatus> collect = tctStatusList.stream().collect(Collectors.toMap(TctStatus::getType, Function.identity(), (keyA, keyB) -> keyB));
             TctStatus tctStatus = new TctStatus();
             tctStatus.setType(type1);
@@ -1452,62 +1450,66 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
         //空中飞行状态 1.飞行中 2.射击中
         int weaponFlyState = buf.readInt();
         //水下战斗状态 1.正在发声 2.停止发声 3.起爆
-        //空中战斗状态 1.击毁目标 2.自毁 3.空中散开
+        //空中战斗状态 1.击毁目标 2.自毁 3.空中散开,0.不在以上状态
         int weaponFightState = buf.readInt();
         //目标相对距离
         double distance = Double.valueOf(new DecimalFormat("#.00").format(buf.readDouble()));
         //显示时间
         double timeValue = buf.readDouble() * 1000;
         //时戳
-        double timeStamp = buf.readDouble();
+//        double timeStamp = buf.readDouble();
         RedisService service = RedisUtils.getService(config.getScreenDataBase());
 
         if (system == 1) {
             //对空
+            weaponType = weaponType + 6;
             //处理任务通道的武器状态
             String key1 = Constant.SCREEN_TASKCHANNELSTATUS_AIRTYPE;
             String json1 = service.boundHashOps(key1).entries().get(String.valueOf(targetBatch));
             ScreenTctData screenTctData = JsonUtils.deserialize(json1, ScreenTctData.class);
             List<TctStatus> tctStatusList = screenTctData.getTctStatusList();
-            String type1 = String.valueOf(weaponType + 1);
             Map<String, TctStatus> collect = tctStatusList.stream().collect(Collectors.toMap(TctStatus::getType, Function.identity(), (keyA, keyB) -> keyB));
             TctStatus tctStatus = new TctStatus();
-            tctStatus.setType(type1);
+            String type1 = String.valueOf(weaponType + 1);
             tctStatus.setTime((long) timeValue);
             tctStatus.setDistance(distance);
-            if (weaponFlyState == 1 && weaponType == 1) {
-                tctStatus.setName("中程弹:飞行");
-            } else if (weaponFlyState == 1 && weaponType == 2) {
-                tctStatus.setName("H10:飞行");
-            } else if (weaponFlyState == 1 && weaponType == 3) {
-                tctStatus.setName("子弹:飞行");
-            } else if (weaponFlyState == 1 && (weaponType == 4 ||weaponType == 5 ||weaponType == 6)) {
-                tctStatus.setName("干扰弹:飞行");
-            } else if (weaponFlyState == 2 && weaponType == 1 && weaponFightState == 1) {
-                tctStatus.setName("中程弹:击毁目标");
-            } else if (weaponFlyState == 2 && weaponType == 1 && weaponFightState == 2) {
-                tctStatus.setName("中程弹:自毁");
-            } else if (weaponFlyState == 2 && weaponType == 1 && weaponFightState == 3) {
-                tctStatus.setName("中程弹:空中散开");
-            } else if (weaponFlyState == 2 && weaponType == 2 && weaponFightState == 1) {
-                tctStatus.setName("H10:击毁目标");
-            } else if (weaponFlyState == 2 && weaponType == 2 && weaponFightState == 2) {
-                tctStatus.setName("H10:自毁");
-            } else if (weaponFlyState == 2 && weaponType == 2 && weaponFightState == 3) {
-                tctStatus.setName("H10:空中散开");
-            } else if (weaponFlyState == 2 && weaponType == 3 && weaponFightState == 1) {
-                tctStatus.setName("子弹:击毁目标");
-            } else if (weaponFlyState == 2 && weaponType == 3 && weaponFightState == 2) {
-                tctStatus.setName("子弹:自毁");
-            } else if (weaponFlyState == 2 && weaponType == 3 && weaponFightState == 3) {
-                tctStatus.setName("子弹:空中散开");
-            } else if (weaponFlyState == 2 && (weaponType == 4 ||weaponType == 5 ||weaponType == 6) && weaponFightState == 1) {
-                tctStatus.setName("干扰弹:击毁目标");
-            } else if (weaponFlyState == 2 && (weaponType == 4 ||weaponType == 5 ||weaponType == 6) && weaponFightState == 2) {
-                tctStatus.setName("干扰弹:自毁");
-            } else if (weaponFlyState == 2 && (weaponType == 4 ||weaponType == 5 ||weaponType == 6) && weaponFightState == 3) {
-                tctStatus.setName("干扰弹:空中散开");
+            String name = "";
+            switch (weaponType-6){
+                case 1:
+                    name+="中程弹:";
+                    break;
+                case 2:
+                    name+="H10:";
+                    break;
+                case 3:
+                    name+="万发:";
+                    break;
+                default:
+                    name+="干扰弹:";
+                    break;
             }
+            if(weaponFlyState==1){
+                name+="飞行中:";
+            }else if(weaponFlyState==2){
+                name+="射击中:";
+            }
+            switch (weaponFightState){
+//                1.击毁目标 2.自毁 3.空中散开,0.不在以上状态
+                case 1:
+                    type1=String.valueOf(Integer.valueOf(type1+1));
+                    name+="击毁目标";
+                    break;
+                case 2:
+                    type1=String.valueOf(Integer.valueOf(type1+1));
+                    name+="自毁";
+                case 3:
+                    type1=String.valueOf(Integer.valueOf(type1+1));
+                    name+="空中散开";
+                default:
+                    break;
+            }
+            tctStatus.setName(name);
+            tctStatus.setType(type1);
             collect.put(type1, tctStatus);
             List<TctStatus> values = collect.values().stream().collect(Collectors.toList());
             screenTctData.setTctStatusList(values);

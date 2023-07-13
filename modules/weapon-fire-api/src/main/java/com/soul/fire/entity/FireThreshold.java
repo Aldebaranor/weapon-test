@@ -20,7 +20,6 @@ import java.sql.Timestamp;
 @Display("阈值表")
 @EqualsAndHashCode(callSuper = true)
 public class FireThreshold extends BaseEntity{
-
     public static final String NAME = "fire-test:threshold";
 
     @Id

@@ -2,12 +2,15 @@ package com.soul.fire.controller.unity;
 
 import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
+import com.egova.redis.RedisUtils;
 import com.egova.web.annotation.Api;
 import com.soul.fire.condition.FireThresholdCondition;
 import com.soul.fire.entity.FireThreshold;
 import com.soul.fire.service.FireThresholdService;
+import com.soul.weapon.config.CommonConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,7 +21,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FireThresholdController {
 
+    @Autowired
     private final FireThresholdService fireThresholdService;
+
 
     @Api
     @GetMapping(value = "/{id}")
@@ -34,6 +39,7 @@ public class FireThresholdController {
     @PutMapping
     public void update(@RequestBody FireThreshold fireThreshold) {
         fireThresholdService.update(fireThreshold);
+
     }
 
     /**

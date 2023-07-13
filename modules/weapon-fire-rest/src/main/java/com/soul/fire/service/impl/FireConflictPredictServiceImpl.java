@@ -75,12 +75,15 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
         conflictReport.setEquipmentIdA(scenariosA.getEquipmentId());
         conflictReport.setEquipmentIdB(scenariosB.getEquipmentId());
 
-        if(scenariosA.getLaunchAzimuth()!=null && scenariosB.getLaunchAzimuth()!=null){
+        if(scenariosA.getLaunchAzimuth()!=-1 && scenariosB.getLaunchAzimuth()!=-1){
 
             // 火力冲突预判
-            boolean timeState = Math.abs(scenariosA.getBeginTime()-scenariosB.getBeginTime())<fireConflictTimeThreshold;
-            boolean pitchState = Math.abs(scenariosA.getLaunchPitchAngle()-scenariosB.getLaunchPitchAngle())<fireConflictPitchAngleThreshold;
-            boolean azimuthState = Math.sqrt((Math.pow((posAx-posBx),2)+Math.pow((posAy-posBy),2)/100))<fireConflictAzimuthThreshold;
+            boolean timeState = Math.abs(scenariosA.getBeginTime()-scenariosB.getBeginTime())<fireConflictTimeThreshold*1000;
+            //角度弧度转换
+            boolean pitchState = Math.abs(Math.toRadians(scenariosA.getLaunchPitchAngle())-Math.toRadians(scenariosB.getLaunchPitchAngle()))<fireConflictPitchAngleThreshold;
+            //
+            boolean azimuthState = Math.abs(Math.toRadians(scenariosA.getLaunchAzimuth())-Math.toRadians(scenariosB.getLaunchAzimuth()))<fireConflictAzimuthThreshold*(Math.sqrt(Math.pow((posAx-posBx),2)+Math.pow((posAy-posBy),2))/100+1);
+
             if(timeState && pitchState && azimuthState ){
                 conflictReport.setConflictType(1);
                 generateDetail(scenariosA,scenariosB);
@@ -111,7 +114,7 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
             }else {
                 return null;
             }
-        }else if(scenariosA.getElectromagneticFrequency()!=null && scenariosB.getElectromagneticFrequency()!=null){
+        }else if(scenariosA.getElectromagneticFrequency()!=-1 && scenariosB.getElectromagneticFrequency()!=-1){
             // 电磁冲突预判
             boolean timeState = (0<(timeA-timeB) &&(timeA-timeB)<scenariosB.getDuration())||(0<(timeB-timeA) &&(timeB-timeA)<scenariosA.getDuration());
             boolean frequencyState = Math.abs(scenariosA.getElectromagneticFrequency()-scenariosB.getElectromagneticFrequency())<electFrequency;
@@ -147,7 +150,7 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
                 return null;
             }
 
-        }else if(scenariosA.getMinHydroacousticFrequency()!=null && scenariosB.getMinHydroacousticFrequency()!=null){
+        }else if(scenariosA.getMinHydroacousticFrequency()!=-1 && scenariosB.getMinHydroacousticFrequency()!=-1){
             // 水声冲突预判
             Float minFreA = scenariosA.getMinHydroacousticFrequency();
             Float maxFreA = scenariosA.getMaxHydroacousticFrequency();

@@ -2,12 +2,14 @@ package com.soul.fire.controller.unity;
 
 import com.egova.redis.RedisUtils;
 import com.egova.web.annotation.Api;
+import com.soul.fire.service.FireConflictChargeService;
 import com.soul.weapon.config.CommonConfig;
 import com.soul.weapon.config.Constant;
 import com.soul.weapon.model.ChargeReport;
 import com.soul.weapon.model.ReportDetail;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -25,7 +27,8 @@ import java.util.stream.Collectors;
 public class FireChargeController {
 
     private final CommonConfig config;
-
+    @Autowired
+    public FireConflictChargeService fireConflictCharge;
     /**
      * 管控结果查询
      *
@@ -34,6 +37,7 @@ public class FireChargeController {
     @Api
     @GetMapping("/result")
     public List<ChargeReport> chargeResult() {
+        fireConflictCharge.chargeTest();
         List<ChargeReport> results = new ArrayList<>();
         Map<String, ChargeReport> chargeResults = RedisUtils.getService(config.
                 getFireDataBase()).extrasForHash().hgetall(Constant.CHARGE_KEY, ChargeReport.class);

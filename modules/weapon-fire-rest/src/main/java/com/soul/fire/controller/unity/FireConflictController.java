@@ -3,6 +3,7 @@ package com.soul.fire.controller.unity;
 import com.egova.json.utils.JsonUtils;
 import com.egova.redis.RedisUtils;
 import com.egova.web.annotation.Api;
+import com.soul.fire.service.FireConflictPredictService;
 import com.soul.weapon.config.CommonConfig;
 import com.soul.weapon.config.Constant;
 import com.soul.weapon.model.ConflictReport;
@@ -26,7 +27,7 @@ import java.util.stream.Collectors;
 public class FireConflictController {
 
     private final CommonConfig config;
-
+    public FireConflictPredictService fireConflictPredictService;
 
     /**
      * 冲突结果查询
@@ -36,6 +37,8 @@ public class FireConflictController {
     @Api
     @GetMapping("/result")
     public List<ConflictReport> chargeResult() {
+        fireConflictPredictService.predictTest();
+
         List<ConflictReport> results = new ArrayList<>();
         Map<String, String> conflictResults = RedisUtils.getService(config.
 

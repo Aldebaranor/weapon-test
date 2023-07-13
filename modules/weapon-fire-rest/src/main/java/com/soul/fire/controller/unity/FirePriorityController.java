@@ -27,6 +27,20 @@ public class FirePriorityController {
     @Api
     @PostMapping("/list")
     public List<FirePriority> getPriorityByType(@RequestBody FirePriorityCondition con) {
+        String type = con.getConflictType();
+        switch (type){
+            case "0":
+                con.setConflictType("1");
+                break;
+            case "1":
+                con.setConflictType("2");
+                break;
+            case "2":
+                con.setConflictType("3");
+                break;
+            default:
+                break;
+        }
         return firePriorityService.list(con);
     }
 }
