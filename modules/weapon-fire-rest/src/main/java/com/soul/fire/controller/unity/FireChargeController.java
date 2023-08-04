@@ -54,6 +54,7 @@ public class FireChargeController {
         }
         return chargeResults.entrySet().stream().map(map -> map.getValue()).collect(Collectors.toList());
     }
+
     @Api
     @GetMapping("/equip/water")
     public List<EquipStatus> getWaterStatus(){
@@ -67,7 +68,7 @@ public class FireChargeController {
         for(EquipmentStatus e:equipmentStatuses.values()){
             if (e.getEquipmentMode().equals("3")) {
                 EquipStatus eq = new EquipStatus();
-                eq.setName(e.getEquipmentId());
+                eq.setId(e.getEquipmentId());
                 eq.setName(fireWeaponService.getById(e.getEquipmentId()).getName());
                 eq.setBeWork(e.getBeWork());
                 eq.setLon((double) e.getLaunchAzimuth());
@@ -79,6 +80,8 @@ public class FireChargeController {
         }
         return equipStatuses;
     }
+
+
     @Api
     @GetMapping("/equip/elec")
     public List<EquipStatus> getElecStatus(){
@@ -92,7 +95,7 @@ public class FireChargeController {
         for(EquipmentStatus e:equipmentStatuses.values()){
             if (e.getEquipmentMode().equals("2")) {
                 EquipStatus eq = new EquipStatus();
-                eq.setName(e.getEquipmentId());
+                eq.setId(e.getEquipmentId());
                 eq.setName(fireWeaponService.getById(e.getEquipmentId()).getName());
                 eq.setBeWork(e.getBeWork());
                 eq.setLon((double) e.getLaunchAzimuth());
@@ -104,6 +107,7 @@ public class FireChargeController {
         }
         return equipStatuses;
     }
+
     /**
      * 冲突装备详细信息查询
      *

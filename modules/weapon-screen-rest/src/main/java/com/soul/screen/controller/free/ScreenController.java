@@ -7,13 +7,18 @@ import com.egova.model.PageResult;
 import com.egova.model.QueryModel;
 import com.egova.redis.RedisUtils;
 import com.egova.web.annotation.Api;
+import com.flagwind.mybatis.utils.CollectionUtils;
+import com.soul.meta.facade.UnpackMessageService;
 import com.soul.screen.model.*;
+import com.soul.screen.service.impl.ScreenUdpMsgImpl;
 import com.soul.weapon.config.CommonConfig;
 import com.soul.weapon.config.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,6 +43,31 @@ public class ScreenController {
 
     private Boolean TARGETID_START = true;
 
+    @Api
+    @GetMapping("/flush")
+    public void flush(){
+        //开始新的想定,清除所有数据
+        Set<String> keys = RedisUtils.getService(config.getScreenDataBase()).keys("SCREEN:*");
+        List<String> keys1 = keys.stream().collect(Collectors.toList());
+        RedisUtils.getService(config.getPumpDataBase()).delete(Constant.CHARGE_KEY);
+        RedisUtils.getService(config.getPumpDataBase()).delete(Constant.CHARGEDETAIL_KEY);
+        RedisUtils.getService(config.getPumpDataBase()).delete(Constant.PREDICT_KEY);
+        RedisUtils.getService(config.getPumpDataBase()).delete(Constant.PREDICTDETAIL_KEY);
+        RedisUtils.getService(config.getFireDataBase()).delete(Constant.EQUIPMENT_STATUS_HTTP_KEY+":"+getTime());
+        RedisUtils.getService(config.getFireDataBase()).delete(Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY+":"+getTime());
+        RedisUtils.getService(config.getScreenDataBase()).delete(Constant.SCREEN_COUNT_WATERTYPE);
+        RedisUtils.getService(config.getScreenDataBase()).delete(Constant.SCREEN_COUNT_AIRTYPE);
+
+        if (CollectionUtils.isNotEmpty(keys)) {
+            RedisUtils.getService(config.getScreenDataBase()).deletes((keys1));
+        }
+
+    }
+
+    private String getTime() {
+        DateFormat df = new SimpleDateFormat("yyyyMMdd");
+        return df.format(System.currentTimeMillis());
+    }
 
     /**
      * 获取选中TargetID
@@ -364,7 +394,7 @@ public class ScreenController {
             return deserialize;
         }).collect(Collectors.toList());
         result.setTargetId(this.SCREEN_TARGETID);
-//        result.setStatus(false);
+        result.setStatus(false);
         if (list.size() > number || list.size() == number) {
             result.setAccuracyData(list.subList(number,list.size()));
         }else{
@@ -399,7 +429,7 @@ public class ScreenController {
             }
         });
         result.setTargetId(this.SCREEN_TARGETID);
-//        result.setStatus(false);
+        result.setStatus(false);
         if (list.size() > number || list.size() == number) {
             result.setAccuracyData(list.subList(number,list.size()));
         }else{
@@ -425,7 +455,7 @@ public class ScreenController {
             return deserialize;
         }).collect(Collectors.toList());
         result.setTargetId(this.SCREEN_TARGETID);
-//        result.setStatus(false);
+        result.setStatus(false);
         if (list.size() > number || list.size() == number) {
             result.setAccuracyData(list.subList(number,list.size()));
         }else{

@@ -7,6 +7,7 @@ import com.soul.weapon.config.CommonConfig;
 import com.soul.weapon.config.Constant;
 import com.soul.weapon.model.ChargeReport;
 import com.soul.weapon.model.EquipStatus;
+import com.soul.weapon.model.FireStatus;
 import com.soul.weapon.model.ReportDetail;
 import com.soul.weapon.model.dds.CombatScenariosInfo;
 import com.soul.weapon.model.dds.EquipmentStatus;
@@ -65,8 +66,14 @@ public class FreeFireChargeController {
         for(EquipmentStatus e:equipmentStatuses.values()){
             if (e.getEquipmentMode().equals("3")) {
                 EquipStatus eq = new EquipStatus();
-                eq.setName(e.getEquipmentId());
-                eq.setName(fireWeaponService.getById(e.getEquipmentId()).getName());
+                eq.setId(e.getEquipmentId());
+                if(e.getEquipmentId().equals("30")){
+                    eq.setName("声干扰器");
+                }else if(e.getEquipmentId().equals("31")){
+                    eq.setName("声诱饵器");
+                }else {
+                    eq.setName(fireWeaponService.getById(e.getEquipmentId()).getName());
+                }
                 eq.setBeWork(e.getBeWork());
                 eq.setLon((double) e.getLaunchAzimuth());
                 eq.setLat((double) e.getLaunchPitchAngle());
@@ -77,6 +84,31 @@ public class FreeFireChargeController {
         }
         return equipStatuses;
     }
+
+    @Api
+    @GetMapping("/equip/fire")
+    public List<FireStatus> getFireStatus(){
+        List<FireStatus> fireStatuses = new ArrayList<>();
+        String equipKey = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
+        Map<String, EquipmentStatus> equipmentStatuses = RedisUtils.getService(config.
+                getFireDataBase()).extrasForHash().hgetall(equipKey,EquipmentStatus.class);
+        if(equipmentStatuses==null){
+            return fireStatuses;
+        }
+        for(EquipmentStatus e:equipmentStatuses.values()){
+            if (e.getEquipmentMode().equals("1")) {
+                FireStatus eq = new FireStatus();
+                eq.setId(e.getEquipmentId());
+                eq.setTime(e.getTime());
+                eq.setLaunchAzimuth((double) e.getLaunchAzimuth());
+                eq.setLaunchPitchAngle((double) e.getLaunchPitchAngle());
+                eq.setName(fireWeaponService.getById(e.getEquipmentId()).getName());
+                fireStatuses.add(eq);
+            }
+        }
+        return fireStatuses;
+    }
+
     @Api
     @GetMapping("/equip/elec")
     public List<EquipStatus> getElecStatus(){
@@ -90,7 +122,7 @@ public class FreeFireChargeController {
         for(EquipmentStatus e:equipmentStatuses.values()){
             if (e.getEquipmentMode().equals("2")) {
                 EquipStatus eq = new EquipStatus();
-                eq.setName(e.getEquipmentId());
+                eq.setId(e.getEquipmentId());
                 eq.setName(fireWeaponService.getById(e.getEquipmentId()).getName());
                 eq.setBeWork(e.getBeWork());
                 eq.setLon((double) e.getLaunchAzimuth());

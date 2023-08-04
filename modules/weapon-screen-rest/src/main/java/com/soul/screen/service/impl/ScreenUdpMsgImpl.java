@@ -13,11 +13,9 @@ import com.soul.weapon.model.ScenariosInfo;
 import com.soul.weapon.model.dds.CombatScenariosInfo;
 import com.soul.weapon.model.dds.EquipmentStatus;
 import io.netty.buffer.ByteBuf;
-import io.netty.util.CharsetUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -102,6 +100,12 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
         }
     }
 
+    @Override
+    public void flush() {
+        aveCMap.clear();
+        aveTVMap.clear();
+    }
+
     private void Msg9_Fire(ByteBuf buf) {
 
         CombatScenariosInfo combatScenariosInfo = new CombatScenariosInfo();
@@ -183,7 +187,14 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                 aveTVMap.clear();
             }
         }
-
+        RedisUtils.getService(config.getPumpDataBase()).delete(Constant.CHARGE_KEY);
+        RedisUtils.getService(config.getPumpDataBase()).delete(Constant.CHARGEDETAIL_KEY);
+        RedisUtils.getService(config.getPumpDataBase()).delete(Constant.PREDICT_KEY);
+        RedisUtils.getService(config.getPumpDataBase()).delete(Constant.PREDICTDETAIL_KEY);
+        RedisUtils.getService(config.getFireDataBase()).delete(Constant.EQUIPMENT_STATUS_HTTP_KEY+":"+getTime());
+        RedisUtils.getService(config.getFireDataBase()).delete(Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY+":"+getTime());
+        RedisUtils.getService(config.getScreenDataBase()).delete(Constant.SCREEN_COUNT_WATERTYPE);
+        RedisUtils.getService(config.getScreenDataBase()).delete(Constant.SCREEN_COUNT_AIRTYPE);
         log.info("报文<0>收到清除命令!!");
     }
 
@@ -1085,12 +1096,21 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                 if (!RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).hasKey(String.valueOf(targetbatch))) {
                     ScreenTctData screenTctData = new ScreenTctData();
                     screenTctData.setTargetId(String.valueOf(targetbatch));
-                    List<TctStatus> list = new ArrayList<>();
+                    List<TctStatus> list = new LinkedList<>();
                     TctStatus tc = new TctStatus();
                     tc.setType(String.valueOf(type1));
                     tc.setDistance(distace);
                     tc.setTime((long) timevalue);
                     list.add(tc);
+                    list.sort(new Comparator<TctStatus>() {
+                        @Override
+                        public int compare(TctStatus o1, TctStatus o2) {
+                            return (int) (o1.getTime()-o2.getTime());
+                        }
+                    });
+                    for(int i=0;i<list.size();i++){
+                        list.get(i).setType(String.valueOf(i+1));
+                    }
                     screenTctData.setTctStatusList(list);
                     RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(targetbatch), JsonUtils.serialize(screenTctData));
                 } else {
@@ -1123,20 +1143,42 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     tctStatus.setType(String.valueOf(type1));
                     tctStatus.setTime((long) timevalue);
                     tctStatus.setDistance(distace);
+                    if(type1==6){
+                        tctStatus.setName("作战执行");
+                    }
                     collect.put(String.valueOf(type1),tctStatus);
-                    List<TctStatus> values = collect.values().stream().collect(Collectors.toList());
+                    List<TctStatus> values = new LinkedList<>();
+                    values = collect.values().stream().collect(Collectors.toList());
+                    values.sort(new Comparator<TctStatus>() {
+                        @Override
+                        public int compare(TctStatus o1, TctStatus o2) {
+                            return (int) (o1.getTime()-o2.getTime());
+                        }
+                    });
+                    for(int i=0;i<values.size();i++){
+                        values.get(i).setType(String.valueOf(i+1));
+                    }
                     deserialize.setTctStatusList(values);
                     RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(targetbatch), JsonUtils.serialize(deserialize));
                 }
             } else {
                 ScreenTctData screenTctData = new ScreenTctData();
                 screenTctData.setTargetId(String.valueOf(targetbatch));
-                List<TctStatus> list = new ArrayList<>();
+                List<TctStatus> list = new LinkedList<>();
                 TctStatus tc = new TctStatus();
                 tc.setType(String.valueOf(type1));
                 tc.setDistance(distace);
                 tc.setTime((long) timevalue);
                 list.add(tc);
+                list.sort(new Comparator<TctStatus>() {
+                    @Override
+                    public int compare(TctStatus o1, TctStatus o2) {
+                        return (int) (o1.getTime()-o2.getTime());
+                    }
+                });
+                for(int i=0;i<list.size();i++){
+                    list.get(i).setType(String.valueOf(i+1));
+                }
                 screenTctData.setTctStatusList(list);
                 RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(targetbatch), JsonUtils.serialize(screenTctData));
             }
@@ -1214,12 +1256,19 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
         double dLaunchPitch = buf.readDouble();
         //对抗目标批号
         int iAimBatch = buf.readInt();
-        //距离
-        //兼容：火力：持续时间，水声电磁：最小工作频率
-        double distance = Double.valueOf(new DecimalFormat("#.00").format(buf.readDouble()));
-        //弹发射时间、时刻
-        //兼容：火力：开始时刻，水声电磁：最大工作频率
-        double dLaunchTime = buf.readDouble() * 1000;
+        double distance = 0;
+        double dLaunchTime=0;
+        if(system!=3) {
+            //距离
+            //兼容：火力：持续时间，水声电磁：最小工作频率
+            distance = Double.valueOf(new DecimalFormat("#.00").format(buf.readDouble()));
+            //弹发射时间、时刻
+            //兼容：火力：开始时刻，水声电磁：最大工作频率
+            dLaunchTime = buf.readDouble() * 1000;
+        }else {
+             distance = buf.readDouble();
+             dLaunchTime = buf.readDouble();
+        }
 
         if(system==3){
             CombatScenariosInfo combatScenariosInfo = new CombatScenariosInfo();
@@ -1242,7 +1291,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             ScenariosInfo scenariosInfo = new ScenariosInfo();
             String equipmentId = String.valueOf(iLauncherId);
             String equipmentTypeId = equipmentId;
-            long beginTime = (long) dLaunchTime/1000;
+            long beginTime = (long) dLaunchTime*1000;
             int duration = 0;
             float launchAzimuth = (float) dLaunchHeading;
             float launchPitchAngle = (float) dLaunchPitch;
@@ -1366,9 +1415,34 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             tctStatus.setType(type1);
             tctStatus.setTime((long) dLaunchTime);
             tctStatus.setDistance(distance);
-            //TODO:是否需要setName
+            String name = "";
+            switch (iWeaponType){
+                case 1:
+                    name+="中程弹发射";
+                    break;
+                case 2:
+                    name+="H10发射";
+                    break;
+                case 3:
+                    name+="万发发射";
+                    break;
+                default:
+                    name+="干扰弹发射";
+                    break;
+            }
+            tctStatus.setName(name);
             collect.put(type1,tctStatus);
-            List<TctStatus> values = collect.values().stream().collect(Collectors.toList());
+            List<TctStatus> values = new LinkedList<>();
+            values = collect.values().stream().collect(Collectors.toList());
+            values.sort(new Comparator<TctStatus>() {
+                @Override
+                public int compare(TctStatus o1, TctStatus o2) {
+                    return (int) (o1.getTime()-o2.getTime());
+                }
+            });
+            for(int i=0;i<values.size();i++){
+                values.get(i).setType(String.valueOf(i+1));
+            }
             screenTctData.setTctStatusList(values);
             service.boundHashOps(key1).put(String.valueOf(iAimBatch), JsonUtils.serialize(screenTctData));
             //处理发射架精度数据
@@ -1401,6 +1475,9 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                 } else if (iWeaponType == 10) {
                     weaponType.add(1+"-"+iLauncherId+"-"+2);
                     deserialize.setWeaponType(weaponType);
+                } else if (iWeaponType == 4) {
+                    weaponType.add(2+"-"+iHoleId+"-"+1);
+                    deserialize.setWeaponType(weaponType);
                 }
             }else{
                 HashSet<String> weaponType = new HashSet<>();
@@ -1409,6 +1486,9 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     deserialize.setWeaponType(weaponType);
                 } else if (iWeaponType == 10) {
                     weaponType.add(1+"-"+iLauncherId+"-"+2);
+                    deserialize.setWeaponType(weaponType);
+                } else if (iWeaponType == 4) {
+                    weaponType.add(2+"-"+iHoleId+"-"+1);
                     deserialize.setWeaponType(weaponType);
                 }
             }
@@ -1419,19 +1499,36 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             String json1 = service.boundHashOps(key1).entries().get(String.valueOf(iAimBatch));
             ScreenTctData screenTctData = JsonUtils.deserialize(json1, ScreenTctData.class);
             List<TctStatus> tctStatusList = screenTctData.getTctStatusList();
-            String type1 = String.valueOf(iWeaponType - 2);
+//            String type1 = String.valueOf(iWeaponType - 2);
             Map<String, TctStatus> collect = tctStatusList.stream().collect(Collectors.toMap(TctStatus::getType, Function.identity(), (keyA, keyB) -> keyB));
             TctStatus tctStatus = new TctStatus();
-            tctStatus.setType(type1);
+//            tctStatus.setType(type1);
             tctStatus.setTime((long) dLaunchTime);
             tctStatus.setDistance(distance);
             if (iWeaponType == 9) {
+                tctStatus.setType("7");
                 tctStatus.setName("声干扰:发射");
+                collect.put("7",tctStatus);
             } else if (iWeaponType == 10) {
+                tctStatus.setType("9");
                 tctStatus.setName("声诱饵:发射");
+                collect.put("9",tctStatus);
+            } else if(iWeaponType==4){
+                tctStatus.setType("11");
+                tctStatus.setName("ATT:发射");
+                collect.put("11",tctStatus);
             }
-            collect.put(type1,tctStatus);
-            List<TctStatus> values = collect.values().stream().collect(Collectors.toList());
+            List<TctStatus> values = new LinkedList<>();
+            values = collect.values().stream().collect(Collectors.toList());
+            values.sort(new Comparator<TctStatus>() {
+                @Override
+                public int compare(TctStatus o1, TctStatus o2) {
+                    return (int) (o1.getTime()-o2.getTime());
+                }
+            });
+            for(int i=0;i<values.size();i++){
+                values.get(i).setType(String.valueOf(i+1));
+            }
             screenTctData.setTctStatusList(values);
             service.boundHashOps(key1).put(String.valueOf(iAimBatch), JsonUtils.serialize(screenTctData));
             //处理发射架精度数据
@@ -1568,6 +1665,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             tctStatus.setTime((long) timeValue);
             tctStatus.setDistance(distance);
             String name = "";
+            //todo:修改名称
             switch (weaponType-6){
                 case 1:
                     name+="中程弹:";
@@ -1582,11 +1680,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     name+="干扰弹:";
                     break;
             }
-            if(weaponFlyState==1){
-                name+="飞行中:";
-            }else if(weaponFlyState==2){
-                name+="射击中:";
-            }
+
             switch (weaponFightState){
 //                1.击毁目标 2.自毁 3.空中散开,0.不在以上状态
                 case 1:
@@ -1600,64 +1694,188 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     type1=String.valueOf(Integer.valueOf(type1)+1);
                     name+="空中散开";
                 default:
+                    if(weaponFlyState==1){
+                        name+="飞行中:";
+                    }else if(weaponFlyState==2){
+                        name+="射击中:";
+                    }
                     break;
             }
             tctStatus.setName(name);
             tctStatus.setType(type1);
             collect.put(type1, tctStatus);
-            List<TctStatus> values = collect.values().stream().collect(Collectors.toList());
+            List<TctStatus> values = new LinkedList<>();
+            values = collect.values().stream().collect(Collectors.toList());
+//            List<TctStatus> unNamed = new ArrayList<>();
+//            List<TctStatus> named = new ArrayList<>();
+//            for(TctStatus t:values){
+//                if(t.getName()!=null){
+//                    named.add(t);
+//                }else {
+//                    unNamed.add(t);
+//                }
+//            }
+//
+//            named.sort(new Comparator<TctStatus>() {
+//                @Override
+//                public int compare(TctStatus o1, TctStatus o2) {
+//                    return (int) (o1.getTime()-o2.getTime());
+//                }
+//            });
+//            for(TctStatus t:named){
+//                unNamed.add(t);
+//            }
+//            for(int i=0;i<unNamed.size();i++){
+//                unNamed.get(i).setType(String.valueOf(i+1));
+//            }
             values.sort(new Comparator<TctStatus>() {
                 @Override
                 public int compare(TctStatus o1, TctStatus o2) {
-                    return Integer.valueOf(o1.getType())-Integer.valueOf(o2.getType());
+                    return (int) (o1.getTime()-o2.getTime());
                 }
             });
+            for(int i=0;i<values.size();i++){
+                values.get(i).setType(String.valueOf(i+1));
+            }
             screenTctData.setTctStatusList(values);
+//            screenTctData.setTctStatusList(unNamed);
             service.boundHashOps(key1).put(String.valueOf(targetBatch), JsonUtils.serialize(screenTctData));
 
             log.info("收到空中报文<8>");
         }else if (system == 2) {
             //水下
-            //处理任务通道的武器状态,+8是为了对应报文6里面声干扰和声诱饵约定的id分别是9和10
+            //处理任务通道的武器状态,+8是为了对应报文6里面声干扰和声诱饵约定的id分别是9和10，有bug
+
+//            weaponType = weaponType + 8;
+//            String type1 = String.valueOf(weaponType + 7);
             weaponType = weaponType + 8;
             String key1 = Constant.SCREEN_TASKCHANNELSTATUS_WATERTYPE;
             String json1 = service.boundHashOps(key1).entries().get(String.valueOf(targetBatch));
             ScreenTctData screenTctData = JsonUtils.deserialize(json1, ScreenTctData.class);
             List<TctStatus> tctStatusList = screenTctData.getTctStatusList();
-            String type1 = String.valueOf(weaponType + 1);
             Map<String, TctStatus> collect = tctStatusList.stream().collect(Collectors.toMap(TctStatus::getType, Function.identity(), (keyA, keyB) -> keyB));
             TctStatus tctStatus = new TctStatus();
-            tctStatus.setType(type1);
+//            tctStatus.setType(type1);
+            String type1 = "";
             tctStatus.setTime((long) timeValue);
             tctStatus.setDistance(distance);
-            if (weaponFlyState == 1 && weaponType == 9) {
-                tctStatus.setName("声干扰:飞行");
-            } else if (weaponFlyState == 1 && (weaponType == 10||weaponType == 11)) {
-                tctStatus.setName("声诱饵:飞行");
-            } else if(weaponFlyState == 1 && weaponType == 12){
-                tctStatus.setName("ATT:飞行");
-            } else if(weaponFlyState == 2 && weaponType == 9 && weaponFightState == 1){
-                tctStatus.setName("声干扰:发声");
-            } else if(weaponFlyState == 2 && weaponType == 9 && weaponFightState == 2){
-                tctStatus.setName("声干扰:停声");
-            } else if(weaponFlyState == 2 && weaponType == 9 && weaponFightState == 3){
-                tctStatus.setName("声干扰:起爆");
-            } else if(weaponFlyState == 2 && (weaponType == 10||weaponType == 11) && weaponFightState == 1){
-                tctStatus.setName("声诱饵:发声");
-            } else if(weaponFlyState == 2 && (weaponType == 10||weaponType == 11) && weaponFightState == 2){
-                tctStatus.setName("声诱饵:停声");
-            } else if(weaponFlyState == 2 && (weaponType == 10||weaponType == 11) && weaponFightState == 3){
-                tctStatus.setName("声诱饵:起爆");
-            } else if(weaponFlyState == 2 && weaponType == 12 && weaponFightState == 1){
-                tctStatus.setName("ATT:发声");
-            } else if(weaponFlyState == 2 && weaponType == 12 && weaponFightState == 2){
-                tctStatus.setName("ATT:停声");
-            } else if(weaponFlyState == 2 && weaponType == 12 && weaponFightState == 3){
-                tctStatus.setName("ATT:起爆");
+            String name = "";
+            switch (weaponType){
+                case 9:
+                    name+="声干扰";
+                    tctStatus.setType("8");
+                    type1="8";
+                    break;
+                case 10:
+                    name+="声诱饵";
+                    tctStatus.setType("10");
+                    type1="10";
+                    break;
+                case 11:
+                    name+="声诱饵";
+                    tctStatus.setType("10");
+                    type1="10";
+                    break;
+                case 12:
+                    name+="ATT";
+                    tctStatus.setType("12");
+                    type1="12";
+                    break;
+                default:
+                    break;
             }
+            if(weaponFlyState==1){
+                if(name.equals("ATT")){
+                    name+=":入水";
+                }else {
+                    name += ":飞行";
+                }
+            }else if(weaponFlyState==2){
+                name+=":入水";
+            }
+            switch (weaponFightState){
+                case 1:
+                    if(name.equals("ATT")){
+                        name += ":航行";
+                    }else {
+                        name += ":发声";
+                    }
+                    break;
+                case 2:
+                    name+=":停声";
+                    break;
+                case 3:
+                    name+=":起爆";
+                    break;
+                default:
+                    break;
+            }
+            tctStatus.setName(name);
+//            if(weaponFightState==0){
+//                return;
+//            }
+//            if (weaponFlyState == 1 && weaponType == 9) {
+//                tctStatus.setName("声干扰:飞行");
+//            } else if (weaponFlyState == 1 && (weaponType == 10||weaponType == 11)) {
+//                tctStatus.setName("声诱饵:飞行");
+//            } else if(weaponFlyState == 1 && weaponType == 12){
+//                tctStatus.setName("ATT:飞行");
+//            } else if(weaponFlyState == 2 && weaponType == 9 && weaponFightState == 1){
+//                tctStatus.setName("声干扰:发声");
+//            } else if(weaponFlyState == 2 && weaponType == 9 && weaponFightState == 2){
+//                tctStatus.setName("声干扰:停声");
+//            } else if(weaponFlyState == 2 && weaponType == 9 && weaponFightState == 3){
+//                tctStatus.setName("声干扰:起爆");
+//            } else if(weaponFlyState == 2 && (weaponType == 10||weaponType == 11) && weaponFightState == 1){
+//                tctStatus.setName("声诱饵:发声");
+//            } else if(weaponFlyState == 2 && (weaponType == 10||weaponType == 11) && weaponFightState == 2){
+//                tctStatus.setName("声诱饵:停声");
+//            } else if(weaponFlyState == 2 && (weaponType == 10||weaponType == 11) && weaponFightState == 3){
+//                tctStatus.setName("声诱饵:起爆");
+//            } else if(weaponFlyState == 2 && weaponType == 12 && weaponFightState == 1){
+//                tctStatus.setName("ATT:航行");
+//            } else if(weaponFlyState == 2 && weaponType == 12 && weaponFightState == 2){
+//                tctStatus.setName("ATT:停止");
+//            } else if(weaponFlyState == 2 && weaponType == 12 && weaponFightState == 3){
+//                tctStatus.setName("ATT:起爆");
+//            }
             collect.put(type1,tctStatus);
-            List<TctStatus> values = collect.values().stream().collect(Collectors.toList());
+            List<TctStatus> values = new LinkedList<>();
+            values = collect.values().stream().collect(Collectors.toList());
+            //
+//            List<TctStatus> unNamed = new ArrayList<>();
+//            List<TctStatus> named = new ArrayList<>();
+//            for(TctStatus t:values){
+//                if(t.getName()!=null){
+//                    named.add(t);
+//                }else {
+//                    unNamed.add(t);
+//                }
+//            }
+//
+//            named.sort(new Comparator<TctStatus>() {
+//                @Override
+//                public int compare(TctStatus o1, TctStatus o2) {
+//                    return (int) (o1.getTime()-o2.getTime());
+//                }
+//            });
+//            for(TctStatus t:named){
+//                unNamed.add(t);
+//            }
+//            for(int i=0;i<unNamed.size();i++){
+//                unNamed.get(i).setType(String.valueOf(i+1));
+//            }
+            values.sort(new Comparator<TctStatus>() {
+                @Override
+                public int compare(TctStatus o1, TctStatus o2) {
+                    return (int) (o1.getTime()-o2.getTime());
+                }
+            });
+            for(int i=0;i<values.size();i++){
+                values.get(i).setType(String.valueOf(i+1));
+            }
             screenTctData.setTctStatusList(values);
+//            screenTctData.setTctStatusList(unNamed);
             service.boundHashOps(key1).put(String.valueOf(targetBatch), JsonUtils.serialize(screenTctData));
 
             log.info("收到水下报文<8>");

@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Display("监控设备状态")
-public class EquipStatus {
+public class  EquipStatus {
 
     @Display("设备Id")
     private String id;

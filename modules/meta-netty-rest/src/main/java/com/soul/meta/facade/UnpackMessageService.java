@@ -17,4 +17,6 @@ public interface UnpackMessageService {
      * @return:void
      **/
     void unpackNetty(ByteBuf buf);
+
+    void flush();
 }

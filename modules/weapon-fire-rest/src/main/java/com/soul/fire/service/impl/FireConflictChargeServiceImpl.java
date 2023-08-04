@@ -88,18 +88,20 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
             generateDetail(equipmentStatusA,equipmentStatusB);
             if(equipmentStatusA.getEquipmentId().equals("14")&&equipmentStatusB.getEquipmentMode().equals("1")&&(equipmentStatusB.getMsgTime()-equipmentStatusA.getMsgTime()<300000)){
                 chargeReport.setFreeEquipId(equipmentStatusA.getEquipmentId());
-                chargeReport.setChargeEquipId(fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getCode());
+                chargeReport.setChargeEquipId(equipmentStatusB.getEquipmentId());
                 String method = fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getName()+"起飞，武器系统禁用5分钟";
                 if(equipmentStatusA.getMsgTime()<System.currentTimeMillis()-300000){
-                    method = method+"(已过期)";
+//                    method = method+"(已过期)";
+                    chargeReport.setExpire(true);
                 }
                 chargeReport.setChargeMethod(method);
             }else if(equipmentStatusB.getEquipmentId().equals("14")&&equipmentStatusA.getEquipmentMode().equals("1")&&(equipmentStatusA.getMsgTime()-equipmentStatusB.getMsgTime()<300000)) {
-                chargeReport.setFreeEquipId(fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getCode());
-                chargeReport.setChargeEquipId(fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getCode());
+                chargeReport.setFreeEquipId(equipmentStatusB.getEquipmentId());
+                chargeReport.setChargeEquipId(equipmentStatusA.getEquipmentId());
                 String method = fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getName() + "起飞，武器系统禁用5分钟";
                 if (equipmentStatusB.getMsgTime() < System.currentTimeMillis() - 300000) {
-                    method = method + "(已过期)";
+//                    method = method + "(已过期)";
+                    chargeReport.setExpire(true);
                 }
                 chargeReport.setChargeMethod(method);
             }
@@ -123,10 +125,11 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
             chargeReport.setChargeType(3);
             generateDetail(equipmentStatusA,equipmentStatusB);
             chargeReport.setFreeEquipId(equipmentStatusA.getEquipmentId());
-            chargeReport.setChargeEquipId(fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getCode());
-            String method = fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getName() + "发射，"+fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getName()+"受到影响";
+            chargeReport.setChargeEquipId(equipmentStatusB.getEquipmentId());
+            String method = fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getName() + "发射声干扰器，"+fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getName()+"受到影响";
             if (equipmentStatusA.getMsgTime() < System.currentTimeMillis() - 300000) {
-                method = method + "(已过期)";
+//                method = method + "(已过期)";
+                chargeReport.setExpire(true);
             }
             chargeReport.setChargeMethod(method);
             if(!RedisUtils.getService(config.getFireDataBase()).exists(Constant.CHARGEDETAIL_KEY)){
@@ -144,11 +147,12 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
             return chargeReport;
         }else if(Integer.valueOf(equipmentStatusB.getEquipmentId())>=30&&Integer.valueOf(equipmentStatusB.getEquipmentId())<=35&&(equipmentStatusA.getEquipmentId().equals("15")||equipmentStatusA.getEquipmentId().equals("16"))&&(Math.abs(equipmentStatusA.getMsgTime()-equipmentStatusB.getMsgTime())<300000)){
             chargeReport.setChargeType(3);
-            chargeReport.setFreeEquipId(fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getCode());
-            chargeReport.setChargeEquipId(fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getCode());
-            String method = fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getName() + "发射，"+fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getName()+"受到影响";
+            chargeReport.setFreeEquipId(equipmentStatusB.getEquipmentId());
+            chargeReport.setChargeEquipId(equipmentStatusA.getEquipmentId());
+            String method = fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getName() + "发射声干扰器，"+fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getName()+"受到影响";
             if (equipmentStatusB.getMsgTime() < System.currentTimeMillis() - 300000) {
-                method = method + "(已过期)";
+//                method = method + "(已过期)";
+                chargeReport.setExpire(true);
             }
             chargeReport.setChargeMethod(method);
             if(!RedisUtils.getService(config.getFireDataBase()).exists(Constant.CHARGEDETAIL_KEY)){
@@ -193,14 +197,16 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
                     chargeReport.setChargeEquipId(equipmentStatusB.getEquipmentId());
                     String method = fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getName()+"禁用5分钟";
                     if(equipmentStatusA.getMsgTime()<System.currentTimeMillis()-300000){
-                        method = method+"(已过期)";
+//                        method = method+"(已过期)";
+                        chargeReport.setExpire(true);
                     }
                     chargeReport.setChargeMethod(method);                }else{
-                    chargeReport.setFreeEquipId(fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getCode());
-                    chargeReport.setChargeEquipId(fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getCode());
+                    chargeReport.setFreeEquipId(equipmentStatusB.getEquipmentId());
+                    chargeReport.setChargeEquipId(equipmentStatusA.getEquipmentId());
                     String method = fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getName()+"禁用5分钟";
                     if(equipmentStatusB.getMsgTime()<System.currentTimeMillis()-300000){
-                        method = method+"(已过期)";
+//                        method = method+"(已过期)";
+                        chargeReport.setExpire(true);
                     }
                     chargeReport.setChargeMethod(method);                }
 
@@ -244,14 +250,16 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
                     chargeReport.setChargeEquipId(equipmentStatusB.getEquipmentId());
                     String method = fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getName()+"禁用5分钟";
                     if(equipmentStatusA.getMsgTime()<System.currentTimeMillis()-300000){
-                        method = method+"(已过期)";
+//                        method = method+"(已过期)";
+                        chargeReport.setExpire(true);
                     }
                     chargeReport.setChargeMethod(method);                }else{
-                    chargeReport.setFreeEquipId(fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getCode());
-                    chargeReport.setChargeEquipId(fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getCode());
+                    chargeReport.setFreeEquipId(equipmentStatusB.getEquipmentId());
+                    chargeReport.setChargeEquipId(equipmentStatusA.getEquipmentId());
                     String method = fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getName()+"禁用5分钟";
                     if(equipmentStatusB.getMsgTime()<System.currentTimeMillis()-300000){
-                        method = method+"(已过期)";
+//                        method = method+"(已过期)";
+                        chargeReport.setExpire(true);
                     }
                     chargeReport.setChargeMethod(method);                }
 
@@ -292,14 +300,16 @@ public class FireConflictChargeServiceImpl implements FireConflictChargeService 
                     chargeReport.setChargeEquipId(equipmentStatusB.getEquipmentId());
                     String method = fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getName()+"禁用5分钟";
                     if(equipmentStatusA.getMsgTime()<System.currentTimeMillis()-300000){
-                        method = method+"(已过期)";
+//                        method = method+"(已过期)";
+                        chargeReport.setExpire(true);
                     }
                     chargeReport.setChargeMethod(method);                }else{
-                    chargeReport.setFreeEquipId(fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getCode());
-                    chargeReport.setChargeEquipId(fireWeaponService.getById(equipmentStatusA.getEquipmentId()).getCode());
+                    chargeReport.setFreeEquipId(equipmentStatusB.getEquipmentId());
+                    chargeReport.setChargeEquipId(equipmentStatusA.getEquipmentId());
                     String method = fireWeaponService.getById(equipmentStatusB.getEquipmentId()).getName()+"禁用5分钟";
                     if(equipmentStatusB.getMsgTime()<System.currentTimeMillis()-300000){
-                        method = method+"(已过期)";
+//                        method = method+"(已过期)";
+                        chargeReport.setExpire(true);
                     }
                     chargeReport.setChargeMethod(method);                }
                 if(!RedisUtils.getService(config.getFireDataBase()).exists(Constant.CHARGEDETAIL_KEY)){

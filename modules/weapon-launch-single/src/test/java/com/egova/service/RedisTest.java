@@ -3,8 +3,11 @@ package com.egova.service;
 import com.egova.BootstrapTest;
 import com.egova.entity.DictionaryGroup;
 import com.egova.redis.RedisUtils;
+import com.soul.screen.model.TctStatus;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -29,5 +32,24 @@ public class RedisTest extends BootstrapTest {
         String test2 = RedisUtils.getService(0).boundListOps("test").index(0);
 
 
+    }
+
+    @Test
+    public void compare(){
+
+        List<TctStatus> values = new ArrayList<>();
+        TctStatus t1 = new TctStatus();
+        t1.setType("1");
+        TctStatus t2 = new TctStatus();
+        t2.setType("10");
+        TctStatus t3 = new TctStatus();
+        t3.setType("11");
+        values.sort(new Comparator<TctStatus>() {
+            @Override
+            public int compare(TctStatus o1, TctStatus o2) {
+                return Integer.parseInt(o1.getType())-Integer.parseInt(o2.getType());
+            }
+        });
+        System.out.println(values);
     }
 }
