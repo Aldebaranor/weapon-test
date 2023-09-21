@@ -212,6 +212,7 @@
         <module>modules/meta-netty-rest</module>
         <module>modules/weapon-screen-api</module>
         <module>modules/weapon-screen-rest</module>
+        <module>modules/weapon-data</module>
     </modules>
 
 </project>

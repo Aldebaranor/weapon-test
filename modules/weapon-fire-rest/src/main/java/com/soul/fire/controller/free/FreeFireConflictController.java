@@ -9,6 +9,7 @@ import com.soul.fire.condition.FireConflictCondition;
 import com.soul.fire.condition.FireThresholdCondition;
 import com.soul.fire.entity.FireConflict;
 import com.soul.fire.entity.FireThreshold;
+import com.soul.fire.service.FireConflictPredictService;
 import com.soul.fire.service.FireConflictService;
 import com.soul.weapon.config.CommonConfig;
 import com.soul.weapon.config.Constant;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 public class FreeFireConflictController {
 
     private final FireConflictService fireConflictService;
+    public FireConflictPredictService fireConflictPredictService;
 
     private final CommonConfig config;
 
@@ -43,6 +45,8 @@ public class FreeFireConflictController {
     @Api
     @GetMapping("/result")
     public List<ConflictReport> chargeResult() {
+        fireConflictPredictService.predictTest();
+
         List<ConflictReport> results = new ArrayList<>();
         Map<String, String> conflictResults = RedisUtils.getService(config.
 

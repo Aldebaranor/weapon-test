@@ -1,5 +1,4 @@
 package com.soul.screen.service.impl;
-
 import com.egova.json.utils.JsonUtils;
 import com.egova.redis.RedisService;
 import com.egova.redis.RedisUtils;
@@ -13,16 +12,21 @@ import com.soul.weapon.model.ScenariosInfo;
 import com.soul.weapon.model.dds.CombatScenariosInfo;
 import com.soul.weapon.model.dds.EquipmentStatus;
 import io.netty.buffer.ByteBuf;
-import io.netty.util.CharsetUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.poifs.filesystem.POIFSFileSystem;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Priority;
+import java.io.*;
 import java.text.DecimalFormat;
+import java.time.LocalTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
@@ -54,6 +58,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
     //关于目标的总计数 key:system-type-targetId value:总计数
     private ConcurrentHashMap<String,Integer> aveCMap = new ConcurrentHashMap<>();
 
+    private List<Integer> finishedWaterTask = new ArrayList<>();
 
     @Override
     public void unpackNetty(ByteBuf buf) {
@@ -102,14 +107,20 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
         }
     }
 
+    @Override
+    public void flush() {
+        aveCMap.clear();
+        aveTVMap.clear();
+        finishedWaterTask.clear();
+    }
+
     private void Msg9_Fire(ByteBuf buf) {
 
         CombatScenariosInfo combatScenariosInfo = new CombatScenariosInfo();
-
-        String sender = NettyUtils.getName(buf.readBytes(16));
-        long msgTime = buf.readLong();
-        long time = buf.readLong();
-        String scenarios = NettyUtils.getName(buf.readBytes(32));
+        String sender = "";
+        long msgTime = System.currentTimeMillis();
+        long time = System.currentTimeMillis();
+        String scenarios = "兼容管控";
 
         combatScenariosInfo.setSender(sender);
         combatScenariosInfo.setMsgTime(msgTime);
@@ -117,59 +128,58 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
         combatScenariosInfo.setScenarios(scenarios);
 
         List<ScenariosInfo> list = new ArrayList<>();
-
-        int listSize = buf.readInt();
-        for(int i=0;i<listSize;i++){
-            ScenariosInfo scenariosInfo = new ScenariosInfo();
-            String equipmentId = NettyUtils.getName(buf.readBytes(32));
-            String equipmentTypeId = NettyUtils.getName(buf.readBytes(32));
-            String equipmentMode = NettyUtils.getName(buf.readBytes(50));
-            long beginTime = buf.readLong();
-            int duration = buf.readInt();
-            float launchAzimuth = buf.readFloat();
-            float launchPitchAngle = buf.readFloat();
-            float electromagneticFrequency = buf.readFloat();
-            float minHydroacousticFrequency = buf.readFloat();
-            float maxHydroacousticFrequency = buf.readFloat();
-            scenariosInfo.setEquipmentId(equipmentId);
-            scenariosInfo.setEquipmentTypeId(equipmentTypeId);
-            scenariosInfo.setEquipmentMode(equipmentMode);
-            scenariosInfo.setBeginTime(beginTime);
-            scenariosInfo.setDuration(duration);
-            scenariosInfo.setLaunchAzimuth(launchAzimuth);
-            scenariosInfo.setLaunchPitchAngle(launchPitchAngle);
-            scenariosInfo.setElectromagneticFrequency(electromagneticFrequency);
-            scenariosInfo.setMinHydroacousticFrequency(minHydroacousticFrequency);
-            scenariosInfo.setMaxHydroacousticFrequency(maxHydroacousticFrequency);
-            list.add(scenariosInfo);
+        String key = String.format("%s:%s", Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY, getTime());
+        if(RedisUtils.getService(config.getFireDataBase()).extrasForValue().get(key)!=null) {
+            CombatScenariosInfo former = JsonUtils.deserialize(RedisUtils.getService(config.getFireDataBase()).extrasForValue().get(key), CombatScenariosInfo.class);
+            list = former.getScenariosList();
         }
+        ScenariosInfo scenariosInfo = new ScenariosInfo();
+        String equipmentId = NettyUtils.getName(buf.readBytes(32));
+        String equipmentTypeId = NettyUtils.getName(buf.readBytes(32));
+        long beginTime = buf.readLong();
+        int duration = buf.readInt();
+        float launchAzimuth = (float) buf.readDouble();
+        float launchPitchAngle = (float) buf.readDouble();
+        float electromagneticFrequency = (float) buf.readDouble();
+        float minHydroacousticFrequency = (float) buf.readDouble();
+        float maxHydroacousticFrequency = (float) buf.readDouble();
+        scenariosInfo.setEquipmentId(equipmentId);
+        scenariosInfo.setEquipmentTypeId(equipmentTypeId);
+        scenariosInfo.setBeginTime(beginTime);
+        scenariosInfo.setDuration(duration);
+        scenariosInfo.setLaunchAzimuth(launchAzimuth);
+        scenariosInfo.setLaunchPitchAngle(launchPitchAngle);
+        scenariosInfo.setElectromagneticFrequency(electromagneticFrequency);
+        scenariosInfo.setMinHydroacousticFrequency(minHydroacousticFrequency);
+        scenariosInfo.setMaxHydroacousticFrequency(maxHydroacousticFrequency);
+        list.add(scenariosInfo);
+
         combatScenariosInfo.setScenariosList(list);
 
 //        CombatScenariosInfo combatScenariosInfo = new CombatScenariosInfo();
 //        String s = buf.toString(CharsetUtil.UTF_8);
 //        combatScenariosInfo = JsonUtils.deserialize(s,CombatScenariosInfo.class);
 
-        String key = String.format("%s:%s", Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY, getTime());
         String value = JsonUtils.serialize(combatScenariosInfo);
-        RedisUtils.getService(config.getFireDataBase()).extrasForValue().set(key,value);
-        for(ScenariosInfo scenariosInfo:combatScenariosInfo.getScenariosList()){
-            EquipmentStatus equipmentStatus = new EquipmentStatus();
-            equipmentStatus.setSender(combatScenariosInfo.getSender());
-            equipmentStatus.setMsgTime(combatScenariosInfo.getMsgTime());
-            equipmentStatus.setEquipmentId(scenariosInfo.getEquipmentId());
-            equipmentStatus.setEquipmentTypeId(scenariosInfo.getEquipmentTypeId());
-            equipmentStatus.setEquipmentMode(scenariosInfo.getEquipmentMode());
-            equipmentStatus.setCheckStatus(true);
-            equipmentStatus.setTime(scenariosInfo.getBeginTime());
-            equipmentStatus.setBeWork(true);
-            equipmentStatus.setLaunchAzimuth(scenariosInfo.getLaunchAzimuth());
-            equipmentStatus.setLaunchPitchAngle(scenariosInfo.getLaunchPitchAngle());
-            equipmentStatus.setElectromagneticFrequency(scenariosInfo.getElectromagneticFrequency());
-            equipmentStatus.setMinFrequency(scenariosInfo.getMinHydroacousticFrequency());
-            equipmentStatus.setMaxFrequency(scenariosInfo.getMaxHydroacousticFrequency());
-            String equipKey = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
-            RedisUtils.getService(config.getFireDataBase()).boundHashOps(equipKey).put(scenariosInfo.getEquipmentId(),JsonUtils.serialize(equipmentStatus));
-        }
+        RedisUtils.getService(config.getFireDataBase()).extrasForValue().set(key, value);
+        EquipmentStatus equipmentStatus = new EquipmentStatus();
+        equipmentStatus.setSender(combatScenariosInfo.getSender());
+        equipmentStatus.setMsgTime(combatScenariosInfo.getMsgTime());
+        equipmentStatus.setEquipmentId(scenariosInfo.getEquipmentId());
+        //typeID用于对照冲突表
+        equipmentStatus.setEquipmentTypeId(scenariosInfo.getEquipmentTypeId());
+        equipmentStatus.setEquipmentMode(scenariosInfo.getEquipmentMode());
+        equipmentStatus.setCheckStatus(true);
+//        equipmentStatus.setTime(scenariosInfo.getBeginTime());
+        equipmentStatus.setTime(scenariosInfo.getDuration().longValue());
+        equipmentStatus.setBeWork(true);
+        equipmentStatus.setLaunchAzimuth(scenariosInfo.getLaunchAzimuth());
+        equipmentStatus.setLaunchPitchAngle(scenariosInfo.getLaunchPitchAngle());
+        equipmentStatus.setElectromagneticFrequency(scenariosInfo.getElectromagneticFrequency());
+        equipmentStatus.setMinFrequency(scenariosInfo.getMinHydroacousticFrequency());
+        equipmentStatus.setMaxFrequency(scenariosInfo.getMaxHydroacousticFrequency());
+        String equipKey = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
+        RedisUtils.getService(config.getFireDataBase()).boundHashOps(equipKey).put(scenariosInfo.getEquipmentId(), JsonUtils.serialize(equipmentStatus));
     }
 
 
@@ -185,7 +195,14 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                 aveTVMap.clear();
             }
         }
-
+        RedisUtils.getService(config.getPumpDataBase()).delete(Constant.CHARGE_KEY);
+        RedisUtils.getService(config.getPumpDataBase()).delete(Constant.CHARGEDETAIL_KEY);
+        RedisUtils.getService(config.getPumpDataBase()).delete(Constant.PREDICT_KEY);
+        RedisUtils.getService(config.getPumpDataBase()).delete(Constant.PREDICTDETAIL_KEY);
+        RedisUtils.getService(config.getFireDataBase()).delete(Constant.EQUIPMENT_STATUS_HTTP_KEY+":"+getTime());
+        RedisUtils.getService(config.getFireDataBase()).delete(Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY+":"+getTime());
+        RedisUtils.getService(config.getScreenDataBase()).delete(Constant.SCREEN_COUNT_WATERTYPE);
+        RedisUtils.getService(config.getScreenDataBase()).delete(Constant.SCREEN_COUNT_AIRTYPE);
         log.info("报文<0>收到清除命令!!");
     }
 
@@ -847,7 +864,6 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             int type = buf.readInt();
             int type1;
             type1 = type;
-
             //目标批号
             int targetbatch = buf.readInt();
             double timevalue = buf.readDouble() * 1000;
@@ -1005,6 +1021,10 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             double timestamp = buf.readDouble();
             String key = Constant.SCREEN_TASKCHANNELSTATUS_WATERTYPE;
             String key2 = Constant.SCREEN_LIUCHENGTU_WATERTYPE;
+            //0921新增数据存储
+            //流程图存储
+            String lctPath = Constant.DATA_SAVE_PATH;//path要优化
+            //0921
             //流程图处理
             if (RedisUtils.getService(config.getScreenDataBase()).exists(key2)) {
                 if (RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key2).entries().containsKey(String.valueOf(targetbatch))) {
@@ -1032,12 +1052,17 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                         default: break;
                     }
                     RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key2).put(String.valueOf(targetbatch),JsonUtils.serialize(deserialize));
-                }else{
+                    try{
+                        saveLct(JsonUtils.serialize(deserialize),lctPath);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }else {
                     FlowchartStatus deserialize = new FlowchartStatus();
                     deserialize.setTargetId(String.valueOf(targetbatch));
                     HashSet<String> set = new HashSet<>();
                     deserialize.setWeaponType(set);
-                    switch (type){
+                    switch (type) {
                         case 1:
                             deserialize.setSensorStatus(true);
                             deserialize.setSensorType(1);
@@ -1053,9 +1078,15 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                             deserialize.setSensorStatus(true);
                             deserialize.setSensorType(2);
                             break;
-                        default: break;
+                        default:
+                            break;
                     }
-                    RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key2).put(String.valueOf(targetbatch),JsonUtils.serialize(deserialize));
+                    RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key2).put(String.valueOf(targetbatch), JsonUtils.serialize(deserialize));
+                    try {
+                        saveLct(JsonUtils.serialize(deserialize), lctPath);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }else{
                 FlowchartStatus deserialize = new FlowchartStatus();
@@ -1083,6 +1114,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                 RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key2).put(String.valueOf(targetbatch),JsonUtils.serialize(deserialize));
             }
 
+
             //任务通道处理
             if (RedisUtils.getService(config.getScreenDataBase()).exists(key)) {
                 if (!RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).hasKey(String.valueOf(targetbatch))) {
@@ -1094,6 +1126,14 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     tc.setDistance(distace);
                     tc.setTime((long) timevalue);
                     list.add(tc);
+                    list.sort(new Comparator<TctStatus>() {
+                        @Override
+                        public int compare(TctStatus o1, TctStatus o2) {
+                            Integer i1 = Integer.parseInt(o1.getType());
+                            Integer i2 = Integer.parseInt(o2.getType());
+                            return i1.compareTo(i2);
+                        }
+                    });
                     screenTctData.setTctStatusList(list);
                     RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(targetbatch), JsonUtils.serialize(screenTctData));
                 } else {
@@ -1126,8 +1166,19 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     tctStatus.setType(String.valueOf(type1));
                     tctStatus.setTime((long) timevalue);
                     tctStatus.setDistance(distace);
+                    if(type1==6){
+                        tctStatus.setName("作战执行");
+                    }
                     collect.put(String.valueOf(type1),tctStatus);
                     List<TctStatus> values = collect.values().stream().collect(Collectors.toList());
+                    values.sort(new Comparator<TctStatus>() {
+                        @Override
+                        public int compare(TctStatus o1, TctStatus o2) {
+                            Integer i1 = Integer.parseInt(o1.getType());
+                            Integer i2 = Integer.parseInt(o2.getType());
+                            return i1.compareTo(i2);
+                        }
+                    });
                     deserialize.setTctStatusList(values);
                     RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(targetbatch), JsonUtils.serialize(deserialize));
                 }
@@ -1140,6 +1191,14 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                 tc.setDistance(distace);
                 tc.setTime((long) timevalue);
                 list.add(tc);
+                list.sort(new Comparator<TctStatus>() {
+                    @Override
+                    public int compare(TctStatus o1, TctStatus o2) {
+                        Integer i1 = Integer.parseInt(o1.getType());
+                        Integer i2 = Integer.parseInt(o2.getType());
+                        return i1.compareTo(i2);
+                    }
+                });
                 screenTctData.setTctStatusList(list);
                 RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key).put(String.valueOf(targetbatch), JsonUtils.serialize(screenTctData));
             }
@@ -1194,25 +1253,129 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
     private void Msg6_LaunchResult(ByteBuf buf) {
 
         //1.对空 2.水下
+        //3.兼容
         int system = buf.readInt();
+        //兼容报文，约定飞机起飞标志，新增舰载机起飞火力禁射，时间设置5min，对应发射架发射孔和数据库的ID,状态显示,声干扰打出去之后，会干扰反潜声纳
         //是否成功
+        //兼容：1火力、2电磁、3水声
         int bSuccessSign = buf.readInt();
         //发射装置Id对应报文5的fsj
+        //兼容：代表设备Id
         int iLauncherId = buf.readInt();
         //发射孔
+        //兼容：是否开机
         int iHoleId = buf.readInt();
         //武器类型
+        //兼容：
         int iWeaponType = buf.readInt();
         //发射舷角
+        //兼容：火力：发射水平角，水声电磁：经度
         double dLaunchHeading = buf.readDouble();
         //发射仰角
+        //兼容：火力：发射俯仰角，水声电磁：纬度
         double dLaunchPitch = buf.readDouble();
         //对抗目标批号
         int iAimBatch = buf.readInt();
-        //距离
-        double distance = Double.valueOf(new DecimalFormat("#.00").format(buf.readDouble()));
-        //弹发射时间
-        double dLaunchTime = buf.readDouble() * 1000;
+        double distance = 0;
+        double dLaunchTime=0;
+        if(system!=3) {
+            //距离
+            //兼容：火力：持续时间，水声电磁：最小工作频率
+            distance = Double.valueOf(new DecimalFormat("#.00").format(buf.readDouble()));
+            //弹发射时间、时刻
+            //兼容：火力：开始时刻，水声电磁：最大工作频率
+            dLaunchTime = buf.readDouble() * 1000;
+        }else {
+             distance = buf.readDouble();
+             dLaunchTime = buf.readDouble();
+        }
+
+        if(system==3){
+            CombatScenariosInfo combatScenariosInfo = new CombatScenariosInfo();
+            String sender = "";
+            long msgTime = System.currentTimeMillis();
+            long time = System.currentTimeMillis();
+            String scenarios = "兼容管控";
+
+            combatScenariosInfo.setSender(sender);
+            combatScenariosInfo.setMsgTime(msgTime);
+            combatScenariosInfo.setTime(time);
+            combatScenariosInfo.setScenarios(scenarios);
+
+            List<ScenariosInfo> list = new ArrayList<>();
+            String key = String.format("%s:%s", Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY, getTime());
+            if(RedisUtils.getService(config.getFireDataBase()).extrasForValue().get(key)!=null) {
+                CombatScenariosInfo former = JsonUtils.deserialize(RedisUtils.getService(config.getFireDataBase()).extrasForValue().get(key), CombatScenariosInfo.class);
+                list = former.getScenariosList();
+            }
+            ScenariosInfo scenariosInfo = new ScenariosInfo();
+            String equipmentId = String.valueOf(iLauncherId);
+            String equipmentTypeId = equipmentId;
+            long beginTime = (long) dLaunchTime*1000;
+            int duration = 0;
+            float launchAzimuth = (float) dLaunchHeading;
+            float launchPitchAngle = (float) dLaunchPitch;
+            if(bSuccessSign==1){
+                //火力
+                if(iWeaponType==1){
+                    //飞机默认5min
+                    duration = 300;
+                }
+                //标识
+                scenariosInfo.setEquipmentMode("1");
+
+            }else if(bSuccessSign==2){
+                //电磁
+                float electromagneticFrequency = (float) distance;
+                scenariosInfo.setElectromagneticFrequency(electromagneticFrequency);
+                scenariosInfo.setEquipmentMode("2");
+            }else {
+                //水声
+                float minHydroacousticFrequency = (float) distance;
+                float maxHydroacousticFrequency = (float) dLaunchTime;
+                scenariosInfo.setMinHydroacousticFrequency(minHydroacousticFrequency);
+                scenariosInfo.setMaxHydroacousticFrequency(maxHydroacousticFrequency);
+                scenariosInfo.setEquipmentMode("3");
+            }
+
+            scenariosInfo.setLaunchAzimuth(launchAzimuth);
+            scenariosInfo.setLaunchPitchAngle(launchPitchAngle);
+            scenariosInfo.setEquipmentId(equipmentId);
+            scenariosInfo.setEquipmentTypeId(equipmentTypeId);
+            scenariosInfo.setBeginTime(beginTime);
+            scenariosInfo.setDuration(duration);
+
+
+            list.add(scenariosInfo);
+
+            combatScenariosInfo.setScenariosList(list);
+
+//        CombatScenariosInfo combatScenariosInfo = new CombatScenariosInfo();
+//        String s = buf.toString(CharsetUtil.UTF_8);
+//        combatScenariosInfo = JsonUtils.deserialize(s,CombatScenariosInfo.class);
+
+            String value = JsonUtils.serialize(combatScenariosInfo);
+            RedisUtils.getService(config.getFireDataBase()).extrasForValue().set(key, value);
+            EquipmentStatus equipmentStatus = new EquipmentStatus();
+            equipmentStatus.setSender(combatScenariosInfo.getSender());
+            equipmentStatus.setMsgTime(combatScenariosInfo.getMsgTime());
+            equipmentStatus.setEquipmentId(scenariosInfo.getEquipmentId());
+            //typeID用于对照冲突表
+            equipmentStatus.setEquipmentTypeId(scenariosInfo.getEquipmentTypeId());
+            equipmentStatus.setEquipmentMode(scenariosInfo.getEquipmentMode());
+            equipmentStatus.setCheckStatus(true);
+            equipmentStatus.setTime(scenariosInfo.getBeginTime());
+//            equipmentStatus.setTime(scenariosInfo.getDuration().longValue());
+            equipmentStatus.setBeWork(true);
+            equipmentStatus.setLaunchAzimuth(scenariosInfo.getLaunchAzimuth());
+            equipmentStatus.setLaunchPitchAngle(scenariosInfo.getLaunchPitchAngle());
+            equipmentStatus.setElectromagneticFrequency(scenariosInfo.getElectromagneticFrequency());
+            equipmentStatus.setMinFrequency(scenariosInfo.getMinHydroacousticFrequency());
+            equipmentStatus.setMaxFrequency(scenariosInfo.getMaxHydroacousticFrequency());
+            String equipKey = String.format("%s:%s", Constant.EQUIPMENT_STATUS_HTTP_KEY, getTime());
+            RedisUtils.getService(config.getFireDataBase()).boundHashOps(equipKey).put(scenariosInfo.getEquipmentId(), JsonUtils.serialize(equipmentStatus));
+            return;
+        }
 
         log.info("报文<6>数据：system："+system+"bSuccessSign:"+bSuccessSign+"iLauncherId:"+iLauncherId+"iHoleId:"+iHoleId+"iWeaponType:"+iWeaponType+"dLaunchHeading:"+dLaunchHeading+"dLaunchPitch:"+dLaunchPitch
                 +"iAimBatch:"+iAimBatch+"distance:"+distance+"dLaunchTime"+dLaunchTime);
@@ -1272,9 +1435,32 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             tctStatus.setType(type1);
             tctStatus.setTime((long) dLaunchTime);
             tctStatus.setDistance(distance);
-            //TODO:是否需要setName
+            String name = "";
+            switch (iWeaponType){
+                case 1:
+                    name+="中程弹发射";
+                    break;
+                case 2:
+                    name+="H10发射";
+                    break;
+                case 3:
+                    name+="万发发射";
+                    break;
+                default:
+                    name+="干扰弹发射";
+                    break;
+            }
+            tctStatus.setName(name);
             collect.put(type1,tctStatus);
             List<TctStatus> values = collect.values().stream().collect(Collectors.toList());
+            values.sort(new Comparator<TctStatus>() {
+                @Override
+                public int compare(TctStatus o1, TctStatus o2) {
+                    Integer i1 = Integer.parseInt(o1.getType());
+                    Integer i2 = Integer.parseInt(o2.getType());
+                    return i1.compareTo(i2);
+                }
+            });
             screenTctData.setTctStatusList(values);
             service.boundHashOps(key1).put(String.valueOf(iAimBatch), JsonUtils.serialize(screenTctData));
             //处理发射架精度数据
@@ -1307,6 +1493,9 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                 } else if (iWeaponType == 10) {
                     weaponType.add(1+"-"+iLauncherId+"-"+2);
                     deserialize.setWeaponType(weaponType);
+                } else if (iWeaponType == 4) {
+                    weaponType.add(2+"-"+iHoleId+"-"+1);
+                    deserialize.setWeaponType(weaponType);
                 }
             }else{
                 HashSet<String> weaponType = new HashSet<>();
@@ -1315,6 +1504,9 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     deserialize.setWeaponType(weaponType);
                 } else if (iWeaponType == 10) {
                     weaponType.add(1+"-"+iLauncherId+"-"+2);
+                    deserialize.setWeaponType(weaponType);
+                } else if (iWeaponType == 4) {
+                    weaponType.add(2+"-"+iHoleId+"-"+1);
                     deserialize.setWeaponType(weaponType);
                 }
             }
@@ -1325,19 +1517,34 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             String json1 = service.boundHashOps(key1).entries().get(String.valueOf(iAimBatch));
             ScreenTctData screenTctData = JsonUtils.deserialize(json1, ScreenTctData.class);
             List<TctStatus> tctStatusList = screenTctData.getTctStatusList();
-            String type1 = String.valueOf(iWeaponType - 2);
+//            String type1 = String.valueOf(iWeaponType - 2);
             Map<String, TctStatus> collect = tctStatusList.stream().collect(Collectors.toMap(TctStatus::getType, Function.identity(), (keyA, keyB) -> keyB));
             TctStatus tctStatus = new TctStatus();
-            tctStatus.setType(type1);
+//            tctStatus.setType(type1);
             tctStatus.setTime((long) dLaunchTime);
             tctStatus.setDistance(distance);
             if (iWeaponType == 9) {
+                tctStatus.setType("7");
                 tctStatus.setName("声干扰:发射");
+                collect.put("7",tctStatus);
             } else if (iWeaponType == 10) {
+                tctStatus.setType("9");
                 tctStatus.setName("声诱饵:发射");
+                collect.put("9",tctStatus);
+            } else if(iWeaponType==4){
+                tctStatus.setType("11");
+                tctStatus.setName("ATT:发射");
+                collect.put("11",tctStatus);
             }
-            collect.put(type1,tctStatus);
             List<TctStatus> values = collect.values().stream().collect(Collectors.toList());
+            values.sort(new Comparator<TctStatus>() {
+                @Override
+                public int compare(TctStatus o1, TctStatus o2) {
+                    Integer i1 = Integer.parseInt(o1.getType());
+                    Integer i2 = Integer.parseInt(o2.getType());
+                    return i1.compareTo(i2);
+                }
+            });
             screenTctData.setTctStatusList(values);
             service.boundHashOps(key1).put(String.valueOf(iAimBatch), JsonUtils.serialize(screenTctData));
             //处理发射架精度数据
@@ -1443,6 +1650,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
         int targetBatch = buf.readInt();
         //武器类型 1.声干扰器 2.助飞声诱饵 3.摇曳声诱饵 4.ATT
         //武器类型 1.中程弹 2.H10 3.万发 4.箔条弹 5.红外 6.烟雾
+        //停止之后下面四个参数都是0
         int weaponType = buf.readInt();
         // 实体Id
         int weaponId = buf.readInt();
@@ -1474,6 +1682,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
             tctStatus.setTime((long) timeValue);
             tctStatus.setDistance(distance);
             String name = "";
+            //todo:修改名称
             switch (weaponType-6){
                 case 1:
                     name+="中程弹:";
@@ -1488,79 +1697,205 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     name+="干扰弹:";
                     break;
             }
-            if(weaponFlyState==1){
-                name+="飞行中:";
-            }else if(weaponFlyState==2){
-                name+="射击中:";
-            }
+
             switch (weaponFightState){
 //                1.击毁目标 2.自毁 3.空中散开,0.不在以上状态
                 case 1:
-                    type1=String.valueOf(Integer.valueOf(type1+1));
+                    type1=String.valueOf(Integer.valueOf(type1)+1);
                     name+="击毁目标";
                     break;
                 case 2:
-                    type1=String.valueOf(Integer.valueOf(type1+1));
+                    type1=String.valueOf(Integer.valueOf(type1)+1);
                     name+="自毁";
                 case 3:
-                    type1=String.valueOf(Integer.valueOf(type1+1));
+                    type1=String.valueOf(Integer.valueOf(type1)+1);
                     name+="空中散开";
                 default:
+                    if(weaponFlyState==1){
+                        name+="飞行中:";
+                    }else if(weaponFlyState==2){
+                        name+="射击中:";
+                    }
                     break;
             }
             tctStatus.setName(name);
             tctStatus.setType(type1);
             collect.put(type1, tctStatus);
             List<TctStatus> values = collect.values().stream().collect(Collectors.toList());
+
+            values.sort(new Comparator<TctStatus>() {
+                @Override
+                public int compare(TctStatus o1, TctStatus o2) {
+                    Integer i1 = Integer.parseInt(o1.getType());
+                    Integer i2 = Integer.parseInt(o2.getType());
+                    return i1.compareTo(i2);
+                }
+            });
             screenTctData.setTctStatusList(values);
+//            screenTctData.setTctStatusList(unNamed);
             service.boundHashOps(key1).put(String.valueOf(targetBatch), JsonUtils.serialize(screenTctData));
 
             log.info("收到空中报文<8>");
         }else if (system == 2) {
-            //水下
-            //处理任务通道的武器状态,+8是为了对应报文6里面声干扰和声诱饵约定的id分别是9和10
-            weaponType = weaponType + 8;
-            String key1 = Constant.SCREEN_TASKCHANNELSTATUS_WATERTYPE;
-            String json1 = service.boundHashOps(key1).entries().get(String.valueOf(targetBatch));
-            ScreenTctData screenTctData = JsonUtils.deserialize(json1, ScreenTctData.class);
-            List<TctStatus> tctStatusList = screenTctData.getTctStatusList();
-            String type1 = String.valueOf(weaponType + 1);
-            Map<String, TctStatus> collect = tctStatusList.stream().collect(Collectors.toMap(TctStatus::getType, Function.identity(), (keyA, keyB) -> keyB));
-            TctStatus tctStatus = new TctStatus();
-            tctStatus.setType(type1);
-            tctStatus.setTime((long) timeValue);
-            tctStatus.setDistance(distance);
-            if (weaponFlyState == 1 && weaponType == 9) {
-                tctStatus.setName("声干扰:飞行");
-            } else if (weaponFlyState == 1 && (weaponType == 10||weaponType == 11)) {
-                tctStatus.setName("声诱饵:飞行");
-            } else if(weaponFlyState == 1 && weaponType == 12){
-                tctStatus.setName("ATT:飞行");
-            } else if(weaponFlyState == 2 && weaponType == 9 && weaponFightState == 1){
-                tctStatus.setName("声干扰:发声");
-            } else if(weaponFlyState == 2 && weaponType == 9 && weaponFightState == 2){
-                tctStatus.setName("声干扰:停声");
-            } else if(weaponFlyState == 2 && weaponType == 9 && weaponFightState == 3){
-                tctStatus.setName("声干扰:起爆");
-            } else if(weaponFlyState == 2 && (weaponType == 10||weaponType == 11) && weaponFightState == 1){
-                tctStatus.setName("声诱饵:发声");
-            } else if(weaponFlyState == 2 && (weaponType == 10||weaponType == 11) && weaponFightState == 2){
-                tctStatus.setName("声诱饵:停声");
-            } else if(weaponFlyState == 2 && (weaponType == 10||weaponType == 11) && weaponFightState == 3){
-                tctStatus.setName("声诱饵:起爆");
-            } else if(weaponFlyState == 2 && weaponType == 12 && weaponFightState == 1){
-                tctStatus.setName("ATT:发声");
-            } else if(weaponFlyState == 2 && weaponType == 12 && weaponFightState == 2){
-                tctStatus.setName("ATT:停声");
-            } else if(weaponFlyState == 2 && weaponType == 12 && weaponFightState == 3){
-                tctStatus.setName("ATT:起爆");
-            }
-            collect.put(type1,tctStatus);
-            List<TctStatus> values = collect.values().stream().collect(Collectors.toList());
-            screenTctData.setTctStatusList(values);
-            service.boundHashOps(key1).put(String.valueOf(targetBatch), JsonUtils.serialize(screenTctData));
+            if(!finishedWaterTask.contains(targetBatch)) {
+                //水下
+                //处理任务通道的武器状态,+8是为了对应报文6里面声干扰和声诱饵约定的id分别是9和10，有bug
+                boolean beStopped = false;
+                if (weaponType == 0 && weaponId == 0 && weaponFightState == 0 && weaponFlyState == 0) {
+                    beStopped = true;
+                }
+//            weaponType = weaponType + 8;
+//            String type1 = String.valueOf(weaponType + 7);
 
-            log.info("收到水下报文<8>");
+                String key1 = Constant.SCREEN_TASKCHANNELSTATUS_WATERTYPE;
+                String json1 = service.boundHashOps(key1).entries().get(String.valueOf(targetBatch));
+                ScreenTctData screenTctData = JsonUtils.deserialize(json1, ScreenTctData.class);
+                List<TctStatus> tctStatusList = screenTctData.getTctStatusList();
+                //0921更新水下停止
+                if (beStopped) {
+                    weaponType = tctStatusList.size() + 6;
+                } else {
+                    weaponType = weaponType + 8;
+                }
+                Map<String, TctStatus> collect = tctStatusList.stream().collect(Collectors.toMap(TctStatus::getType, Function.identity(), (keyA, keyB) -> keyB));
+                TctStatus tctStatus = new TctStatus();
+//            tctStatus.setType(type1);
+                String type1 = "";
+                tctStatus.setTime((long) timeValue);
+                tctStatus.setDistance(distance);
+                String name = "";
+                if (beStopped) {
+                    name = "目标已击毁";
+                    type1 = String.valueOf(weaponType);
+                    tctStatus.setType(type1);
+                    finishedWaterTask.add(targetBatch);
+                } else {
+                    switch (weaponType) {
+                        case 9:
+                            name += "声干扰";
+                            tctStatus.setType("8");
+                            type1 = "8";
+                            break;
+                        case 10:
+                            name += "声诱饵";
+                            tctStatus.setType("10");
+                            type1 = "10";
+                            break;
+                        case 11:
+                            name += "声诱饵";
+                            tctStatus.setType("10");
+                            type1 = "10";
+                            break;
+                        case 12:
+                            name += "ATT";
+                            tctStatus.setType("12");
+                            type1 = "12";
+                            break;
+                        default:
+                            break;
+                    }
+                    if (weaponFlyState == 1) {
+                        if (name.equals("ATT")) {
+                            name += ":入水";
+                        } else {
+                            name += ":飞行";
+                        }
+                    } else if (weaponFlyState == 2) {
+                        name += ":入水";
+                    }
+                    switch (weaponFightState) {
+                        case 1:
+                            if (name.equals("ATT:入水")) {
+                                name += ":航行";
+                            } else {
+                                if (!(name.equals("声诱饵:飞行") || name.equals("声干扰:飞行"))) {
+                                    name += ":发声";
+                                }
+                            }
+                            break;
+                        case 2:
+                            name += ":停声";
+                            break;
+                        case 3:
+                            name += ":起爆";
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                tctStatus.setName(name);
+
+                collect.put(type1, tctStatus);
+                List<TctStatus> values = collect.values().stream().collect(Collectors.toList());
+
+                values.sort(new Comparator<TctStatus>() {
+                    @Override
+                    public int compare(TctStatus o1, TctStatus o2) {
+                        Integer i1 = Integer.parseInt(o1.getType());
+                        Integer i2 = Integer.parseInt(o2.getType());
+                        return i1.compareTo(i2);
+                    }
+                });
+                screenTctData.setTctStatusList(values);
+//            screenTctData.setTctStatusList(unNamed);
+                service.boundHashOps(key1).put(String.valueOf(targetBatch), JsonUtils.serialize(screenTctData));
+
+                log.info("收到水下报文<8>");
+            }
+        }
+    }
+
+    public void saveLct(String json,String path) throws Exception {
+        //判断excel是否存在
+        File file = new File(path + "/LIUCHENGTU.xls");
+        boolean exist = true;
+        if (!file.exists()) {
+            //判断路径是否存在
+            File fPath = new File(path);
+            if (!fPath.exists()) {
+                //创建excel表目录
+                fPath.mkdir();
+                try {
+                    //创建excel表
+                    file.createNewFile();
+                    exist = false;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        //如果excel是新创建的，则创建Workbook类
+        Sheet sheet;
+        Workbook wb;
+        if (!exist) {
+            wb = new HSSFWorkbook();
+            sheet = wb.createSheet("sheetName");//sheet是一张表，创建时可以传入表名字
+            Row row1 = sheet.createRow(0);//由表创建行，需要传入行标，由0开始
+            row1.createCell(0).setCellValue("时间");//得到行对象后，按列写入值
+            row1.createCell(1).setCellValue("content");//value转json字符串
+        } else {
+            POIFSFileSystem fileSystem = new POIFSFileSystem(file);
+            wb = new HSSFWorkbook(fileSystem);
+            sheet = wb.getSheetAt(0);//sheet是一张表，创建时可以传入表名字
+            Row row1 = sheet.createRow(sheet.getLastRowNum() + 1);//由表创建行，需要传入行标，由0开始
+        }
+        int num = sheet.getLastRowNum();
+        Row row = sheet.createRow(num + 1);
+//        LocalDate date = LocalDate.now();
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        row.createCell(0).setCellValue(String.valueOf(LocalTime.now()));//设置时间，是否要改成相对时间
+        row.createCell(1).setCellValue(json);
+
+        //下面给出文件和输出流，然后把excel数据写入
+        try (OutputStream ops = new FileOutputStream(file)) {
+            wb.write(ops);
+            //wb.close();
+            ops.close();
+            //这里关闭Workbook或者关闭OutputStream都可以，应该是Workbook关闭的时候顺带关闭了OutputStream
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }

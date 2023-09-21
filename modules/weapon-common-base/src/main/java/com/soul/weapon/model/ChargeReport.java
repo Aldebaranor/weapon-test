@@ -29,4 +29,8 @@ public class ChargeReport {
 
     @Display("未管控装备标识")
     private String freeEquipId;
+
+    @Display("是否过期")
+    private Boolean expire;
+
 }

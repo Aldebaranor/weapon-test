@@ -68,12 +68,44 @@ public class FireConflictPredictServiceImpl implements FireConflictPredictServic
 //        conflictReport.setId(UUID.randomUUID().toString());
         conflictReport.setId(scenariosA.getEquipmentId()+scenariosB.getEquipmentId());
 
+//        Long timeA = scenariosA.getBeginTime();
+//        Long timeB = scenariosB.getBeginTime();
         Long timeA = scenariosA.getBeginTime();
         Long timeB = scenariosB.getBeginTime();
 
         conflictReport.setTime(Math.min(scenariosA.getBeginTime(),scenariosB.getBeginTime()));
         conflictReport.setEquipmentIdA(scenariosA.getEquipmentId());
         conflictReport.setEquipmentIdB(scenariosB.getEquipmentId());
+
+        //火力兼容中有舰载机就停止其他所有
+        if(scenariosA.getEquipmentId().equals("14")||scenariosB.getEquipmentId().equals("14")){
+            conflictReport.setConflictType(1);
+            generateDetail(scenariosA,scenariosB);
+            if(!RedisUtils.getService(config.getFireDataBase()).exists(Constant.PREDICT_KEY)){
+                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.PREDICT_KEY,
+                        conflictReport.getId(), JsonUtils.serialize(conflictReport));
+                RedisUtils.getService(config.getFireDataBase()).expire(Constant.PREDICT_KEY,AN_HOUR);
+            }else{
+                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.PREDICT_KEY,
+                        conflictReport.getId(), JsonUtils.serialize(conflictReport));
+            }
+
+            if(!RedisUtils.getService(config.getFireDataBase()).exists(Constant.PREDICTDETAIL_KEY)){
+                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.PREDICTDETAIL_KEY,
+                        conflictReportDetailA.getId(), JsonUtils.serialize(conflictReportDetailA));
+                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.PREDICTDETAIL_KEY,
+                        conflictReportDetailB.getId(), JsonUtils.serialize(conflictReportDetailB));
+                RedisUtils.getService(config.getFireDataBase()).expire(Constant.PREDICTDETAIL_KEY,AN_HOUR);
+            }else{
+                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.PREDICTDETAIL_KEY,
+                        conflictReportDetailA.getId(), JsonUtils.serialize(conflictReportDetailA));
+                RedisUtils.getService(config.getFireDataBase()).opsForHash().put(Constant.PREDICTDETAIL_KEY,
+                        conflictReportDetailB.getId(), JsonUtils.serialize(conflictReportDetailB));
+            }
+
+            return conflictReport;
+        }
+
 
         if(scenariosA.getLaunchAzimuth()!=-1 && scenariosB.getLaunchAzimuth()!=-1){
 

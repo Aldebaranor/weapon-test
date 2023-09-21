@@ -10,6 +10,8 @@ import java.util.concurrent.ScheduledFuture;
  */
 public class Constant {
 
+    public static String DATA_SAVE_PATH = "resource";
+
     /**
      * http 报文存入redis方法
      */

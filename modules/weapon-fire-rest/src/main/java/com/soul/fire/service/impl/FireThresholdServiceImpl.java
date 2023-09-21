@@ -64,6 +64,9 @@ public class FireThresholdServiceImpl extends TemplateService<FireThreshold, Str
         RedisUtils.getService(config.getPumpDataBase()).delete(Constant.CHARGEDETAIL_KEY);
         RedisUtils.getService(config.getPumpDataBase()).delete(Constant.PREDICT_KEY);
         RedisUtils.getService(config.getPumpDataBase()).delete(Constant.PREDICTDETAIL_KEY);
+        RedisUtils.getService(config.getFireDataBase()).delete(Constant.EQUIPMENT_STATUS_HTTP_KEY);
+        RedisUtils.getService(config.getFireDataBase()).delete(Constant.COMBAT_SCENARIOS_INFO_HTTP_KEY);
+
         fireThreshold.setModifyTime(new Timestamp(System.currentTimeMillis()));
         super.update(fireThreshold);
         upDate(fireThreshold.getId(),fireThreshold.getThresholdValue());
