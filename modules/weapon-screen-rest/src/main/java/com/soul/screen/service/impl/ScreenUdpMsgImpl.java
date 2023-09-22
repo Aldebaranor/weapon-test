@@ -1053,7 +1053,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     }
                     RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key2).put(String.valueOf(targetbatch),JsonUtils.serialize(deserialize));
                     try{
-                        saveLct(JsonUtils.serialize(deserialize),lctPath);
+                        saveLct(JsonUtils.serialize(deserialize),lctPath,"LIUCHENGTU");
                     }catch (Exception e){
                         e.printStackTrace();
                     }
@@ -1083,7 +1083,7 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     }
                     RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key2).put(String.valueOf(targetbatch), JsonUtils.serialize(deserialize));
                     try {
-                        saveLct(JsonUtils.serialize(deserialize), lctPath);
+                        saveLct(JsonUtils.serialize(deserialize),lctPath,"LIUCHENGTU");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -1112,6 +1112,11 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
                     default: break;
                 }
                 RedisUtils.getService(config.getScreenDataBase()).boundHashOps(key2).put(String.valueOf(targetbatch),JsonUtils.serialize(deserialize));
+                try {
+                    saveLct(JsonUtils.serialize(deserialize),lctPath,"LIUCHENGTU");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
 
 
@@ -1845,13 +1850,13 @@ public class ScreenUdpMsgImpl implements UnpackMessageService {
         }
     }
 
-    public void saveLct(String json,String path) throws Exception {
+    public void saveLct(String json,String path,String name) throws Exception {
         //判断excel是否存在
-        File file = new File(path + "/LIUCHENGTU.xls");
+        File file = new File(path + "/"+name+".xls");
         boolean exist = true;
         if (!file.exists()) {
             //判断路径是否存在
-            File fPath = new File(path);
+            File fPath = new File(path);//
             if (!fPath.exists()) {
                 //创建excel表目录
                 fPath.mkdir();
